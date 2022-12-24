@@ -1,0 +1,38 @@
+{
+  "Actions": [
+    {
+      "Icon": "action/images/actionimage", 
+      "Name": "OnAir Clock", 
+      "States": [
+        {
+            "Image": "action/images/image"
+        }
+    ],
+      "Tooltip": "This is onairclock", 
+      "UUID": "fail.marc.onairclock.action"
+    }
+  ], 
+  "SDKVersion": 2,
+  "Author": "Elgato", 
+  "CodePath": "index.html", 
+  "PropertyInspectorPath": "propertyinspector/index.html", 
+  "Description": "Example description", 
+  "Name": "OnAir Clock", 
+  "Icon": "action/images/action", 
+  "URL": "https://www.elgato.com/en/gaming/stream-deck", 
+  "Version": "1.0.1",
+  "OS": [
+    {
+        "Platform": "mac", 
+        "MinimumVersion" : "10.11"
+    },
+    {
+        "Platform": "windows", 
+        "MinimumVersion" : "10"
+    }
+  ],
+  "Software": 
+    {
+        "MinimumVersion" : "4.1"
+  }
+}
