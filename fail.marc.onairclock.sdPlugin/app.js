@@ -206,7 +206,7 @@ function displayTime(canvas) {
 
 
         // Draw second dots first
-        for(var i=0; i < s; i++){
+        for(var i=0; i < ( s + 1 ); i++){
             var dotRadians = (Math.TAU * i/dotGrid) - (Math.TAU/4);
 
             var targetX = clockX + Math.cos(dotRadians) * (circleDiameter * clockRadius);
@@ -265,6 +265,12 @@ function displayTime(canvas) {
         context.textAlign = "center";
         context.fillStyle = dotColor;
         context.fillText(padZero(h) + ":" + padZero(m), clockX, (clockY + 10));
+
+        // draw seconds in second line
+        context.font = "22px Verdana";
+        context.textAlign = "center";
+        context.fillStyle = dotColor;
+        context.fillText(padZero(s), clockX, (clockY + 35));
 
     }
     
