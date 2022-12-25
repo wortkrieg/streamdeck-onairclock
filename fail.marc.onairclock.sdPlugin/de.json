@@ -1,10 +1,10 @@
 {
   "Description": "Eine klassische OnAir Uhr, wie man sie im professionellen Rundfunk findet", 
-  "Name": "OnAir Uhr", 
+  "Name": "OnAir Clock", 
   "Category": "Templates", 
   "fail.marc.onairclock.action": {
-    "Name": "OnAir Uhr", 
-    "Tooltip": "OnAir Uhr"
+    "Name": "OnAir Clock", 
+    "Tooltip": "Eine klassiche OnAir-Uhr"
   },
   "Localization": {
     "More info": "Mehr Infos",
