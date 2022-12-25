@@ -8,7 +8,7 @@
             "Image": "action/images/image"
         }
     ],
-      "Tooltip": "This is onairclock", 
+      "Tooltip": "A classic OnAir Clock", 
       "UUID": "fail.marc.onairclock.action"
     }
   ], 
@@ -16,11 +16,11 @@
   "Author": "Marc Herrmann", 
   "CodePath": "index.html", 
   "PropertyInspectorPath": "propertyinspector/index.html", 
-  "Description": "Example description", 
+  "Description": "A classic OnAir clock as found in professional broadcasting on the streamdeck.", 
   "Name": "OnAir Clock", 
   "Icon": "action/images/action", 
-  "URL": "https://www.elgato.com/en/gaming/stream-deck", 
-  "Version": "1.0.1",
+  "URL": "https://github.com/wortkrieg/streamdeck-onairclock", 
+  "Version": "0.1.1",
   "OS": [
     {
         "Platform": "mac", 
