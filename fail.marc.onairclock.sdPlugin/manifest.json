@@ -13,7 +13,7 @@
     }
   ], 
   "SDKVersion": 2,
-  "Author": "Elgato", 
+  "Author": "Marc Herrmann", 
   "CodePath": "index.html", 
   "PropertyInspectorPath": "propertyinspector/index.html", 
   "Description": "Example description", 
