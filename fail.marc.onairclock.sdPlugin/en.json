@@ -1,10 +1,10 @@
 {
-  "Description": "Use this to create your own plugin", 
-  "Name": "Stream Deck Template", 
+  "Description": "A classic OnAir clock as found in professional broadcasting on the streamdeck", 
+  "Name": "OnAir Clock", 
   "Category": "Templates", 
   "fail.marc.onairclock.action": {
-    "Name": "Action", 
-    "Tooltip": "This is the only action in this plugin"
+    "Name": "OnAir Clock", 
+    "Tooltip": "OnAir Clock"
   },
   "Localization": {
     "More info": "More info",

@@ -1,10 +1,10 @@
 {
-  "Description": "Nimm diese Vorlage für dein erstes Plugin", 
-  "Name": "Stream Deck Template", 
+  "Description": "Eine klassische OnAir Uhr, wie man sie im professionellen Rundfunk findet", 
+  "Name": "OnAir Uhr", 
   "Category": "Templates", 
   "fail.marc.onairclock.action": {
-    "Name": "Action", 
-    "Tooltip": "Dies ist die einzige 'Action' in diesem Template"
+    "Name": "OnAir Uhr", 
+    "Tooltip": "OnAir Uhr"
   },
   "Localization": {
     "More info": "Mehr Infos",
