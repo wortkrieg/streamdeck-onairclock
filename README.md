@@ -63,7 +63,7 @@ Currently just the official [Stream Deck SDK](https://developer.elgato.com/docum
 
 ## Disclaimer
 
-I made this plugin just for fund and because I thought it would be handy to have a plugin like that. Therefore, it is released under MIT license. Do what ever you want with it, but it comes without warranty of any kind.
+I made this plugin just for fun and because I thought it would be handy to have a plugin like that. Therefore, it is released under MIT license. Do whatever you want with it, but it comes without warranty or liability of any kind.
 
 However, an acknowledgement would be nice.
 
