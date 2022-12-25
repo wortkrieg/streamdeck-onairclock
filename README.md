@@ -55,8 +55,6 @@ Then relaunch streamdeck software.
 
 Follow [this tutorial](https://developer.elgato.com/documentation/stream-deck/sdk/create-your-own-plugin/) for advice on how to debug the plugin.
 
-Use 
-
 ## Dependencies
 
 Currently just the official [Stream Deck SDK](https://developer.elgato.com/documentation/stream-deck/sdk/overview/).
