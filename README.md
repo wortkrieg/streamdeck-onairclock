@@ -25,13 +25,15 @@ Planned: Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
 * Keypress-Action
 * Show Date option
 
-## Installation from elgato plugin store
+## Installation
+
+### From elgato plugin store
 
 The plugin is not submitted yet. Will do this once all features are included and tested enough.
 
-## Manual installation from github
+### Manually from github
 
-### Mac
+#### Mac
 
 Go to 
 
@@ -41,7 +43,7 @@ and copy the fail.marc.onairclock.sdPlugin folder there.
 
 Then relaunch streamdeck software.
 
-### Windows 
+#### Windows 
 
 Go to
 
