@@ -173,6 +173,9 @@ function displayTime(canvas) {
     var h = now.getHours();
     var m = now.getMinutes();
     var s = now.getSeconds();
+    var month = now.getMonth();
+    month = month + 1
+    var day = now.getDate();
      
     // var timeString = formatHour(h) + ":" + padZero(m) + ":" + padZero(s) + " " + getTimePeriod(h);
     // document.querySelector("#current-time").innerHTML = timeString;
@@ -272,9 +275,15 @@ function displayTime(canvas) {
         context.fillStyle = dotColor;
         context.fillText(padZero(s), clockX, (clockY + 35));
 
+                // draw date
+                context.font = "14px Verdana";
+                context.textAlign = "center";
+                context.fillStyle = dotColor;
+                context.fillText(day + "-" + month, clockX, (clockY - 27));
+
     }
-    
-    drawScale(s, 0.8, 2, 1.2, '#bf0000', '#888888')
+    // drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor) 
+    drawScale(s, 0.8, 2.2, 1.4, '#bf0000', '#888888')
 
 }
 
