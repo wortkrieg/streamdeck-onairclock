@@ -17,6 +17,7 @@ Planned: Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
   * Enable seconds display checkbox
 
 * Make multiple instances possible - currently shared settings and drawing routine.
+* Bug: having multiple instances causes stored settings to mismatch as they share context during runtime
 
 * Cleanup code fragments from samples & template
 * Create preview images & logo icon
