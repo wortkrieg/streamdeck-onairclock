@@ -177,14 +177,14 @@ $SD.on('piDataChanged', (returnValue) => {
         //    postMessage(window.xtWindow);
         // }
 
-        document.getElementById('dotcolor').value = gDotColorDefault;
-        document.getElementById('inactivecolor').value = gDotInactiveColorDefault;
-        document.getElementById('backgroundcolor').value = gBackgroundColorDefault;
-        
+        // document.getElementById('dotcolor').value = gDotColorDefault;
+        // document.getElementById('inactivecolor').value = gDotInactiveColorDefault;
+        // document.getElementById('backgroundcolor').value = gBackgroundColorDefault;
+        console.log("setdefault key pressed")
         console.log(returnValue)
 
         /* SAVE THE VALUE TO SETTINGS */
-        saveSettings(returnValue);
+        // saveSettings(returnValue);
         // /* SEND THE VALUES TO PLUGIN */
         // sendValueToPlugin(returnValue, 'sdpi_collection');
 
