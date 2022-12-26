@@ -56,7 +56,7 @@ function connected(jsn) {
     });
     $SD.on('fail.marc.onairclock.action.propertyInspectorDidDisappear', (jsonObj) => {
         console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
-        destroyClock(jsonObj)
+        // destroyClock(jsonObj)
     });
 };
 
