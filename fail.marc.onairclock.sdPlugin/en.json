@@ -7,9 +7,9 @@
     "Tooltip": "OnAir Clock"
   },
   "Localization": {
-    "More info": "More info",
-    "Message": "Message",
-    "Click Me": "Click Me",
-    "Button": "Button"
+    "Dot Color": "Dot Color",
+    "Inactive Color": "Inactive Color",
+    "Background Color": "Background Color",
+    "Set Default": "Set Default"
   }
 }

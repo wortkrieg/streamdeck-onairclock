@@ -7,10 +7,9 @@
     "Tooltip": "Eine klassiche OnAir-Uhr"
   },
   "Localization": {
-    "More info": "Mehr Infos",
-    "Message": "Nachricht",
-    "Click Me": "Klicke mich",
-    "Button": "Taste"
-
+    "Dot Color": "Punktfarbe",
+    "Inactive Color": "Inaktiv-Farbe",
+    "Background Color": "Hingergrundfarbe",
+    "Set Default": "Default"
   }
 }
