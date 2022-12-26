@@ -16,8 +16,13 @@ Planned: Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
   * Setting for background color
   * Enable seconds display checkbox
 
+* Make multiple instances possible - currently shared settings and drawing routine.
+
 * Cleanup code fragments from samples & template
-* Create preview images
+* Create preview images & logo icon
+
+### Done
+
 * Make actually useful manifest.json
 * Experiment with dot size to improve readability
 
