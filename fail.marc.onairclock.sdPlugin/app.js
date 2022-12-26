@@ -73,6 +73,7 @@ const action = {
             console.log("dotcolor is hex")
             gBackgroundColor = jsn.payload.settings.backgroundcolor
         }
+        drawClockImg(jsn)
 
     },
 
@@ -101,6 +102,8 @@ const action = {
             this.settings.mynameinput = 'TEMPLATE';
         }
         this.setTitle(jsn);
+        // init with correct settings
+        this.onDidReceiveSettings(jsn);
 
          setInterval(function(sx) {
             drawClockImg(jsn)
