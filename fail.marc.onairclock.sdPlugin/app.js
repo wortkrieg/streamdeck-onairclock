@@ -251,6 +251,12 @@ function destroyClock(jsn) {
         currentElement = allElements.find(item => item.context === jsn.context)
         console.log(currentElement.timer)
         clearInterval(currentElement.timer)
+
+        const index = allElements.indexOf(currentElement)
+        allElements.splice(index, 1)
+        console.log("deleted element" + index )
+        console.log(allElements)
+
     }
 
 }
