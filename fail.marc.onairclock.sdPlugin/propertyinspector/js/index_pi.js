@@ -153,28 +153,43 @@ const updateUI = (pl) => {
  *
  */
 
+var gDotColorDefault = "#bf0000"
+var gDotInactiveColorDefault = "#888888"
+var gBackgroundColorDefault = "#000000"
+
 $SD.on('piDataChanged', (returnValue) => {
 
     console.log('%c%s', 'color: white; background: blue}; font-size: 15px;', 'piDataChanged');
     console.log(returnValue);
     
-    if (returnValue.key === 'clickme') {
+    if (returnValue.key === 'setdefault') {
 
-        postMessage = (w) => {
-            w.postMessage(
-                Object.assign({}, $SD.applicationInfo.application, {action: $SD.actionInfo.action})
-                ,'*');
-        }
+        // postMessage = (w) => {
+        //     w.postMessage(
+        //         Object.assign({}, $SD.applicationInfo.application, {action: $SD.actionInfo.action})
+        //         ,'*');
+        // }
 
-        if (!window.xtWindow || window.xtWindow.closed) {
-            window.xtWindow  = window.open('../externalWindow.html', 'External Window');
-            setTimeout(() => postMessage(window.xtWindow), 200);
-        } else {
-           postMessage(window.xtWindow);
-        }
+        // if (!window.xtWindow || window.xtWindow.closed) {
+        //     window.xtWindow  = window.open('../externalWindow.html', 'External Window');
+        //     setTimeout(() => postMessage(window.xtWindow), 200);
+        // } else {
+        //    postMessage(window.xtWindow);
+        // }
+
+        document.getElementById('dotcolor').value = gDotColorDefault;
+        document.getElementById('inactivecolor').value = gDotInactiveColorDefault;
+        document.getElementById('backgroundcolor').value = gBackgroundColorDefault;
+        
+        console.log(returnValue)
+
+        /* SAVE THE VALUE TO SETTINGS */
+        saveSettings(returnValue);
+        // /* SEND THE VALUES TO PLUGIN */
+        // sendValueToPlugin(returnValue, 'sdpi_collection');
 
     } else {
-
+        console.log(returnValue)
         /* SAVE THE VALUE TO SETTINGS */
         saveSettings(returnValue);
 

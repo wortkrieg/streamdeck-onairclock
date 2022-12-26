@@ -20,6 +20,14 @@
 
 $SD.on('connected', (jsonObj) => connected(jsonObj));
 
+var gDotColor = "#bf0000"
+var gDotInactiveColor = "#888888"
+var gBackgroundColor = "#000000"
+
+var gDotColorDefault = "#bf0000"
+var gDotInactiveColorDefault = "#888888"
+var gBackgroundColorDefault = "#000000"
+
 function connected(jsn) {
     // Subscribe to the willAppear and other events
     $SD.on('fail.marc.onairclock.action.willAppear', (jsonObj) => action.onWillAppear(jsonObj));
@@ -35,14 +43,13 @@ function connected(jsn) {
 };
 
 // ACTIONS
-
 const action = {
     settings:{},
     onDidReceiveSettings: function(jsn) {
         console.log('%c%s', 'color: white; background: red; font-size: 15px;', '[app.js]onDidReceiveSettings:');
-
-        this.settings = Utils.getProp(jsn, 'payload.settings', {});
-        this.doSomeThing(this.settings, 'onDidReceiveSettings', 'orange');
+        console.log(jsn)
+        // this.settings = Utils.getProp(jsn, 'payload.settings', {});
+        // this.doSomeThing(this.settings, 'onDidReceiveSettings', 'orange');
 
         /**
          * In this example we put a HTML-input element with id='mynameinput'
@@ -53,7 +60,20 @@ const action = {
          * the key.
          */
 
-         this.setTitle(jsn);
+        //  this.setTitle(jsn);
+        if (isHexColor(jsn.payload.settings.dotcolor) == true) {
+            console.log("dotcolor is hex")
+            gDotColor = jsn.payload.settings.dotcolor
+        }
+        if (isHexColor(jsn.payload.settings.inactivecolor) == true) {
+            console.log("dotcolor is hex")
+            gDotInactiveColor = jsn.payload.settings.inactivecolor
+        }
+        if (isHexColor(jsn.payload.settings.backgroundcolor) == true) {
+            console.log("dotcolor is hex")
+            gBackgroundColor = jsn.payload.settings.backgroundcolor
+        }
+
     },
 
     /** 
@@ -82,7 +102,7 @@ const action = {
         }
         this.setTitle(jsn);
 
-        setInterval(function(sx) {
+         val(function(sx) {
             drawClockImg(jsn)
         }, 1000);
 
@@ -160,7 +180,7 @@ function drawClockImg(jsn) {
     displayTime(canvas)
     var imgData = canvas.toDataURL();
 
-    console.log(canvas)
+    // console.log(canvas)
     $SD.api.setImage(
         jsn.context,
         imgData
@@ -193,7 +213,7 @@ function displayTime(canvas) {
     // Make sure TAU is defined (it's not by default)
     Math.TAU = 2 * Math.PI;
 
-    function drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor) {
+    function drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor, backgroundColor) {
         const dotGrid = 60
         const hourGrid = 12
         
@@ -201,7 +221,7 @@ function displayTime(canvas) {
         // console.log("draw operation")
         var targetX = 0
         var targetY = 0
-        context.fillStyle = "#000000";
+        context.fillStyle = backgroundColor;
         context.fillRect(0,0,canvas.width,canvas.height);
 
 
@@ -283,7 +303,7 @@ function displayTime(canvas) {
 
     }
     // drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor) 
-    drawScale(s, 0.8, 2.2, 1.4, '#bf0000', '#888888')
+    drawScale(s, 0.8, 2.2, 1.4, gDotColor, gDotInactiveColor, gBackgroundColor)
 
 }
 
@@ -308,3 +328,8 @@ function formatHour(h) {
 function getTimePeriod(h) {
     return (h < 12) ? "AM" : "PM"; 
 }
+
+function isHexColor(color) {
+    const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+    return hexColorRegex.test(color);
+  }
