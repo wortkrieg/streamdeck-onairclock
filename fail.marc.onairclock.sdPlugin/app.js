@@ -24,13 +24,30 @@ var gDotColor = "#bf0000"
 var gDotInactiveColor = "#888888"
 var gBackgroundColor = "#000000"
 
-var gDotColorDefault = "#bf0000"
-var gDotInactiveColorDefault = "#888888"
-var gBackgroundColorDefault = "#000000"
+const gDotColorDefault = "#bf0000"
+const gDotInactiveColorDefault = "#888888"
+const gBackgroundColorDefault = "#000000"
+
+var allElements = []
+
+/**
+ * Data Structure of allElements
+ * [ 
+ *      {
+ *          context: jsn.context,
+ *          dotColor: "",
+ *          inactiveColor: "",
+ *          backgroundColor: "",
+ *          timer: <object>
+ *      }
+ * ]
+ * 
+ */
 
 function connected(jsn) {
     // Subscribe to the willAppear and other events
     $SD.on('fail.marc.onairclock.action.willAppear', (jsonObj) => action.onWillAppear(jsonObj));
+    $SD.on('fail.marc.onairclock.action.willDisappear', jsonObj => action.onWillDisappear(jsonObj));
     $SD.on('fail.marc.onairclock.action.keyUp', (jsonObj) => action.onKeyUp(jsonObj));
     $SD.on('fail.marc.onairclock.action.sendToPlugin', (jsonObj) => action.onSendToPlugin(jsonObj));
     $SD.on('fail.marc.onairclock.action.didReceiveSettings', (jsonObj) => action.onDidReceiveSettings(jsonObj));
@@ -39,6 +56,7 @@ function connected(jsn) {
     });
     $SD.on('fail.marc.onairclock.action.propertyInspectorDidDisappear', (jsonObj) => {
         console.log('%c%s', 'color: white; background: red; font-size: 13px;', '[app.js]propertyInspectorDidDisappear:');
+        destroyClock(jsonObj)
     });
 };
 
@@ -61,19 +79,20 @@ const action = {
          */
 
         //  this.setTitle(jsn);
-        if (isHexColor(jsn.payload.settings.dotcolor) == true) {
-            console.log("dotcolor is hex")
-            gDotColor = jsn.payload.settings.dotcolor
-        }
-        if (isHexColor(jsn.payload.settings.inactivecolor) == true) {
-            console.log("dotcolor is hex")
-            gDotInactiveColor = jsn.payload.settings.inactivecolor
-        }
-        if (isHexColor(jsn.payload.settings.backgroundcolor) == true) {
-            console.log("dotcolor is hex")
-            gBackgroundColor = jsn.payload.settings.backgroundcolor
-        }
-        drawClockImg(jsn)
+        // if (isHexColor(jsn.payload.settings.dotcolor) == true) {
+        //     console.log("dotcolor is hex")
+        //     gDotColor = jsn.payload.settings.dotcolor
+        // }
+        // if (isHexColor(jsn.payload.settings.inactivecolor) == true) {
+        //     console.log("dotcolor is hex")
+        //     gDotInactiveColor = jsn.payload.settings.inactivecolor
+        // }
+        // if (isHexColor(jsn.payload.settings.backgroundcolor) == true) {
+        //     console.log("dotcolor is hex")
+        //     gBackgroundColor = jsn.payload.settings.backgroundcolor
+        // }
+        // const clock = new drawClockImg(jsn)
+        updateClock(jsn)
 
     },
 
@@ -95,19 +114,37 @@ const action = {
          * 
          * $SD.api.getSettings(jsn.context);
         */
+
+        if(!jsn.payload || !jsn.payload.hasOwnProperty('settings')) return;
         this.settings = jsn.payload.settings;
+
+        console.log("did load. Context: ")
+        console.log(jsn.context)
 
         // Nothing in the settings pre-fill, just something for demonstration purposes
         if (!this.settings || Object.keys(this.settings).length === 0) {
             this.settings.mynameinput = 'TEMPLATE';
         }
-        this.setTitle(jsn);
+        // this.setTitle(jsn);
         // init with correct settings
+
+        updateClock(jsn)
+
+
+        // jsn.intervalID = new createClock(jsn);
+
+        // console.log("interval, context ")
+        // console.log(jsn.intervalID)
+        // console.log(jsn.context)
+
+        // this.cache[jsn.intervalID] = jsn.intervalID;
         this.onDidReceiveSettings(jsn);
 
-         setInterval(function(sx) {
-            drawClockImg(jsn)
-        }, 1000);
+    },
+
+    onWillDisappear: function (jsn) {
+
+        destroyClock(jsn)
 
     },
 
@@ -175,12 +212,59 @@ const action = {
 
 };
 
+function updateClock(jsn) {
+
+    var currentElement = {}
+
+    if(allElements.some(item => item.context === jsn.context) == true) {
+        // update settings
+        currentElement = allElements.find(item => item.context === jsn.context)
+
+        currentElement.dotColor = isHexColor(jsn.payload.settings.dotcolor) ? jsn.payload.settings.dotcolor : gDotColorDefault;
+        currentElement.inactiveColor = isHexColor(jsn.payload.settings.inactivecolor) ? jsn.payload.settings.inactivecolor : gDotInactiveColorDefault;
+        currentElement.backgroundColor = isHexColor(jsn.payload.settings.backgroundcolor) ? jsn.payload.settings.backgroundcolor : gBackgroundColorDefault;
+
+        console.log(currentElement)
+    } else {
+        // create new entry, populate with data, setup timer
+
+        currentElement.context = jsn.context
+        
+        currentElement.dotColor = isHexColor(jsn.payload.settings.dotcolor) ? jsn.payload.settings.dotcolor : gDotColorDefault;
+        currentElement.inactiveColor = isHexColor(jsn.payload.settings.inactivecolor) ? jsn.payload.settings.inactivecolor : gDotInactiveColorDefault;
+        currentElement.backgroundColor = isHexColor(jsn.payload.settings.backgroundcolor) ? jsn.payload.settings.backgroundcolor : gBackgroundColorDefault;
+
+        currentElement.timer = setInterval(function(sx) {
+            drawClockImg(jsn)
+        }, 1000);
+
+        allElements.push(currentElement)
+    }
+
+
+}
+function destroyClock(jsn) {
+    console.log("destroying")
+    var currentElement = {}
+    if(allElements.some(item => item.context === jsn.context) == true) {
+        console.log("destroying elem timer")
+        currentElement = allElements.find(item => item.context === jsn.context)
+        console.log(currentElement.timer)
+        clearInterval(currentElement.timer)
+    }
+
+}
 
 function drawClockImg(jsn) {
+    // var context = jsn.context
+    // var clockID = 0
+
     var canvas = document.createElement('canvas');
+    canvas.id = jsn.context;
+    // console.log(canvas.id)
     canvas.width = 144;
     canvas.height = 144;
-    displayTime(canvas)
+    displayTime(canvas, jsn)
     var imgData = canvas.toDataURL();
 
     // console.log(canvas)
@@ -188,10 +272,23 @@ function drawClockImg(jsn) {
         jsn.context,
         imgData
     );
+
 }
 
 
-function displayTime(canvas) {
+function displayTime(canvas, jsn) {
+    console.log("displayTime jsn:")
+    console.log(jsn)
+
+    console.log(allElements)
+    var currentElement = {}
+    // we only care about the jsn.context here and read everything else from our allElements storage.
+    if(allElements.some(item => item.context === jsn.context) == true) {
+        // update settings
+        console.log("found current context in global storage")
+        currentElement = allElements.find(item => item.context === jsn.context)
+    }
+
     var now = new Date();
     var h = now.getHours();
     var m = now.getMinutes();
@@ -306,31 +403,34 @@ function displayTime(canvas) {
 
     }
     // drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor) 
-    drawScale(s, 0.8, 2.2, 1.4, gDotColor, gDotInactiveColor, gBackgroundColor)
+    drawScale(s, 0.8, 2.2, 1.4, currentElement.dotColor, currentElement.inactiveColor, currentElement.backgroundColor)
 
-}
 
-function padZero(num) {
-    if (num < 10) { 
-        return "0" + String(num);
+    function padZero(num) {
+        if (num < 10) { 
+            return "0" + String(num);
+        }
+        else {
+            return String(num);
+        }
     }
-    else {
-        return String(num);
-    }
-}
-function formatHour(h) {
-    var hour = h % 12;
- 
-    if (hour == 0) { 
-        hour = 12; 
-    }
+    function formatHour(h) {
+        var hour = h % 12;
      
-    return String(hour)
+        if (hour == 0) { 
+            hour = 12; 
+        }
+         
+        return String(hour)
+    }
+    
+    function getTimePeriod(h) {
+        return (h < 12) ? "AM" : "PM"; 
+    }
+
 }
 
-function getTimePeriod(h) {
-    return (h < 12) ? "AM" : "PM"; 
-}
+
 
 function isHexColor(color) {
     const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
