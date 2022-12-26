@@ -102,7 +102,7 @@ const action = {
         }
         this.setTitle(jsn);
 
-         val(function(sx) {
+         setInterval(function(sx) {
             drawClockImg(jsn)
         }, 1000);
 
