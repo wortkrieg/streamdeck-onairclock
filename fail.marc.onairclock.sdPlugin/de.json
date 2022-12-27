@@ -10,6 +10,8 @@
     "Dot Color": "Punktfarbe",
     "Inactive Color": "Inaktiv-Farbe",
     "Background Color": "Hingergrund",
-    "Set Default": "Default"
+    "Set Default": "Default",
+    "Show Seconds": "Sekunden anzeigen",
+    "Show Date": "Datum anzeigen"
   }
 }

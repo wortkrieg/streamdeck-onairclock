@@ -10,6 +10,8 @@
     "Dot Color": "Dot Color",
     "Inactive Color": "Inactive Color",
     "Background Color": "Background Color",
-    "Set Default": "Set Default"
+    "Set Default": "Set Default",
+    "Show Seconds": "Show Seconds",
+    "Show Date": "Show Date"
   }
 }
