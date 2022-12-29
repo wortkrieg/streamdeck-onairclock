@@ -407,7 +407,7 @@ function displayTime(canvas, jsn) {
             context.font = "22px Verdana";
             context.textAlign = "center";
             context.fillStyle = dotColor;
-            context.fillText(padZero(s), clockX, (clockY + 35));
+            context.fillText(padZero(s), clockX, (clockY + 36));
         }
 
 
