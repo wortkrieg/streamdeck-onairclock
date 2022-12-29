@@ -20,13 +20,14 @@
 
 $SD.on('connected', (jsonObj) => connected(jsonObj));
 
-var gDotColor = "#bf0000"
+var gDotColor = "#ab0000"
 var gDotInactiveColor = "#888888"
 var gBackgroundColor = "#000000"
 
-const gDotColorDefault = "#bf0000"
+const gDotColorDefault = "#ab0000"
 const gDotInactiveColorDefault = "#888888"
 const gBackgroundColorDefault = "#000000"
+const gWatchfaceDefault = 0
 
 var allElements = []
 
@@ -69,29 +70,6 @@ const action = {
         // this.settings = Utils.getProp(jsn, 'payload.settings', {});
         // this.doSomeThing(this.settings, 'onDidReceiveSettings', 'orange');
 
-        /**
-         * In this example we put a HTML-input element with id='mynameinput'
-         * into the Property Inspector's DOM. If you enter some data into that
-         * input-field it get's saved to Stream Deck persistently and the plugin
-         * will receive the updated 'didReceiveSettings' event.
-         * Here we look for this setting and use it to change the title of
-         * the key.
-         */
-
-        //  this.setTitle(jsn);
-        // if (isHexColor(jsn.payload.settings.dotcolor) == true) {
-        //     console.log("dotcolor is hex")
-        //     gDotColor = jsn.payload.settings.dotcolor
-        // }
-        // if (isHexColor(jsn.payload.settings.inactivecolor) == true) {
-        //     console.log("dotcolor is hex")
-        //     gDotInactiveColor = jsn.payload.settings.inactivecolor
-        // }
-        // if (isHexColor(jsn.payload.settings.backgroundcolor) == true) {
-        //     console.log("dotcolor is hex")
-        //     gBackgroundColor = jsn.payload.settings.backgroundcolor
-        // }
-        // const clock = new drawClockImg(jsn)
         updateClock(jsn)
 
     },
@@ -105,15 +83,7 @@ const action = {
 
     onWillAppear: function (jsn) {
         console.log("You can cache your settings in 'onWillAppear'", jsn.payload.settings);
-        /**
-         * The willAppear event carries your saved settings (if any). You can use these settings
-         * to setup your plugin or save the settings for later use. 
-         * If you want to request settings at a later time, you can do so using the
-         * 'getSettings' event, which will tell Stream Deck to send your data 
-         * (in the 'didReceiveSettings above)
-         * 
-         * $SD.api.getSettings(jsn.context);
-        */
+
 
         if(!jsn.payload || !jsn.payload.hasOwnProperty('settings')) return;
         this.settings = jsn.payload.settings;
@@ -172,13 +142,7 @@ const action = {
 
     saveSettings: function (jsn, sdpi_collection) {
         console.log('saveSettings:', jsn);
-        // if (sdpi_collection.hasOwnProperty('key') && sdpi_collection.key != '') {
-        //     if (sdpi_collection.value && sdpi_collection.value !== undefined) {
-        //         this.settings[sdpi_collection.key] = sdpi_collection.value;
-        //         console.log('setSettings....', this.settings);
-        //         $SD.api.setSettings(jsn.context, this.settings);
-        //     }
-        // }
+
     },
 
     /**
@@ -224,6 +188,16 @@ function updateClock(jsn) {
         currentElement.inactiveColor = isHexColor(jsn.payload.settings.inactivecolor) ? jsn.payload.settings.inactivecolor : gDotInactiveColorDefault;
         currentElement.backgroundColor = isHexColor(jsn.payload.settings.backgroundcolor) ? jsn.payload.settings.backgroundcolor : gBackgroundColorDefault;
 
+        if( typeof jsn.payload.settings.watchface !== "undefined" ) {
+            if(parseInt(jsn.payload.settings.watchface) >= 0 && parseInt(jsn.payload.settings.watchface) <= 4) {
+                currentElement.watchface = parseInt(jsn.payload.settings.watchface)
+            } else {
+                currentElement.watchface = gWatchfaceDefault
+            }
+        } else {
+            currentElement.watchface = gWatchfaceDefault
+        }
+
         console.log(currentElement)
     } else {
         // create new entry, populate with data, setup timer
@@ -234,13 +208,22 @@ function updateClock(jsn) {
         currentElement.inactiveColor = isHexColor(jsn.payload.settings.inactivecolor) ? jsn.payload.settings.inactivecolor : gDotInactiveColorDefault;
         currentElement.backgroundColor = isHexColor(jsn.payload.settings.backgroundcolor) ? jsn.payload.settings.backgroundcolor : gBackgroundColorDefault;
 
+        if( typeof jsn.payload.settings.watchface !== "undefined" ) {
+            if(parseInt(jsn.payload.settings.watchface) >= 0 && parseInt(jsn.payload.settings.watchface) <= 4) {
+                currentElement.watchface = parseInt(jsn.payload.settings.watchface)
+            } else {
+                currentElement.watchface = gWatchfaceDefault
+            }
+        } else {
+            currentElement.watchface = gWatchfaceDefault
+        }
+
         currentElement.timer = setInterval(function(sx) {
             drawClockImg(jsn)
         }, 1000);
 
         allElements.push(currentElement)
     }
-
 
 }
 function destroyClock(jsn) {
@@ -330,82 +313,155 @@ function displayTime(canvas, jsn) {
         context.fillStyle = backgroundColor;
         context.fillRect(0,0,canvas.width,canvas.height);
 
+        // Need i to be accassible throughout all following draw functions
+        var i = 0
+        function drawDotsActive() {
+                    // Draw second dots first
+            for(i=0; i < ( s + 1 ); i++){
+                var dotRadians = (Math.TAU * i/dotGrid) - (Math.TAU/4);
 
-        // ToDo cleanup, make drawDots function
+                var targetX = clockX + Math.cos(dotRadians) * (circleDiameter * clockRadius);
+                var targetY = clockY + Math.sin(dotRadians) * (circleDiameter * clockRadius);
 
-
-        // Draw second dots first
-        for(var i=0; i < ( s + 1 ); i++){
-            var dotRadians = (Math.TAU * i/dotGrid) - (Math.TAU/4);
-
-            var targetX = clockX + Math.cos(dotRadians) * (circleDiameter * clockRadius);
-            var targetY = clockY + Math.sin(dotRadians) * (circleDiameter * clockRadius);
-
-            // context.fillRect(targetX,targetY,3,3);
-            context.fillStyle = dotColor;
-            context.beginPath();
-            context.arc(targetX, targetY, dotThickness, 0, 2 * Math.PI, true);
-            context.fill();
+                // context.fillRect(targetX,targetY,3,3);
+                context.fillStyle = dotColor;
+                context.beginPath();
+                context.arc(targetX, targetY, dotThickness, 0, 2 * Math.PI, true);
+                context.fill();
+            }
         }
-        // draw dots inactive
-        for(var j=i; j < dotGrid; j++){
-            var dotRadians = (Math.TAU * j/dotGrid) - (Math.TAU/4);
 
-            var targetX = clockX + Math.cos(dotRadians) * (circleDiameter * clockRadius);
-            var targetY = clockY + Math.sin(dotRadians) * (circleDiameter * clockRadius);
+        function drawDotsInactive() {
+                    // draw dots inactive
+            for(var j=i; j < dotGrid; j++){
+                var dotRadians = (Math.TAU * j/dotGrid) - (Math.TAU/4);
+
+                var targetX = clockX + Math.cos(dotRadians) * (circleDiameter * clockRadius);
+                var targetY = clockY + Math.sin(dotRadians) * (circleDiameter * clockRadius);
 
 
-            context.fillStyle = dotInactiveColor;
-            context.beginPath();
-            context.arc(targetX, targetY, dotInactiveThickness, 0, 2 * Math.PI, true);
-            context.fill();
+                context.fillStyle = dotInactiveColor;
+                context.beginPath();
+                context.arc(targetX, targetY, dotInactiveThickness, 0, 2 * Math.PI, true);
+                context.fill();
+            }
         }
-        // draw hour marks
-        for(var k=0; k < hourGrid; k++){
-            var dotRadians = (Math.TAU * k/hourGrid) - (Math.TAU/4);
+
+        function drawScale() {
+            // draw hour marks
+            for(var k=0; k < hourGrid; k++){
+                var dotRadians = (Math.TAU * k/hourGrid) - (Math.TAU/4);
+                // console.log(circleDiameter)
+                var targetX = clockX + Math.cos(dotRadians) * ((circleDiameter - 0.08) * clockRadius);
+                var targetY = clockY + Math.sin(dotRadians) * ((circleDiameter - 0.08) * clockRadius);
+
+                context.fillStyle = dotInactiveColor;
+                context.beginPath();
+                context.arc(targetX, targetY, dotThickness, 0, 2 * Math.PI, true);
+                context.fill();
+            }
+            // draw 0 dot in scale a bit bigger
+            var dotRadians = (Math.TAU * 0/hourGrid) - (Math.TAU/4);
             // console.log(circleDiameter)
             var targetX = clockX + Math.cos(dotRadians) * ((circleDiameter - 0.08) * clockRadius);
             var targetY = clockY + Math.sin(dotRadians) * ((circleDiameter - 0.08) * clockRadius);
 
             context.fillStyle = dotInactiveColor;
             context.beginPath();
-            context.arc(targetX, targetY, dotThickness, 0, 2 * Math.PI, true);
+            context.arc(targetX, targetY, dotThickness + 0.5, 0, 2 * Math.PI, true);
             context.fill();
         }
-        // draw 0
-        var dotRadians = (Math.TAU * 0/hourGrid) - (Math.TAU/4);
-        // console.log(circleDiameter)
-        var targetX = clockX + Math.cos(dotRadians) * ((circleDiameter - 0.08) * clockRadius);
-        var targetY = clockY + Math.sin(dotRadians) * ((circleDiameter - 0.08) * clockRadius);
 
-        context.fillStyle = dotInactiveColor;
-        context.beginPath();
-        context.arc(targetX, targetY, dotThickness + 0.5, 0, 2 * Math.PI, true);
-        context.fill();
 
-        // draw time with seconds 
-        // context.font = "20px Verdana";
-        // context.textAlign = "center";
-        // context.fillStyle = dotColor;
-        // context.fillText(padZero(h) + ":" + padZero(m) + ":" + padZero(s), clockX, (clockY + 10));
+        
+        function drawClassicTime() {
+            // draw time hh:mm
+            context.font = "30px Verdana";
+            context.textAlign = "center";
+            context.fillStyle = dotColor;
+            context.fillText(padZero(h) + ":" + padZero(m), clockX, (clockY + 10));
+        }
+        function drawModernTime() {
+            // draw time hh:mm
+            context.font = "45px Verdana";
+            context.textAlign = "center";
+            context.fillStyle = dotColor;
+            context.fillText(padZero(h), clockX, (clockY - 10));
+            context.fillText(padZero(m), clockX, (clockY + 30));
 
-        // draw time without seconds
-        context.font = "30px Verdana";
-        context.textAlign = "center";
-        context.fillStyle = dotColor;
-        context.fillText(padZero(h) + ":" + padZero(m), clockX, (clockY + 10));
+            context.font = "22px Verdana";
+            context.fillText(padZero(s), clockX, (clockY + 51));
 
-        // draw seconds in second line
-        context.font = "22px Verdana";
-        context.textAlign = "center";
-        context.fillStyle = dotColor;
-        context.fillText(padZero(s), clockX, (clockY + 35));
+        }
 
-                // draw date
-                context.font = "14px Verdana";
-                context.textAlign = "center";
-                context.fillStyle = dotColor;
-                context.fillText(day + "-" + month, clockX, (clockY - 27));
+        function drawDate() {
+            // draw date
+            context.font = "18px Verdana";
+            context.textAlign = "center";
+            context.fillStyle = dotColor;
+            context.fillText(day + "-" + month, clockX, (clockY - 25));
+        }
+
+        function drawSeconds() {
+            // draw seconds in second line
+            context.font = "22px Verdana";
+            context.textAlign = "center";
+            context.fillStyle = dotColor;
+            context.fillText(padZero(s), clockX, (clockY + 35));
+        }
+
+
+        switch (currentElement.watchface) {
+            case 0:
+                drawDotsActive()
+                drawDotsInactive()
+                drawScale()
+                drawClassicTime()
+                drawDate()
+                drawSeconds()
+                break;
+            case 1:
+                drawDotsActive()
+                drawDotsInactive()
+                drawScale()
+                drawClassicTime()
+                drawSeconds()
+                break;
+            case 2:
+                drawDotsActive()
+                drawDotsInactive()
+                drawScale()
+                drawClassicTime()
+                drawDate()
+                break;
+            case 3:
+                drawDotsActive()
+                drawDotsInactive()
+                drawScale()
+                drawClassicTime()
+                break;
+            case 4:
+                drawDotsActive()
+                drawDotsInactive()
+                // drawScale()
+                drawModernTime()
+                break;
+            default:
+                drawDotsActive()
+                drawDotsInactive()
+                drawScale()
+                drawClassicTime()
+                drawDate()
+                drawSeconds()
+              break;
+          }
+
+
+
+        
+
+
+
 
     }
     // drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor) 

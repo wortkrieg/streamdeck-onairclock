@@ -16,15 +16,27 @@
               <div class="sdpi-item-label">Dot Color</div>
               <input id="dotcolor" class="sdpi-item-value" type="text" value="#bf0000" pattern="#[0-9A-Fa-f]{6}" />
             </div> -->
-            <div type="checkbox" class="sdpi-item">
+            <!-- <div type="checkbox" class="sdpi-item">
               <div class="sdpi-item-label">Appearance</div>
               <div class="sdpi-item-value ">
-                  <input id="showseconds" type="checkbox" value="show seconds">
+                  <input id="showseconds" type="checkbox" checked>
                   <label for="showseconds"><span></span>Show Seconds</label>
-                  <input id="showdate" type="checkbox" value="show date">
+                  <input id="showdate" type="checkbox" checked>
                   <label for="showdate"><span></span>Show Date</label>
               </div>
+            </div> -->
+
+            <div class="sdpi-item" id="watchfaceSelector">
+              <div class="sdpi-item-label">Watchface</div>
+              <select class="sdpi-item-value select" id="watchface">
+                 <option value="0">Default</option>
+                 <option value="1">No Date</option>
+                 <option value="2">No Seconds</option>
+                 <option value="3">No Date & Seconds</option>
+                 <option value="4">Modern Minimal</option>
+              </select>
             </div>
+
             <div type="range" class="sdpi-item" id="dotcolorSlider">
               <div class="sdpi-item-label">Dot Color</div>
               <div class="sdpi-item-value">
@@ -42,14 +54,14 @@
             <div type="range" class="sdpi-item" id="backgroundcolorSlider">
               <div class="sdpi-item-label">Background Color</div>
               <div class="sdpi-item-value">
-                  <input type="color" pattern="#[0-9A-Fa-f]{6}" id="backgroundcolor" value="#000000" pattern="#[0-9A-Fa-f]{6}">
+                  <input type="color" pattern="#[0-9A-Fa-f]{6}" id="backgroundcolor" value="#000000">
               </div>
             </div>
 
-            <div class="sdpi-item">
-              <!-- <div class="sdpi-item-label"></div> -->
-              <button class="sdpi-item-value" id="setdefault" value="Set Default" data-localize="Click me">Set Default</button>
-            </div>
+            <!-- <div class="sdpi-item">
+              <div class="sdpi-item-label"></div>
+              <button class="sdpi-item-value" id="setdefault" value="Set Default" data-localize="setdefault">Set Default</button>
+            </div> -->
 
 
               <!-- END OF SDPI-WRAPPER -->

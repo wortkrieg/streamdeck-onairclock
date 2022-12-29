@@ -180,12 +180,14 @@ $SD.on('piDataChanged', (returnValue) => {
         // document.getElementById('dotcolor').value = gDotColorDefault;
         // document.getElementById('inactivecolor').value = gDotInactiveColorDefault;
         // document.getElementById('backgroundcolor').value = gBackgroundColorDefault;
-        console.log("setdefault key pressed")
-        console.log(returnValue)
+        // console.log("setdefault key pressed")
+        // console.log(returnValue)
 
         /* SAVE THE VALUE TO SETTINGS */
         // saveSettings(returnValue);
         // /* SEND THE VALUES TO PLUGIN */
+        // sendValueToPlugin(returnValue, 'sdpi_collection');
+        // saveSettings(returnValue);
         // sendValueToPlugin(returnValue, 'sdpi_collection');
 
     } else {
@@ -411,6 +413,7 @@ function handleSdpiItemChange(e, idx) {
 
     if (sdpiItemChildren.length && ['radio','checkbox'].includes(sdpiItemChildren[0].type)) {
         e.setAttribute('_value', e.checked); //'_value' has priority over .value
+        console.log("is checkbox")
     }
     if (sdpiItemGroup && !sdpiItemChildren.length) {
         for (let x of ['input', 'meter', 'progress']) {
