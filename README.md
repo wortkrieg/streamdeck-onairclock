@@ -1,11 +1,17 @@
+![GH_Banner](fail.marc.onairclock.sdPlugin/previews/1-preview.png)
+
 # streamdeck-onairclock
 
 A versatile and configurable broadcast-inspired on air clock for Elgato Stream Deck.
 
+![moving_preview](preview.gif)
+
 ## Features
 
+![Features](fail.marc.onairclock.sdPlugin/previews/2-preview.png)
+
 * Choose between different watchfaces - including classic on air clock or more modern clockface
-* Change the appearance colors by simply setting HEX values. 
+* Change the appearance colors by simply setting color values. 
 * Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
 
 ## Installation
