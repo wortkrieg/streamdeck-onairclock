@@ -1,35 +1,12 @@
 # streamdeck-onairclock
 
-A simple broadcast-inspired on air clock for Elgato Stream Deck
+A versatile and configurable broadcast-inspired on air clock for Elgato Stream Deck.
 
 ## Features
 
-Planned: You can change the appearance colors by simply setting HEX values. 
-
-Planned: Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
-
-## ToDos 
-
-* property inspector:
-  * Setting for foreground/dots active color
-  * Setting for dots inactive color
-  * Setting for background color
-  * Enable seconds display checkbox
-
-* Make multiple instances possible - currently shared settings and drawing routine.
-* Bug: having multiple instances causes stored settings to mismatch as they share context during runtime
-
-* Cleanup code fragments from samples & template
-* Create preview images & logo icon
-
-### Done
-
-* Make actually useful manifest.json
-* Experiment with dot size to improve readability
-
-## Ideas
-* Keypress-Action
-* Show Date option
+* Choose between different watchfaces - including classic on air clock or more modern clockface
+* Change the appearance colors by simply setting HEX values. 
+* Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
 
 ## Installation
 
@@ -62,6 +39,16 @@ Then relaunch streamdeck software.
 ## Developing
 
 Follow [this tutorial](https://developer.elgato.com/documentation/stream-deck/sdk/create-your-own-plugin/) for advice on how to debug the plugin.
+
+## Distribution
+
+Not yet done. Should work using DistributionTool and this command:
+
+```sh
+./DistributionTool -b -i fail.marc.onairclock.sdPlugin/ -o release/
+```
+
+Make sure to rm or rename file from release folder before calling DistributionTool.
 
 ## Dependencies
 
