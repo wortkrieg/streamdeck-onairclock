@@ -14,6 +14,8 @@ A versatile and configurable broadcast-inspired on air clock for Elgato Stream D
 * Change the appearance colors by simply setting color values. 
 * Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
 
+![PI](pi.png)
+
 ## Installation
 
 ### From elgato plugin store
