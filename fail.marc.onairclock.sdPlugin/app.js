@@ -197,6 +197,7 @@ function updateClock(jsn) {
         } else {
             currentElement.watchface = gWatchfaceDefault
         }
+        drawClockImg(jsn)
 
         console.log(currentElement)
     } else {
