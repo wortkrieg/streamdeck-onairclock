@@ -8,7 +8,7 @@
             "Image": "action/images/image"
         }
     ],
-      "Tooltip": "A classic OnAir Clock", 
+      "Tooltip": "A versatile On Air Clock", 
       "UUID": "fail.marc.onairclock.action"
     }
   ], 
@@ -16,11 +16,13 @@
   "Author": "Marc Herrmann", 
   "CodePath": "index.html", 
   "PropertyInspectorPath": "propertyinspector/index.html", 
-  "Description": "A classic OnAir clock as found in professional broadcasting on the streamdeck.", 
-  "Name": "OnAir Clock", 
-  "Icon": "action/images/action", 
+  "Description": "A versatile On Air clock as found in professional broadcasting on the streamdeck.", 
+  "Category": "On Air Clock",
+  "CategoryIcon": "action/images/category",
+  "Name": "On Air Clock", 
+  "Icon": "action/images/actionimage", 
   "URL": "https://github.com/wortkrieg/streamdeck-onairclock", 
-  "Version": "0.1.1",
+  "Version": "0.9.1",
   "OS": [
     {
         "Platform": "mac", 
