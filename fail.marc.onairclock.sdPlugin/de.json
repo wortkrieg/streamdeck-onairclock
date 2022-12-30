@@ -1,17 +1,20 @@
 {
-  "Description": "Eine klassische OnAir Uhr, wie man sie im professionellen Rundfunk findet", 
-  "Name": "OnAir Clock", 
+  "Description": "Eine vielseitige und konfigurierbare On Air-Uhr, inspiriert vom professionellen Rundfunk.", 
+  "Name": "On Air Clock", 
   "Category": "Templates", 
   "fail.marc.onairclock.action": {
-    "Name": "OnAir Clock", 
-    "Tooltip": "Eine klassiche OnAir-Uhr"
+    "Name": "On Air Clock", 
+    "Tooltip": "Eine klassiche On Air-Uhr"
   },
   "Localization": {
     "Dot Color": "Punktfarbe",
     "Inactive Color": "Inaktiv-Farbe",
     "Background Color": "Hingergrund",
-    "Set Default": "Default",
-    "Show Seconds": "Sekunden anzeigen",
-    "Show Date": "Datum anzeigen"
+    "Watchface": "Ziffernblatt",
+    "Default": "Standard",
+    "No Date": "Kein Datum",
+    "No Seconds": "Keine Sekunden",
+    "No Date & Seconds": "Kein Datum & Sekunden",
+    "Modern Minimal": "Modern Minimal"
   }
 }

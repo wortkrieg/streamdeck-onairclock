@@ -16,13 +16,13 @@
   "Author": "Marc Herrmann", 
   "CodePath": "index.html", 
   "PropertyInspectorPath": "propertyinspector/index.html", 
-  "Description": "A versatile On Air clock as found in professional broadcasting on the streamdeck.", 
+  "Description": "A versatile and configurable broadcast-inspired on air clock.", 
   "Category": "On Air Clock",
   "CategoryIcon": "action/images/category",
   "Name": "On Air Clock", 
   "Icon": "action/images/actionimage", 
   "URL": "https://github.com/wortkrieg/streamdeck-onairclock", 
-  "Version": "0.9.1",
+  "Version": "1.0.1",
   "OS": [
     {
         "Platform": "mac", 

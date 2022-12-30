@@ -1,17 +1,20 @@
 {
-  "Description": "A classic OnAir clock as found in professional broadcasting on the streamdeck", 
-  "Name": "OnAir Clock", 
+  "Description": "A versatile and configurable broadcast-inspired on air clock.", 
+  "Name": "On Air Clock", 
   "Category": "Templates", 
   "fail.marc.onairclock.action": {
-    "Name": "OnAir Clock", 
-    "Tooltip": "OnAir Clock"
+    "Name": "On Air Clock", 
+    "Tooltip": "On Air Clock"
   },
   "Localization": {
     "Dot Color": "Dot Color",
     "Inactive Color": "Inactive Color",
     "Background Color": "Background Color",
-    "Set Default": "Set Default",
-    "Show Seconds": "Show Seconds",
-    "Show Date": "Show Date"
+    "Watchface": "Watchface",
+    "Default": "Default",
+    "No Date": "No Date",
+    "No Seconds": "No Seconds",
+    "No Date & Seconds": "No Date & Seconds",
+    "Modern Minimal": "Modern Minimal"
   }
 }
