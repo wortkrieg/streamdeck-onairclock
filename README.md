@@ -18,11 +18,15 @@ A versatile and configurable broadcast-inspired on air clock for Elgato Stream D
 
 ## Installation
 
+### Package file
+
+Download the fail.marc.onairclock.streamDeckPlugin file from releases section and install it directly with streamdeck software.
+
 ### From elgato plugin store
 
 The plugin is not submitted yet. Will do this once all features are included and tested enough.
 
-### Manually from github
+### Manually using sources from github
 
 #### Mac
 
