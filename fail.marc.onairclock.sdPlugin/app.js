@@ -400,7 +400,7 @@ function displayTime(canvas, jsn) {
             context.font = "18px Verdana";
             context.textAlign = "center";
             context.fillStyle = dotColor;
-            context.fillText(day + "-" + month, clockX, (clockY - 25));
+            context.fillText(padZero(day) + "-" + padZero(month), clockX, (clockY - 25));
         }
 
         function drawSeconds() {
