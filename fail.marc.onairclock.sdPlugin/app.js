@@ -221,7 +221,7 @@ function updateClock(jsn) {
 
         currentElement.timer = setInterval(function(sx) {
             drawClockImg(jsn)
-        }, 1000);
+        }, 250);
 
         allElements.push(currentElement)
     }
@@ -303,7 +303,7 @@ function displayTime(canvas, jsn) {
     // Make sure TAU is defined (it's not by default)
     Math.TAU = 2 * Math.PI;
 
-    function drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor, backgroundColor) {
+    function drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor, backgroundColor, dateType) {
         const dotGrid = 60
         const hourGrid = 12
         
@@ -400,7 +400,11 @@ function displayTime(canvas, jsn) {
             context.font = "18px Verdana";
             context.textAlign = "center";
             context.fillStyle = dotColor;
-            context.fillText(padZero(day) + "-" + padZero(month), clockX, (clockY - 25));
+            if(dateType == "mm-dd") {
+                context.fillText(padZero(month) + "-" + padZero(day), clockX, (clockY - 25));
+            } else {
+                context.fillText(padZero(day) + "-" + padZero(month), clockX, (clockY - 25));
+            }
         }
 
         function drawSeconds() {
@@ -466,7 +470,7 @@ function displayTime(canvas, jsn) {
 
     }
     // drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor) 
-    drawScale(s, 0.8, 2.2, 1.4, currentElement.dotColor, currentElement.inactiveColor, currentElement.backgroundColor)
+    drawScale(s, 0.8, 2.2, 1.4, currentElement.dotColor, currentElement.inactiveColor, currentElement.backgroundColor, "dd-mm")
 
 
     function padZero(num) {
