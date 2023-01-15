@@ -12,7 +12,7 @@ A versatile and configurable broadcast-inspired on air clock for Elgato Stream D
 
 * Choose between different watchfaces - including classic on air clock or more modern clockface
 * Change the appearance colors by simply setting color values. 
-* Set the watch to display date (dd-mm) and/or seconds or just hh:mm.
+* Set the watch to display date (format can be configured) and/or seconds or just hh:mm.
 
 ![PI](pi.png)
 
