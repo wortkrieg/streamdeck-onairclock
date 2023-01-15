@@ -290,15 +290,15 @@ function drawClockImg(jsn) {
 
 
 function displayTime(canvas, jsn) {
-    console.log("displayTime jsn:")
-    console.log(jsn)
+    // console.log("displayTime jsn:")
+    // console.log(jsn)
 
-    console.log(allElements)
+    // console.log(allElements)
     var currentElement = {}
     // we only care about the jsn.context here and read everything else from our allElements storage.
     if(allElements.some(item => item.context === jsn.context) == true) {
         // update settings
-        console.log("found current context in global storage")
+        // console.log("found current context in global storage")
         currentElement = allElements.find(item => item.context === jsn.context)
     }
 
