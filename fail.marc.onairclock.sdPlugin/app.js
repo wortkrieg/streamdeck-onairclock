@@ -119,7 +119,22 @@ const action = {
     },
 
     onKeyUp: function (jsn) {
-        this.doSomeThing(jsn, 'onKeyUp', 'green');
+        // this.doSomeThing(jsn, 'onKeyUp', 'green');
+
+        let currentElement = {}
+
+        console.log("Keyress, element:")
+        console.log(jsn)
+
+        if(allElements.some(item => item.context === jsn.context) == true) {
+            // update settings
+            currentElement = allElements.find(item => item.context === jsn.context)
+
+            currentElement.watchface = parseInt(jsn.payload.settings.watchface) + 1
+            console.log(currentElement.watchface)
+            jsn.payload.settings.watchface = currentElement.watchface
+        }
+
     },
 
     onSendToPlugin: function (jsn) {
@@ -178,7 +193,7 @@ const action = {
 
 function updateClock(jsn) {
 
-    var currentElement = {}
+    let currentElement = {}
 
     if(allElements.some(item => item.context === jsn.context) == true) {
         // update settings
@@ -290,15 +305,15 @@ function drawClockImg(jsn) {
 
 
 function displayTime(canvas, jsn) {
-    console.log("displayTime jsn:")
-    console.log(jsn)
+    // console.log("displayTime jsn:")
+    // console.log(jsn)
 
-    console.log(allElements)
+    // console.log(allElements)
     var currentElement = {}
     // we only care about the jsn.context here and read everything else from our allElements storage.
     if(allElements.some(item => item.context === jsn.context) == true) {
         // update settings
-        console.log("found current context in global storage")
+        // console.log("found current context in global storage")
         currentElement = allElements.find(item => item.context === jsn.context)
     }
 
