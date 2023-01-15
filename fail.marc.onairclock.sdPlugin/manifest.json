@@ -22,7 +22,7 @@
   "Name": "On Air Clock", 
   "Icon": "action/images/actionimage", 
   "URL": "https://github.com/wortkrieg/streamdeck-onairclock", 
-  "Version": "1.0.1",
+  "Version": "1.1.1",
   "OS": [
     {
         "Platform": "mac", 
