@@ -197,6 +197,29 @@ function updateClock(jsn) {
         } else {
             currentElement.watchface = gWatchfaceDefault
         }
+        //TODO build PI dropdown for date selection
+        switch (jsn.payload.settings.dateType) {
+            case "mm-dd":
+                currentElement.dateType = "mm-dd"
+                break;
+            case "dd-mm":
+                currentElement.dateType = "dd-mm"
+                break;
+            case "dd-mm-yy":
+                currentElement.dateType = "dd-mm-yy"
+                break;
+            case "mm-dd-yy":
+                currentElement.dateType = "mm-dd-yy"
+                break;
+            case "yy-mm-dd":
+                currentElement.dateType = "yy-mm-dd"
+                break;
+            default:
+                currentElement.dateType = "dd-mm"
+                break;
+        }
+
+
         drawClockImg(jsn)
 
         console.log(currentElement)
@@ -286,6 +309,7 @@ function displayTime(canvas, jsn) {
     var month = now.getMonth();
     month = month + 1
     var day = now.getDate();
+    var year = now.getFullYear();
      
     // var timeString = formatHour(h) + ":" + padZero(m) + ":" + padZero(s) + " " + getTimePeriod(h);
     // document.querySelector("#current-time").innerHTML = timeString;
@@ -397,14 +421,39 @@ function displayTime(canvas, jsn) {
 
         function drawDate() {
             // draw date
-            context.font = "18px Verdana";
+            
             context.textAlign = "center";
             context.fillStyle = dotColor;
-            if(dateType == "mm-dd") {
-                context.fillText(padZero(month) + "-" + padZero(day), clockX, (clockY - 25));
-            } else {
-                context.fillText(padZero(day) + "-" + padZero(month), clockX, (clockY - 25));
+
+            let shortYear = year.toString().substr(-2)
+
+            switch(dateType) {
+                case "mm-dd":
+                    context.font = "18px Verdana";
+                    context.fillText(padZero(month) + "-" + padZero(day), clockX, (clockY - 25));
+                    break;
+                case "dd-mm":
+                    context.font = "18px Verdana";
+                    context.fillText(padZero(day) + "-" + padZero(month), clockX, (clockY - 25));
+                    break;
+                case "dd-mm-yy":
+                    context.font = "16px Verdana";
+                    context.fillText(padZero(day) + "-" + padZero(month) + "-" + padZero(shortYear), clockX, (clockY - 25));
+                    break;
+                case "mm-dd-yy":
+                    context.font = "16px Verdana";
+                    context.fillText(padZero(month) + "-" + padZero(day) + "-" + padZero(shortYear), clockX, (clockY - 25));
+                    break;
+                case "yy-mm-dd":
+                    context.font = "16px Verdana";
+                    context.fillText(padZero(shortYear) + "-" + padZero(month) + "-" + padZero(day), clockX, (clockY - 25));
+                    break;
+                default:
+                    context.font = "18px Verdana";
+                    context.fillText(padZero(day) + "-" + padZero(month), clockX, (clockY - 25));
+                    break;
             }
+
         }
 
         function drawSeconds() {
@@ -470,7 +519,7 @@ function displayTime(canvas, jsn) {
 
     }
     // drawScale(s, circleDiameter, dotThickness, dotInactiveThickness, dotColor, dotInactiveColor) 
-    drawScale(s, 0.8, 2.2, 1.4, currentElement.dotColor, currentElement.inactiveColor, currentElement.backgroundColor, "dd-mm")
+    drawScale(s, 0.8, 2.2, 1.4, currentElement.dotColor, currentElement.inactiveColor, currentElement.backgroundColor, currentElement.dateType)
 
 
     function padZero(num) {

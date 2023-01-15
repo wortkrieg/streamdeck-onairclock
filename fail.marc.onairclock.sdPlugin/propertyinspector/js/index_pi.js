@@ -198,6 +198,15 @@ $SD.on('piDataChanged', (returnValue) => {
         /* SEND THE VALUES TO PLUGIN */
         sendValueToPlugin(returnValue, 'sdpi_collection');
     }
+
+    let watchfaceSelected = document.getElementById('watchface').value
+
+    if(watchfaceSelected == 0 || watchfaceSelected == 2) {
+        document.getElementById('dateTypeSelector').style.display = "flex";
+    } else {
+        document.getElementById('dateTypeSelector').style.display = "none";
+    }
+
 });
 
 /**
