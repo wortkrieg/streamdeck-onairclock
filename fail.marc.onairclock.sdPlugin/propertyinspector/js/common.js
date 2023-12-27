@@ -1036,6 +1036,7 @@ const ELGEvents = {
  * - setSettings
  * - setTitle
  * - setImage
+ * - setFeedback
  * - sendToPropertyInspector
  *
  * Messages send from Property Inspector
@@ -1131,6 +1132,12 @@ const SDApi = {
                     image: img || '',
                     target: target || DestinationEnum.HARDWARE_AND_SOFTWARE
                 }
+            });
+        },
+
+        setFeedback: function (context, payload) {
+            SDApi.send(context, 'setFeedback', {
+                payload: payload
             });
         },
 
