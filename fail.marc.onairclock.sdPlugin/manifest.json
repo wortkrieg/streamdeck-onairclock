@@ -7,7 +7,19 @@
         {
             "Image": "action/images/image"
         }
-    ],
+      ],
+      "Controllers": ["Keypad", "Encoder"],
+      "Encoder": {
+          "layout": "layout/sdplus.layout.json",
+          "Icon": "action/images/actionimage",
+          "StackColor": "#0000FF",
+          "TriggerDescription": {
+              "Rotate": "Unused",
+              "Push": "Unused",
+              "Touch": "Unused",
+              "LongTouch": "Unused"
+          }
+      },
       "Tooltip": "A versatile On Air Clock", 
       "UUID": "fail.marc.onairclock.action"
     }
