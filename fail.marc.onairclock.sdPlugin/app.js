@@ -272,6 +272,8 @@ function drawClockImg(jsn) {
     // var context = jsn.context
     // var clockID = 0
 
+    var isEncoder = jsn.payload?.controller === 'Encoder';
+
     var canvas = document.createElement('canvas');
     canvas.id = jsn.context;
     // console.log(canvas.id)
@@ -279,6 +281,13 @@ function drawClockImg(jsn) {
     canvas.height = 144;
     displayTime(canvas, jsn)
     var imgData = canvas.toDataURL();
+
+    if(isEncoder) {
+        const payload = {
+            'icon' :imgData
+        };
+        $SD.api.setFeedback(jsn.context, payload);
+    }
 
     // console.log(canvas)
     $SD.api.setImage(
