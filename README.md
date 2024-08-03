@@ -72,6 +72,10 @@ I made this plugin just for fun and because I thought it would be handy to have 
 
 However, an acknowledgement would be nice.
 
+## Feature & Pull Requests
+
+Feel free to request features, but my time is very limited. So it is unlikely that any new features will be added in the future. If you want to contribute and add features yourself, feel free to create a PR. I'll review and merge if it makes the plugin any better!
+
 ## Acknowledgements
 
 This plugin is based on the [elgato plugin template](https://github.com/elgatosf/streamdeck-plugintemplate).
