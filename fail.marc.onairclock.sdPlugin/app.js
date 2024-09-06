@@ -199,11 +199,11 @@ function updateClock(jsn) {
         }
         //TODO build PI dropdown for date selection
         switch (jsn.payload.settings.dateType) {
-            case "mm-dd":
-                currentElement.dateType = "mm-dd"
-                break;
             case "dd-mm":
                 currentElement.dateType = "dd-mm"
+                break;
+            case "mm-dd":
+                currentElement.dateType = "mm-dd"
                 break;
             case "dd-mm-yy":
                 currentElement.dateType = "dd-mm-yy"
@@ -437,13 +437,13 @@ function displayTime(canvas, jsn) {
             let shortYear = year.toString().substr(-2)
 
             switch(dateType) {
-                case "mm-dd":
-                    context.font = "18px Verdana";
-                    context.fillText(padZero(month) + "-" + padZero(day), clockX, (clockY - 25));
-                    break;
                 case "dd-mm":
                     context.font = "18px Verdana";
                     context.fillText(padZero(day) + "-" + padZero(month), clockX, (clockY - 25));
+                    break;
+                case "mm-dd":
+                    context.font = "18px Verdana";
+                    context.fillText(padZero(month) + "-" + padZero(day), clockX, (clockY - 25));
                     break;
                 case "dd-mm-yy":
                     context.font = "16px Verdana";
