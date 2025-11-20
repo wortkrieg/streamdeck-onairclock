@@ -197,7 +197,6 @@ function updateClock(jsn) {
         } else {
             currentElement.watchface = gWatchfaceDefault
         }
-        //TODO build PI dropdown for date selection
         switch (jsn.payload.settings.dateType) {
             case "dd-mm":
                 currentElement.dateType = "dd-mm"
@@ -311,8 +310,17 @@ function displayTime(canvas, jsn) {
         currentElement = allElements.find(item => item.context === jsn.context)
     }
 
+    var hourFormat = jsn.payload.settings.hourFormat
+
     var now = new Date();
-    var h = now.getHours();
+
+    var h
+    if (jsn.payload.settings.hourFormat === "12") {
+        h = now.getHours() % 12 || 12;
+    } else {
+        h = now.getHours();
+    }
+
     var m = now.getMinutes();
     var s = now.getSeconds();
     var month = now.getMonth();
@@ -408,14 +416,25 @@ function displayTime(canvas, jsn) {
 
 
         
-        function drawClassicTime() {
+        function drawClassicTime(hourFormat) {
             // draw time hh:mm
             context.font = "30px Verdana";
             context.textAlign = "center";
             context.fillStyle = dotColor;
             context.fillText(padZero(h) + ":" + padZero(m), clockX, (clockY + 10));
+
+            if (hourFormat === "12") {
+                if (getTimePeriod(now.getHours()) === "PM") {
+                    var markPeriodString = "p"
+                } else {
+                    var markPeriodString = ""
+                }
+                context.font = "12px Verdana";
+                context.fillText(markPeriodString, (clockX + 52), (clockY - 4));
+            }
+
         }
-        function drawModernTime() {
+        function drawModernTime(hourFormat) {
             // draw time hh:mm
             context.font = "45px Verdana";
             context.textAlign = "center";
@@ -423,10 +442,24 @@ function displayTime(canvas, jsn) {
             context.fillText(padZero(h), clockX, (clockY - 10));
             context.fillText(padZero(m), clockX, (clockY + 30));
 
-            context.font = "22px Verdana";
-            context.fillText(padZero(s), clockX, (clockY + 51));
+
+            if (hourFormat === "12") {
+                if (getTimePeriod(now.getHours()) === "PM") {
+                    var markPeriodString = "p"
+                } else {
+                    var markPeriodString = ""
+                }
+                context.font = "22px Verdana";
+                context.fillText(padZero(s), clockX, (clockY + 51));
+                context.font = "13px Verdana";
+                context.fillText(markPeriodString, (clockX + 19), (clockY + 42));
+            } else {
+                context.font = "22px Verdana";
+                context.fillText(padZero(s), clockX, (clockY + 51));
+            }
 
         }
+        
 
         function drawDate() {
             // draw date
@@ -479,7 +512,7 @@ function displayTime(canvas, jsn) {
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime()
+                drawClassicTime(hourFormat)
                 drawDate()
                 drawSeconds()
                 break;
@@ -487,33 +520,33 @@ function displayTime(canvas, jsn) {
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime()
+                drawClassicTime(hourFormat)
                 drawSeconds()
                 break;
             case 2:
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime()
+                drawClassicTime(hourFormat)
                 drawDate()
                 break;
             case 3:
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime()
+                drawClassicTime(hourFormat)
                 break;
             case 4:
                 drawDotsActive()
                 drawDotsInactive()
                 // drawScale()
-                drawModernTime()
+                drawModernTime(hourFormat)
                 break;
             default:
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime()
+                drawClassicTime(hourFormat)
                 drawDate()
                 drawSeconds()
               break;
