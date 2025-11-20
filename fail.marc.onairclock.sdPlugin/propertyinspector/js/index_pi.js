@@ -119,6 +119,14 @@ const updateUI = (pl) => {
             }
         }
    })
+   
+   // Set initial visibility for AM/PM indicator based on hour format
+   let hourFormatValue = pl.hourFormat || "24";
+   if(hourFormatValue == "12") {
+       document.getElementById('ampmindicatorSelector').style.display = "flex";
+   } else {
+       document.getElementById('ampmindicatorSelector').style.display = "none";
+   }
 }
 
 /**
@@ -205,6 +213,14 @@ $SD.on('piDataChanged', (returnValue) => {
         document.getElementById('dateTypeSelector').style.display = "flex";
     } else {
         document.getElementById('dateTypeSelector').style.display = "none";
+    }
+
+    let hourFormatSelected = document.getElementById('hourFormat').value
+
+    if(hourFormatSelected == "12") {
+        document.getElementById('ampmindicatorSelector').style.display = "flex";
+    } else {
+        document.getElementById('ampmindicatorSelector').style.display = "none";
     }
 
 });

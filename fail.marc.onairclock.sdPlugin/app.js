@@ -28,6 +28,8 @@ const gDotColorDefault = "#ab0000"
 const gDotInactiveColorDefault = "#888888"
 const gBackgroundColorDefault = "#000000"
 const gWatchfaceDefault = 0
+const gTimeFormatDefault = "24"
+const gAmpmIndicatorDefault = false
 
 var allElements = []
 
@@ -218,6 +220,12 @@ function updateClock(jsn) {
                 break;
         }
 
+        currentElement.hourFormat = jsn.payload.settings.hourFormat || gTimeFormatDefault
+        currentElement.ampmindicator = jsn.payload.settings.ampmindicator === "true" || jsn.payload.settings.ampmindicator === true
+
+        console.log("Update settings - hourFormat:", jsn.payload.settings.hourFormat, "ampmindicator:", jsn.payload.settings.ampmindicator)
+        console.log("Stored in element - hourFormat:", currentElement.hourFormat, "ampmindicator:", currentElement.ampmindicator)
+
 
         drawClockImg(jsn)
 
@@ -240,6 +248,33 @@ function updateClock(jsn) {
         } else {
             currentElement.watchface = gWatchfaceDefault
         }
+        
+        switch (jsn.payload.settings.dateType) {
+            case "dd-mm":
+                currentElement.dateType = "dd-mm"
+                break;
+            case "mm-dd":
+                currentElement.dateType = "mm-dd"
+                break;
+            case "dd-mm-yy":
+                currentElement.dateType = "dd-mm-yy"
+                break;
+            case "mm-dd-yy":
+                currentElement.dateType = "mm-dd-yy"
+                break;
+            case "yy-mm-dd":
+                currentElement.dateType = "yy-mm-dd"
+                break;
+            default:
+                currentElement.dateType = "dd-mm"
+                break;
+        }
+
+        currentElement.hourFormat = jsn.payload.settings.hourFormat || gTimeFormatDefault
+        currentElement.ampmindicator = jsn.payload.settings.ampmindicator === "true" || jsn.payload.settings.ampmindicator === true
+
+        console.log("New element settings - hourFormat:", jsn.payload.settings.hourFormat, "ampmindicator:", jsn.payload.settings.ampmindicator)
+        console.log("New element stored - hourFormat:", currentElement.hourFormat, "ampmindicator:", currentElement.ampmindicator)
 
         currentElement.timer = setInterval(function(sx) {
             drawClockImg(jsn)
@@ -310,14 +345,19 @@ function displayTime(canvas, jsn) {
         currentElement = allElements.find(item => item.context === jsn.context)
     }
 
-    var hourFormat = jsn.payload.settings.hourFormat
+    var hourFormat = currentElement.hourFormat
+    console.log("hour format received: " + hourFormat)
+    var ampmindicator = currentElement.ampmindicator
+    console.log("ampm indicator received: " + ampmindicator)
 
     var now = new Date();
 
     var h
-    if (jsn.payload.settings.hourFormat === "12") {
+    if (hourFormat === "12") {
+        console.log("12 hour format")
         h = now.getHours() % 12 || 12;
     } else {
+        console.log("24 hour format")
         h = now.getHours();
     }
 
@@ -416,16 +456,17 @@ function displayTime(canvas, jsn) {
 
 
         
-        function drawClassicTime(hourFormat) {
+        function drawClassicTime(hourFormat, ampmindicator) {
             // draw time hh:mm
             context.font = "30px Verdana";
             context.textAlign = "center";
             context.fillStyle = dotColor;
             context.fillText(padZero(h) + ":" + padZero(m), clockX, (clockY + 10));
 
-            if (hourFormat === "12") {
+            if (hourFormat === "12" && ampmindicator === true) {
+                console.log("drawing ampm indicator")
                 if (getTimePeriod(now.getHours()) === "PM") {
-                    var markPeriodString = "p"
+                    var markPeriodString = "*"
                 } else {
                     var markPeriodString = ""
                 }
@@ -434,7 +475,7 @@ function displayTime(canvas, jsn) {
             }
 
         }
-        function drawModernTime(hourFormat) {
+        function drawModernTime(hourFormat, ampmindicator) {
             // draw time hh:mm
             context.font = "45px Verdana";
             context.textAlign = "center";
@@ -442,22 +483,19 @@ function displayTime(canvas, jsn) {
             context.fillText(padZero(h), clockX, (clockY - 10));
             context.fillText(padZero(m), clockX, (clockY + 30));
 
+            context.font = "22px Verdana";
+            context.fillText(padZero(s), clockX, (clockY + 51));
 
-            if (hourFormat === "12") {
+            if (hourFormat === "12" && ampmindicator === true) {
+                console.log("drawing ampm indicator")
                 if (getTimePeriod(now.getHours()) === "PM") {
-                    var markPeriodString = "p"
+                    var markPeriodString = "*"
                 } else {
                     var markPeriodString = ""
                 }
-                context.font = "22px Verdana";
-                context.fillText(padZero(s), clockX, (clockY + 51));
-                context.font = "13px Verdana";
-                context.fillText(markPeriodString, (clockX + 19), (clockY + 42));
-            } else {
-                context.font = "22px Verdana";
-                context.fillText(padZero(s), clockX, (clockY + 51));
+                context.font = "15px Verdana";
+                context.fillText(markPeriodString, (clockX + 19), (clockY + 46));
             }
-
         }
         
 
@@ -512,7 +550,7 @@ function displayTime(canvas, jsn) {
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime(hourFormat)
+                drawClassicTime(hourFormat, ampmindicator)
                 drawDate()
                 drawSeconds()
                 break;
@@ -520,33 +558,33 @@ function displayTime(canvas, jsn) {
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime(hourFormat)
+                drawClassicTime(hourFormat, ampmindicator)
                 drawSeconds()
                 break;
             case 2:
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime(hourFormat)
+                drawClassicTime(hourFormat, ampmindicator)
                 drawDate()
                 break;
             case 3:
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime(hourFormat)
+                drawClassicTime(hourFormat, ampmindicator)
                 break;
             case 4:
                 drawDotsActive()
                 drawDotsInactive()
                 // drawScale()
-                drawModernTime(hourFormat)
+                drawModernTime(hourFormat, ampmindicator)
                 break;
             default:
                 drawDotsActive()
                 drawDotsInactive()
                 drawScale()
-                drawClassicTime(hourFormat)
+                drawClassicTime(hourFormat, ampmindicator)
                 drawDate()
                 drawSeconds()
               break;
