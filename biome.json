@@ -14,8 +14,6 @@
 			"!.superpowers",
 			"!.claude",
 			"!.playwright-mcp",
-			"!fail.marc.onairclock.sdPlugin/action",
-			"!fail.marc.onairclock.sdPlugin/previews",
 			"!fail.marc.onairclock.sdPlugin/ui/sdpi-components.js"
 		]
 	},

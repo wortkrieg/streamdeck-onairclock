@@ -5,8 +5,8 @@
 	"URL": "https://github.com/wortkrieg/streamdeck-onairclock",
 	"Description": "A broadcast studio clock for your Stream Deck: five watchfaces, any color, time zones and a countdown.",
 	"Category": "On Air Clock",
-	"CategoryIcon": "action/images/category",
-	"Icon": "action/images/actionimage",
+	"CategoryIcon": "imgs/plugin/category",
+	"Icon": "imgs/plugin/icon",
 	"CodePath": "bin/plugin.js",
 	"SDKVersion": 3,
 	"Software": {
@@ -23,18 +23,18 @@
 		{
 			"Name": "On Air Clock",
 			"UUID": "fail.marc.onairclock.action",
-			"Icon": "action/images/actionimage",
+			"Icon": "imgs/actions/clock/icon",
 			"Tooltip": "A studio clock with time zones.",
 			"PropertyInspectorPath": "ui/clock.html",
 			"Controllers": ["Keypad", "Encoder"],
 			"States": [
 				{
-					"Image": "action/images/image"
+					"Image": "imgs/actions/clock/key"
 				}
 			],
 			"Encoder": {
 				"layout": "layouts/clock.json",
-				"Icon": "action/images/actionimage",
+				"Icon": "imgs/actions/clock/encoder",
 				"StackColor": "#0000FF",
 				"TriggerDescription": {
 					"Push": "Cancel countdown",

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+	<title>Countdown</title>
+	<!-- Countdown action: ring with a start triangle (centroid on the ring centre). -->
+	<circle cx="10" cy="10" r="7.5" fill="none" stroke="#FFFFFF" stroke-width="1.6"/>
+	<path d="M8.4 6.9L13.2 10L8.4 13.1Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round"/>
+</svg>

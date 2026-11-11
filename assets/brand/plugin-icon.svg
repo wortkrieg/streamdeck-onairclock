@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
+	<title>On Air Clock</title>
+	<!-- On Air Clock, "Farbraum": a black key on ultramarine, its seconds ring in three clock colours. -->
+	<rect width="144" height="144" fill="#2B3BFF"/>
+	<rect x="22" y="22" width="100" height="100" rx="18" fill="#000000"/>
+	<g fill="none" stroke-width="7" stroke-linecap="round">
+		<path d="M72 40A32 32 0 0 1 100.04 87.42" stroke="#FF3B2F"/>
+		<path d="M90.81 97.89A32 32 0 0 1 44.98 89.15" stroke="#3DFFB5"/>
+		<path d="M40.25 76.01A32 32 0 0 1 58.38 43.05" stroke="#FFA516"/>
+	</g>
+</svg>
