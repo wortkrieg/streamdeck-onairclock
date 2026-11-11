@@ -1,8 +1,9 @@
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { buildAssets } from "./build-assets";
+import { BRAND, buildAssets } from "./build-assets";
 
 const PLUGIN = "fail.marc.onairclock.sdPlugin";
 const PNG_SIGNATURE = Buffer.from([
@@ -76,5 +77,20 @@ describe("buildAssets", () => {
 		expect(w / h).toBeGreaterThanOrEqual(2);
 		const gif = readFileSync(join(out, "docs/images/readme-demo.gif"));
 		expect(gif.subarray(0, 6).toString("latin1")).toBe("GIF89a");
+	});
+});
+
+describe("manifest branding", () => {
+	test("the Stream Deck+ encoder stack color is the brand ultramarine", () => {
+		const manifest = JSON.parse(
+			readFileSync(
+				fileURLToPath(new URL(`../${PLUGIN}/manifest.json`, import.meta.url)),
+				"utf8",
+			),
+		) as { Actions: { UUID: string; Encoder?: { StackColor?: string } }[] };
+		const clock = manifest.Actions.find(
+			(a) => a.UUID === "fail.marc.onairclock.action",
+		);
+		expect(clock?.Encoder?.StackColor).toBe(BRAND.ultramarine);
 	});
 });
