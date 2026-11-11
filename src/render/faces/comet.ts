@@ -11,10 +11,12 @@ import {
 	MIN_FRACTION,
 	mainTwoLines,
 	pmDot,
+	pmPosition,
 	ringFraction,
+	splitMain,
 } from "./shared";
 
-const R = 60;
+const R = 64;
 const TAIL = 0.22;
 const SEGMENTS = 16;
 
@@ -48,14 +50,8 @@ export function renderComet(m: FaceModel, s: FaceStyle, a: AnimState): string {
 		out += head(x, y, 4.2 + 1.2 * a.glow, c);
 	}
 
-	out += mainTwoLines(
-		m,
-		a,
-		c,
-		{ cy: 54, height: 27, stroke: 3.3 },
-		{ cy: 92, height: 27, stroke: 3.3 },
-	);
-	// hours at height 27 end at x~92, top y~40.5
-	if (m.pm) out += pmDot(98.5, 43, c);
+	const top = { cy: 48, height: 38, stroke: 5 };
+	out += mainTwoLines(m, a, c, top, { cy: 96, height: 38, stroke: 5 });
+	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], top), c);
 	return out;
 }

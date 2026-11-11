@@ -17,12 +17,12 @@ export function renderCountdownKey(
 	if (view === null || view.phase === "finished") {
 		const digits = renderDigits(formatMMSS(durationSec), {
 			cx: 72,
-			cy: 64,
-			height: 26,
-			stroke: 3.2,
+			cy: 60,
+			height: 32,
+			stroke: 4.2,
 			color,
 		});
-		const triangle = `<path d="M67 93L78 100L67 107Z" fill="${color}" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>`;
+		const triangle = `<path d="M65 94L80 103L65 112Z" fill="${color}" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>`;
 		return svgDocument(digits + triangle, background);
 	}
 	const m = countdownFaceModel(view);

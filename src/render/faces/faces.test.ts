@@ -148,12 +148,12 @@ describe("renderFace", () => {
 		const m = clock("line", {}, MINUTE);
 		expect(m.fraction).toBe(0);
 		const svg = renderFace("line", m, STYLE, STATIC_ANIM);
-		expect(arcPaths(svg, 61)).toBe(0);
+		expect(arcPaths(svg, 64)).toBe(0);
 		expect(svg).toContain(
-			`<circle cx="72" cy="72" r="61" fill="none" stroke="${STYLE.inactive}"`,
+			`<circle cx="72" cy="72" r="64" fill="none" stroke="${STYLE.inactive}"`,
 		);
 		expect(
-			arcPaths(renderFace("line", clock("line"), STYLE, STATIC_ANIM), 61),
+			arcPaths(renderFace("line", clock("line"), STYLE, STATIC_ANIM), 64),
 		).toBe(1);
 	});
 
@@ -290,6 +290,22 @@ describe("renderFace", () => {
 		expect(digitGroups(svg)).toBe(2); // main + sub, no date
 	});
 
+	test("long labels shrink to stay inside the face", async () => {
+		const h = await withHardware({ TEXT_SUPPORTED: true });
+		const size = (text: string) => {
+			const svg = h.renderFace(
+				"classic",
+				h.buildFaceModel(NOW, cfg("classic", { label: text })),
+				STYLE,
+				STATIC_ANIM,
+			);
+			return Number(/font-size="([\d.]+)"/.exec(svg)?.[1]);
+		};
+		expect(size("NYC")).toBe(20);
+		expect(size("LONDON")).toBeLessThan(20);
+		expect(size("LONDON") * 6 * 0.7).toBeLessThanOrEqual(76);
+	});
+
 	test("no label in the svg when text is not supported", async () => {
 		const h = await withHardware({ TEXT_SUPPORTED: false });
 		const svg = h.renderFace(
@@ -332,8 +348,8 @@ describe("renderFace", () => {
 				fillCircles(renderFace("classic", classic, STYLE, off), STYLE.active),
 			).toBe(0);
 			const line = countdownModel("line", phase);
-			expect(arcPaths(renderFace("line", line, STYLE, on), 61)).toBe(1);
-			expect(arcPaths(renderFace("line", line, STYLE, off), 61)).toBe(0);
+			expect(arcPaths(renderFace("line", line, STYLE, on), 64)).toBe(1);
+			expect(arcPaths(renderFace("line", line, STYLE, off), 64)).toBe(0);
 		}
 		// running shows the remaining fraction regardless of ringOn
 		const running = countdownModel("classic", "running");
@@ -361,9 +377,9 @@ describe("renderFace", () => {
 				STYLE,
 				STATIC_ANIM,
 			);
-		expect(at("line")).toContain("fill-opacity="); // head halo
+		expect(at("line")).toContain('fill="url(#glow)"'); // head halo
 		const comet = at("comet");
-		expect(arcPaths(comet, 60)).toBeGreaterThan(0); // tail, not the full ring
+		expect(arcPaths(comet, 64)).toBeGreaterThan(0); // tail, not the full ring
 		expect(comet).not.toContain('stroke-width="2.4"');
 	});
 
@@ -388,7 +404,10 @@ describe("renderFace", () => {
 			...STATIC_ANIM,
 			glow: 0.5,
 		});
-		expect(fillCircles(glowing, STYLE.active)).toBeGreaterThan(54);
+		expect(glowing).toContain('fill="url(#glow)"');
+		expect(renderFace("classic", m, STYLE, STATIC_ANIM)).not.toContain(
+			"url(#glow)",
+		);
 	});
 
 	test("flash and pulse wrap the face", () => {
@@ -422,8 +441,14 @@ describe("renderFace", () => {
 		expectWellFormed(svg);
 	});
 
-	test("glow technique: stacked circles need no defs", () => {
-		const svg = renderFace("line", clock("line"), STYLE, STATIC_ANIM);
+	test("glow technique: stacked circles need no defs", async () => {
+		const h = await withHardware({ GLOW_TECHNIQUE: "stackedCircles" });
+		const svg = h.renderFace(
+			"line",
+			h.buildFaceModel(NOW, cfg("line")),
+			STYLE,
+			STATIC_ANIM,
+		);
 		expect(svg).not.toContain("<defs");
 		expect(count(svg, /fill-opacity=/g)).toBeGreaterThanOrEqual(3);
 	});
@@ -507,7 +532,7 @@ describe("renderCountdownKey", () => {
 		expect(digitGroups(svg)).toBe(1);
 		expect(svg).toContain(`d="${GLYPHS["5"]}"`);
 		expect(svg).toMatch(/<path d="M[^"]*Z" fill="#FF3B2F"/); // triangle
-		expect(arcPaths(svg, 61)).toBe(0);
+		expect(arcPaths(svg, 64)).toBe(0);
 		preview("countdown-key-idle", svg);
 		expect(svg).toMatchSnapshot();
 	});
@@ -525,7 +550,7 @@ describe("renderCountdownKey", () => {
 			"#FF3B2F",
 		);
 		expectWellFormed(svg);
-		expect(arcPaths(svg, 61)).toBe(1);
+		expect(arcPaths(svg, 64)).toBe(1);
 		expect(svg).toContain(`d="${GLYPHS["4"]}"`); // 03:45
 		preview("countdown-key-running", svg);
 		expect(svg).toMatchSnapshot();

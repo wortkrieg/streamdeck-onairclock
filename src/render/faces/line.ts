@@ -13,12 +13,13 @@ import {
 	MIN_FRACTION,
 	mainLine,
 	pmDot,
+	pmPosition,
 	ringFraction,
 	subLine,
 	wiping,
 } from "./shared";
 
-const R = 61;
+const R = 64;
 const WIDTH = 4;
 
 function arc(f0: number, f1: number, color: string): string {
@@ -40,15 +41,15 @@ export function renderLine(m: FaceModel, s: FaceStyle, a: AnimState): string {
 		out += head(x, y, 4.6 + 1.2 * a.glow, c);
 	}
 
-	if (m.label) out += label(m.label, 40, 12, c);
-	const cd = m.mode === "countdown";
-	out += mainLine(m, a, c, {
-		cy: m.sub ? 66 : 72,
-		height: cd ? 22 : 23,
-		stroke: 2.9,
-	});
-	out += subLine(m, a, c, { cy: 96, height: 11, stroke: 2 });
-	// main "16:59" at height 23 ends at x~113, top y~54.5 (with seconds)
-	if (m.pm) out += pmDot(120, m.sub ? 57 : 63, c);
+	if (m.label) out += label(m.label, 38, 19, c, 80);
+	const main = {
+		cy: m.sub ? 68 : 72,
+		height: 28,
+		stroke: 4.2,
+		maxWidth: 106,
+	};
+	out += mainLine(m, a, c, main);
+	out += subLine(m, a, c, { cy: 101, height: 17, stroke: 2.9 });
+	if (m.pm) out += pmDot(...pmPosition(m.main, main), c);
 	return out;
 }

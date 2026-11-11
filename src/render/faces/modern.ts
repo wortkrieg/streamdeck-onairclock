@@ -8,22 +8,32 @@ import {
 	label,
 	mainTwoLines,
 	pmDot,
+	pmPosition,
+	splitMain,
 	subLine,
 } from "./shared";
+
+// V1 proportions: digits about 32 high on a 40 line pitch, seconds about 16 high.
+const PLAIN = {
+	top: { cy: 43, height: 32, stroke: 4.6 },
+	bottom: { cy: 83, height: 32, stroke: 4.6 },
+	sub: { cy: 115, height: 17, stroke: 3 },
+};
+// With a label on top the rows move down and shrink a little.
+const LABELLED = {
+	top: { cy: 52, height: 28, stroke: 4.2 },
+	bottom: { cy: 87, height: 28, stroke: 4.2 },
+	sub: { cy: 116, height: 15, stroke: 2.8 },
+};
 
 export function renderModern(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	const c = s.active;
 	let out = dotRing(m, s, a);
-	if (m.label) out += label(m.label, 24, 11, c);
-	out += mainTwoLines(
-		m,
-		a,
-		c,
-		{ cy: 50, height: 30, stroke: 3.6 },
-		{ cy: 88, height: 30, stroke: 3.6 },
-	);
-	out += subLine(m, a, c, { cy: 118, height: 13, stroke: 2.1 });
-	// hours at height 30 end at x~94, top y 35
-	if (m.pm) out += pmDot(101, 38, c);
+	const top = m.label ? label(m.label, 25, 17, c, 64) : "";
+	const g = top ? LABELLED : PLAIN;
+	out += top;
+	out += mainTwoLines(m, a, c, g.top, g.bottom);
+	out += subLine(m, a, c, g.sub);
+	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], g.top), c);
 	return out;
 }

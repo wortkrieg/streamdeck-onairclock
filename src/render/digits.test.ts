@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { GLYPHS, renderDigits } from "./digits";
+import { fitHeight, GLYPHS, renderDigits, textUnits } from "./digits";
 
 const base = { cx: 72, cy: 72, height: 48, stroke: 4, color: "#fff" };
 const count = (s: string, needle: string) => s.split(needle).length - 1;
@@ -48,5 +48,20 @@ describe("renderDigits", () => {
 		expect(s).toContain("translate(-5 1.13)");
 		expect(s).toContain('opacity="0.13"');
 		expect(s).toContain('opacity="0.88"');
+	});
+});
+
+describe("fitHeight", () => {
+	test("short text keeps the maximum height", () => {
+		expect(fitHeight("20:48", 28, 106, 4.2)).toBe(28);
+	});
+	test("long text shrinks until it fits the width", () => {
+		const h = fitHeight("+00:12", 28, 106, 4.2);
+		expect(h).toBeLessThan(28);
+		expect((textUnits("+00:12") * h) / 16 + 4.2).toBeCloseTo(106, 6);
+	});
+	test("unknown characters take no width", () => {
+		expect(textUnits("1x2")).toBe(textUnits("12"));
+		expect(fitHeight("", 20, 10, 2)).toBe(20);
 	});
 });

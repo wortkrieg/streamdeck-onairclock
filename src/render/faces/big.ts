@@ -9,7 +9,9 @@ import {
 	MIN_FRACTION,
 	mainTwoLines,
 	pmDot,
+	pmPosition,
 	ringFraction,
+	splitMain,
 	wiping,
 } from "./shared";
 
@@ -18,23 +20,17 @@ const LEN = 100;
 const Y = 131;
 
 function bar(f0: number, f1: number, color: string): string {
-	return `<line x1="${r2(X0 + LEN * f0)}" y1="${Y}" x2="${r2(X0 + LEN * f1)}" y2="${Y}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+	return `<line x1="${r2(X0 + LEN * f0)}" y1="${Y}" x2="${r2(X0 + LEN * f1)}" y2="${Y}" stroke="${color}" stroke-width="4" stroke-linecap="round"/>`;
 }
 
 export function renderBig(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	const c = s.active;
-	let out = mainTwoLines(
-		m,
-		a,
-		c,
-		{ cy: 41, height: 44, stroke: 5 },
-		{ cy: 95, height: 44, stroke: 5 },
-	);
+	const top = { cy: 41, height: 44, stroke: 5.6 };
+	let out = mainTwoLines(m, a, c, top, { cy: 95, height: 44, stroke: 5.6 });
 	out += bar(0, 1, s.inactive);
 	const frac = ringFraction(m, a);
 	if (frac > MIN_FRACTION) out += bar(0, frac, c);
 	if (wiping(m, a)) out += bar(easeOutCubic(a.wipe), 1, c);
-	// hours at height 44 end at x~104, top y 19
-	if (m.pm) out += pmDot(112, 22, c);
+	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], top), c);
 	return out;
 }

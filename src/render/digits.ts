@@ -48,6 +48,28 @@ function isKnown(ch: string): boolean {
 	return ch === ":" || ch === " " || ch in GLYPHS;
 }
 
+/** Width of `text` in glyph units (unknown characters take no space). */
+export function textUnits(text: string): number {
+	const known = [...text].filter(isKnown);
+	return known.reduce((a, c) => a + (WIDTHS[c] ?? 10) + GAP, -GAP);
+}
+
+/**
+ * Largest digit height up to `maxHeight` at which `text` drawn with `stroke` stays
+ * within `maxWidth`. Long strings ("+00:12", "11-11-26") shrink, short ones keep
+ * `maxHeight`.
+ */
+export function fitHeight(
+	text: string,
+	maxHeight: number,
+	maxWidth: number,
+	stroke: number,
+): number {
+	const units = textUnits(text);
+	if (units <= 0) return maxHeight;
+	return Math.min(maxHeight, ((maxWidth - stroke) * 16) / units);
+}
+
 export function renderDigits(text: string, o: DigitOptions): string {
 	const sc = o.height / 16;
 	const swU = o.stroke / sc;

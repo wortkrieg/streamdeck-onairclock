@@ -1,7 +1,7 @@
 // Types and drawing parts shared by the five faces. Geometry is 144x144, centre 72,72.
 import type { FaceModel } from "../../core/clock-model";
 import { GLOW_TECHNIQUE, TEXT_SUPPORTED } from "../../hardware";
-import { easeOutCubic, renderDigits } from "../digits";
+import { easeOutCubic, fitHeight, renderDigits, textUnits } from "../digits";
 import { polar, r2 } from "../geometry";
 
 export interface FaceStyle {
@@ -123,7 +123,14 @@ export function head(x: number, y: number, rad: number, color: string): string {
 
 /** Small PM marker (V1 drew "*"). */
 export function pmDot(x: number, y: number, color: string): string {
-	return dot(x, y, 2, color);
+	return dot(x, y, 2.6, color);
+}
+
+/** PM dot just right of the top edge of a centred digit row (main text, or its top line). */
+export function pmPosition(text: string, box: DigitBox): [number, number] {
+	const h = boxHeight(text, box);
+	const half = (textUnits(text) * h) / 16 / 2;
+	return [(box.cx ?? 72) + half + box.stroke / 2 + 4.5, box.cy - h / 2 + 2.6];
 }
 
 export function escapeXml(s: string): string {
@@ -136,15 +143,25 @@ export function escapeXml(s: string): string {
 	);
 }
 
-/** Label text centred on cy (cap height ~0.7em). "" when the key cannot draw text. */
+// Generous average advance of bold caps (Arial Bold is ~0.72em), so the estimate errs wide.
+const CAP_ADVANCE = 0.7;
+
+/**
+ * Label text centred on cy (cap height ~0.7em), at `size` or smaller so that it stays
+ * within `maxWidth`. "" when the key cannot draw text.
+ */
 export function label(
 	text: string,
 	cy: number,
 	size: number,
 	color: string,
+	maxWidth = 144,
 ): string {
 	if (!TEXT_SUPPORTED) return "";
-	return `<text x="72" y="${r2(cy + size * 0.35)}" font-family="Barlow, Arial, sans-serif" font-weight="600" font-size="${size}" text-anchor="middle" fill="${color}">${escapeXml(text.toUpperCase())}</text>`;
+	const chars = [...text].length;
+	const fit = maxWidth / (Math.max(1, chars) * CAP_ADVANCE);
+	const fs = Math.min(size, Math.floor(fit * 100) / 100);
+	return `<text x="72" y="${r2(cy + fs * 0.35)}" font-family="Barlow, Arial, sans-serif" font-weight="600" font-size="${fs}" text-anchor="middle" fill="${color}">${escapeXml(text.toUpperCase())}</text>`;
 }
 
 /** "16:59" / "+00:05" -> ["16", "59"] / ["00", "05"]; the two-row faces draw the "+" separately. */
@@ -158,6 +175,15 @@ export interface DigitBox {
 	cy: number;
 	height: number;
 	stroke: number;
+	/** Longer strings shrink below `height` to stay within this width. */
+	maxWidth?: number;
+}
+
+/** Height for `text` in `box`: `box.height`, or less when the text would exceed maxWidth. */
+export function boxHeight(text: string, box: DigitBox): number {
+	return box.maxWidth === undefined
+		? box.height
+		: fitHeight(text, box.height, box.maxWidth, box.stroke);
 }
 
 /** Main digits on one line, with roll and colon blink. */
@@ -169,6 +195,7 @@ export function mainLine(
 ): string {
 	return renderDigits(m.main, {
 		...box,
+		height: boxHeight(m.main, box),
 		cx: box.cx ?? 72,
 		color,
 		prev: m.prevMain,
@@ -234,6 +261,7 @@ export function subLine(
 	if (m.sub === undefined) return "";
 	return renderDigits(m.sub, {
 		...box,
+		height: boxHeight(m.sub, box),
 		cx: box.cx ?? 72,
 		color,
 		prev: m.prevSub,
@@ -241,9 +269,10 @@ export function subLine(
 	});
 }
 
-const DOT_RING_R = 61;
-const DOT_ON = 2.3;
-const DOT_OFF = 1.45;
+// Ring close to the key edge (V1 used r 66) so the digits get the space inside.
+export const DOT_RING_R = 65;
+const DOT_ON = 2.4;
+const DOT_OFF = 1.5;
 
 /**
  * 60-dot seconds ring (classic, modern): active dots, inactive dots, the ring reset
