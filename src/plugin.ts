@@ -5,6 +5,7 @@ import { ClockController } from "./plugin/clock-controller";
 import { CountdownAction } from "./plugin/countdown-action";
 import { CountdownController } from "./plugin/countdown-controller";
 import { countdowns } from "./plugin/registry";
+import { watchSystemZone } from "./plugin/system-zone";
 import { combineFrames, type FrameFn, Ticker } from "./plugin/ticker";
 
 const log = streamDeck.logger.createScope("OnAirClock");
@@ -34,3 +35,5 @@ streamDeck.actions.registerAction(
 
 await streamDeck.connect();
 ticker.start();
+// Clocks on "System time" follow a changed system time zone within ZONE_CHECK_MS.
+watchSystemZone();
