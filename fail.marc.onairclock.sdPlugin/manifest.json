@@ -41,6 +41,19 @@
 					"Touch": "Cancel countdown"
 				}
 			}
+		},
+		{
+			"Name": "Countdown",
+			"UUID": "fail.marc.onairclock.countdown",
+			"Icon": "imgs/actions/countdown/icon",
+			"Tooltip": "Starts a countdown on the clocks of this Stream Deck.",
+			"PropertyInspectorPath": "ui/countdown.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/countdown/key"
+				}
+			]
 		}
 	],
 	"UUID": "fail.marc.onairclock"

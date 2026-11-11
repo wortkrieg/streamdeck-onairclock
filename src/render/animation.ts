@@ -1,4 +1,5 @@
 import type { FaceModel } from "../core/clock-model";
+import type { CountdownView } from "../core/countdown";
 import type { ClockConfig } from "../core/settings";
 import type { AnimState } from "./faces";
 
@@ -20,6 +21,26 @@ const progress = (ageMs: number, durationMs: number): number =>
 /** Positive modulo, also for negative values. */
 const mod = (a: number, n: number): number => ((a % n) + n) % n;
 
+/** The countdown's own animation: warning pulse, ring blink and end flash. */
+export function countdownAnim(
+	cv: CountdownView | undefined,
+	secAgeMs: number,
+): Pick<AnimState, "pulse" | "ringOn" | "flash"> {
+	let pulse = 1;
+	if (cv?.phase === "running" && cv.warn && cv.remainingMs <= WARN_LAST_MS) {
+		const k = mod(cv.remainingMs, 1000) / 1000;
+		pulse =
+			(1 + PULSE_MIN) / 2 + ((1 - PULSE_MIN) / 2) * Math.cos(2 * Math.PI * k);
+	}
+	const blinking =
+		cv?.phase === "overtime" || cv?.phase === "hold" || cv?.phase === "flash";
+	return {
+		pulse,
+		ringOn: blinking ? mod(secAgeMs, 1000) < BLINK_MS : true,
+		flash: cv?.phase === "flash" && mod(cv.sinceZeroMs, 1000) < FLASH_ON_MS,
+	};
+}
+
 /**
  * Animation parameters for one frame. roll, subRoll and wipe stay linear: the digits
  * and the ring apply the ease-out themselves.
@@ -30,18 +51,7 @@ export function animState(
 ): AnimState {
 	const clock = m.mode === "clock";
 	const anim = cfg.animations;
-	const cv = m.countdown;
 	const secPhase = mod(m.secAgeMs, 1000);
-
-	let pulse = 1;
-	if (cv?.phase === "running" && cv.warn && cv.remainingMs <= WARN_LAST_MS) {
-		const k = mod(cv.remainingMs, 1000) / 1000;
-		pulse =
-			(1 + PULSE_MIN) / 2 + ((1 - PULSE_MIN) / 2) * Math.cos(2 * Math.PI * k);
-	}
-
-	const blinking =
-		cv?.phase === "overtime" || cv?.phase === "hold" || cv?.phase === "flash";
 
 	return {
 		roll: anim ? progress(m.mainAgeMs, ROLL_MS) : 1,
@@ -50,9 +60,7 @@ export function animState(
 		glow: anim ? 1 - progress(m.secAgeMs, GLOW_MS) : 0,
 		colonOpacity:
 			cfg.blinkColon && clock && secPhase >= BLINK_MS ? COLON_DIM : 1,
-		pulse,
-		ringOn: blinking ? secPhase < BLINK_MS : true,
-		flash: cv?.phase === "flash" && mod(cv.sinceZeroMs, 1000) < FLASH_ON_MS,
+		...countdownAnim(m.countdown, m.secAgeMs),
 	};
 }
 
