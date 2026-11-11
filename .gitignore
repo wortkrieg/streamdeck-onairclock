@@ -1,1 +1,12 @@
-.DS_store
+# macOS
+.DS_Store
+
+# Node / V2 build
+node_modules/
+dist/
+*.log
+.env
+
+# Local tool artifacts (brainstorm mockups, browser automation)
+.superpowers/
+.playwright-mcp/
