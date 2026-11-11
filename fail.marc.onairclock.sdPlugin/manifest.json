@@ -25,6 +25,7 @@
 			"UUID": "fail.marc.onairclock.action",
 			"Icon": "action/images/actionimage",
 			"Tooltip": "A versatile On Air Clock",
+			"PropertyInspectorPath": "ui/clock.html",
 			"Controllers": ["Keypad", "Encoder"],
 			"States": [
 				{
@@ -32,14 +33,12 @@
 				}
 			],
 			"Encoder": {
-				"layout": "$A0",
+				"layout": "layouts/clock.json",
 				"Icon": "action/images/actionimage",
 				"StackColor": "#0000FF",
 				"TriggerDescription": {
-					"Rotate": "Unused",
-					"Push": "Unused",
-					"Touch": "Unused",
-					"LongTouch": "Unused"
+					"Push": "Cancel countdown",
+					"Touch": "Cancel countdown"
 				}
 			}
 		}

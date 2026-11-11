@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>On Air Clock Settings</title>
+		<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+		<style>
+			.hint {
+				color: #969696;
+				font-family: "Segoe UI", Arial, Roboto, Helvetica, sans-serif;
+				font-size: 8pt;
+				line-height: 1.4;
+				margin: 4px 0 0;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Setting keys and defaults match ClockSettingsStored and CLOCK_DEFAULTS in src/core/settings.ts. -->
+		<sdpi-item label="Watchface">
+			<sdpi-select setting="face" default="classic">
+				<option value="classic">Classic</option>
+				<option value="modern">Modern Minimal</option>
+				<option value="line">Line</option>
+				<option value="comet">Comet</option>
+				<option value="big">Big</option>
+			</sdpi-select>
+		</sdpi-item>
+		<sdpi-item label="Show date">
+			<sdpi-checkbox setting="showDate" default="true"></sdpi-checkbox>
+		</sdpi-item>
+		<sdpi-item label="Show seconds">
+			<sdpi-checkbox setting="showSeconds" default="true"></sdpi-checkbox>
+		</sdpi-item>
+		<sdpi-item label="Date format">
+			<sdpi-select setting="dateType" default="dd-mm">
+				<option value="dd-mm">DD-MM</option>
+				<option value="mm-dd">MM-DD</option>
+				<option value="dd-mm-yy">DD-MM-YY</option>
+				<option value="mm-dd-yy">MM-DD-YY</option>
+				<option value="yy-mm-dd">YY-MM-DD</option>
+			</sdpi-select>
+		</sdpi-item>
+		<sdpi-item label="Hour format">
+			<sdpi-select setting="hourFormat" default="24">
+				<option value="24">24 hour</option>
+				<option value="12">12 hour</option>
+			</sdpi-select>
+		</sdpi-item>
+		<sdpi-item label="PM indicator">
+			<!-- No default attribute: sdpi reads default="false" as a truthy string. -->
+			<sdpi-checkbox setting="ampmindicator"></sdpi-checkbox>
+		</sdpi-item>
+		<sdpi-item label="Active color">
+			<sdpi-color setting="dotcolor" default="#FF3B2F"></sdpi-color>
+		</sdpi-item>
+		<sdpi-item label="Inactive color">
+			<sdpi-color setting="inactivecolor" default="#3D3D3D"></sdpi-color>
+		</sdpi-item>
+		<sdpi-item label="Background color">
+			<sdpi-color setting="backgroundcolor" default="#000000"></sdpi-color>
+		</sdpi-item>
+		<sdpi-item label="Time zone">
+			<sdpi-select id="timezone" setting="timezone" default="system">
+				<option value="system">System time</option>
+				<option value="fixed">Fixed UTC offset</option>
+				<!-- IANA time zones are added by the script below. -->
+			</sdpi-select>
+			<p class="hint">Time wrong after a time zone change? Choose a fixed UTC offset.</p>
+		</sdpi-item>
+		<sdpi-item id="utcOffsetItem" label="UTC offset" hidden>
+			<!-- Values are OFFSET_STEPS (minutes), labels formatOffset(minutes). -->
+			<sdpi-select id="utcOffset" setting="utcOffset" default="0">
+				<option value="-720">UTC−12:00</option>
+				<option value="-705">UTC−11:45</option>
+				<option value="-690">UTC−11:30</option>
+				<option value="-675">UTC−11:15</option>
+				<option value="-660">UTC−11:00</option>
+				<option value="-645">UTC−10:45</option>
+				<option value="-630">UTC−10:30</option>
+				<option value="-615">UTC−10:15</option>
+				<option value="-600">UTC−10:00</option>
+				<option value="-585">UTC−09:45</option>
+				<option value="-570">UTC−09:30</option>
+				<option value="-555">UTC−09:15</option>
+				<option value="-540">UTC−09:00</option>
+				<option value="-525">UTC−08:45</option>
+				<option value="-510">UTC−08:30</option>
+				<option value="-495">UTC−08:15</option>
+				<option value="-480">UTC−08:00</option>
+				<option value="-465">UTC−07:45</option>
+				<option value="-450">UTC−07:30</option>
+				<option value="-435">UTC−07:15</option>
+				<option value="-420">UTC−07:00</option>
+				<option value="-405">UTC−06:45</option>
+				<option value="-390">UTC−06:30</option>
+				<option value="-375">UTC−06:15</option>
+				<option value="-360">UTC−06:00</option>
+				<option value="-345">UTC−05:45</option>
+				<option value="-330">UTC−05:30</option>
+				<option value="-315">UTC−05:15</option>
+				<option value="-300">UTC−05:00</option>
+				<option value="-285">UTC−04:45</option>
+				<option value="-270">UTC−04:30</option>
+				<option value="-255">UTC−04:15</option>
+				<option value="-240">UTC−04:00</option>
+				<option value="-225">UTC−03:45</option>
+				<option value="-210">UTC−03:30</option>
+				<option value="-195">UTC−03:15</option>
+				<option value="-180">UTC−03:00</option>
+				<option value="-165">UTC−02:45</option>
+				<option value="-150">UTC−02:30</option>
+				<option value="-135">UTC−02:15</option>
+				<option value="-120">UTC−02:00</option>
+				<option value="-105">UTC−01:45</option>
+				<option value="-90">UTC−01:30</option>
+				<option value="-75">UTC−01:15</option>
+				<option value="-60">UTC−01:00</option>
+				<option value="-45">UTC−00:45</option>
+				<option value="-30">UTC−00:30</option>
+				<option value="-15">UTC−00:15</option>
+				<option value="0">UTC+00:00</option>
+				<option value="15">UTC+00:15</option>
+				<option value="30">UTC+00:30</option>
+				<option value="45">UTC+00:45</option>
+				<option value="60">UTC+01:00</option>
+				<option value="75">UTC+01:15</option>
+				<option value="90">UTC+01:30</option>
+				<option value="105">UTC+01:45</option>
+				<option value="120">UTC+02:00</option>
+				<option value="135">UTC+02:15</option>
+				<option value="150">UTC+02:30</option>
+				<option value="165">UTC+02:45</option>
+				<option value="180">UTC+03:00</option>
+				<option value="195">UTC+03:15</option>
+				<option value="210">UTC+03:30</option>
+				<option value="225">UTC+03:45</option>
+				<option value="240">UTC+04:00</option>
+				<option value="255">UTC+04:15</option>
+				<option value="270">UTC+04:30</option>
+				<option value="285">UTC+04:45</option>
+				<option value="300">UTC+05:00</option>
+				<option value="315">UTC+05:15</option>
+				<option value="330">UTC+05:30</option>
+				<option value="345">UTC+05:45</option>
+				<option value="360">UTC+06:00</option>
+				<option value="375">UTC+06:15</option>
+				<option value="390">UTC+06:30</option>
+				<option value="405">UTC+06:45</option>
+				<option value="420">UTC+07:00</option>
+				<option value="435">UTC+07:15</option>
+				<option value="450">UTC+07:30</option>
+				<option value="465">UTC+07:45</option>
+				<option value="480">UTC+08:00</option>
+				<option value="495">UTC+08:15</option>
+				<option value="510">UTC+08:30</option>
+				<option value="525">UTC+08:45</option>
+				<option value="540">UTC+09:00</option>
+				<option value="555">UTC+09:15</option>
+				<option value="570">UTC+09:30</option>
+				<option value="585">UTC+09:45</option>
+				<option value="600">UTC+10:00</option>
+				<option value="615">UTC+10:15</option>
+				<option value="630">UTC+10:30</option>
+				<option value="645">UTC+10:45</option>
+				<option value="660">UTC+11:00</option>
+				<option value="675">UTC+11:15</option>
+				<option value="690">UTC+11:30</option>
+				<option value="705">UTC+11:45</option>
+				<option value="720">UTC+12:00</option>
+				<option value="735">UTC+12:15</option>
+				<option value="750">UTC+12:30</option>
+				<option value="765">UTC+12:45</option>
+				<option value="780">UTC+13:00</option>
+				<option value="795">UTC+13:15</option>
+				<option value="810">UTC+13:30</option>
+				<option value="825">UTC+13:45</option>
+				<option value="840">UTC+14:00</option>
+			</sdpi-select>
+		</sdpi-item>
+		<sdpi-item label="Label">
+			<sdpi-textfield setting="label" maxlength="6" placeholder="e.g. NYC"></sdpi-textfield>
+		</sdpi-item>
+		<sdpi-item label="Animations">
+			<sdpi-checkbox setting="animations" default="true"></sdpi-checkbox>
+		</sdpi-item>
+		<sdpi-item label="Blinking colon">
+			<sdpi-checkbox setting="blinkColon" default="true"></sdpi-checkbox>
+		</sdpi-item>
+		<sdpi-item label="Show countdown">
+			<sdpi-checkbox setting="showCountdown" default="true"></sdpi-checkbox>
+		</sdpi-item>
+
+		<script>
+			(() => {
+				const timezone = document.getElementById("timezone");
+				const offsetItem = document.getElementById("utcOffsetItem");
+				const offset = document.getElementById("utcOffset");
+
+				// IANA zones from this webview's Intl data. sdpi-select picks up added
+				// <option>/<optgroup> children; the plugin validates the stored zone again.
+				let zones = [];
+				try {
+					zones = Intl.supportedValuesOf("timeZone");
+				} catch {
+					// Without Intl.supportedValuesOf only system time and fixed offsets remain.
+				}
+				if (zones.length > 0) {
+					const group = document.createElement("optgroup");
+					group.label = "Time zones";
+					for (const zone of zones) group.append(new Option(zone.replaceAll("_", " "), zone));
+					timezone.append(group);
+				}
+
+				// The UTC offset is only relevant for "Fixed UTC offset".
+				const sync = () => {
+					const fixed = timezone.value === "fixed";
+					offsetItem.hidden = !fixed;
+					// The offset select shows UTC+00:00 until one is picked: store it so the
+					// clock matches. Deferred so settings arriving together are applied first.
+					if (fixed)
+						setTimeout(() => {
+							if (offset.value === undefined) offset.value = "0";
+						});
+				};
+				timezone.addEventListener("valuechange", sync);
+				sync();
+			})();
+		</script>
+	</body>
+</html>
