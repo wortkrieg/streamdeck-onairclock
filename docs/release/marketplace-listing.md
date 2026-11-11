@@ -38,9 +38,9 @@ Ziffernblätter: Klassik (60 Punkte, Stundenmarken, optional Datum und Sekunden)
 
 Farben: Aktiv-Farbe, Inaktiv-Farbe und Hintergrund stellst du selbst ein.
 
-Zeitzonen: Jede Taste zeigt die Systemzeit, eine IANA-Zeitzone oder einen festen UTC-Versatz (-12:00 bis +14:00 in 15-Minuten-Schritten). Mit einer kurzen Beschriftung wie NYC unterscheidest du Weltzeituhren. Stimmt die Zeit in deiner Region um eine Stunde nicht, wähle "Fester UTC-Versatz".
+Zeitzonen: Jede Taste zeigt die Systemzeit, eine IANA-Zeitzone oder einen festen UTC-Versatz (-12:00 bis +14:00 in 15-Minuten-Schritten). Mit einer kurzen Beschriftung wie NYC unterscheidest du Weltzeituhren. Stimmt die Zeit in deiner Region um eine Stunde nicht, wähle bei „Time zone“ die Option „Fixed UTC offset“.
 
-Countdown: Die Countdown-Aktion startet eine voreingestellte Dauer von bis zu 99:59 auf allen Uhren desselben Stream Decks, bei denen "Countdown anzeigen" aktiviert ist. Ein erneuter Druck oder ein Druck auf eine Uhr bricht ab. Bei null zählt die Uhr das Überziehen weiter (+MM:SS), bleibt bei 00:00 stehen oder kehrt zur Uhrzeit zurück. Eine optionale Warnung pulsiert in den letzten 10 Sekunden.
+Countdown: Die Countdown-Aktion startet eine voreingestellte Dauer von bis zu 99:59 auf allen Uhren desselben Stream Decks, bei denen „Show countdown“ aktiviert ist. Ein erneuter Druck oder ein Druck auf eine Uhr bricht ab. Bei null zählt die Uhr das Überziehen weiter (+MM:SS), bleibt bei 00:00 stehen oder kehrt zur Uhrzeit zurück. Eine optionale Warnung pulsiert in den letzten 10 Sekunden.
 
 Details: rollende Ziffern, Ring-Reset, blinkender Doppelpunkt und Nachglühen (standardmäßig an; Animationen und der blinkende Doppelpunkt lassen sich jeweils abschalten), fünf Datumsformate, 12- oder 24-Stunden-Anzeige mit PM-Markierung und Unterstützung für das Touch-Display des Stream Deck+.
 
