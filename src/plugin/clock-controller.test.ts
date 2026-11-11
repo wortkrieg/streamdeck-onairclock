@@ -119,6 +119,55 @@ describe("ClockController drawing", () => {
 		c.frame(T0 + 700);
 		expect(a.draw).toHaveBeenCalledTimes(2);
 	});
+
+	test("a target whose render throws does not stop the others; retried, logged once per 10 s", () => {
+		const log = vi.fn();
+		const c = new ClockController(new CountdownRegistry(), log);
+		const a = target("a");
+		const broken = target("broken");
+		const b = target("b");
+		const brokenCfg = cfg({
+			colors: undefined as unknown as ClockConfig["colors"],
+		});
+		c.add(a, cfg());
+		c.add(broken, brokenCfg);
+		c.add(b, cfg({ face: "line" }));
+
+		const start = T0 + 5_700;
+		for (let i = 0; i < 30; i++)
+			expect(() => c.frame(start + i * 100)).not.toThrow();
+		const last = start + 29 * 100;
+		expect(lastUri(a)).toBe(expected(last, cfg()));
+		expect(lastUri(b)).toBe(expected(last, cfg({ face: "line" })));
+		expect(broken.draw).not.toHaveBeenCalled();
+		expect(log).toHaveBeenCalledTimes(1);
+		expect(log.mock.calls[0]?.[0]).toContain("broken");
+
+		c.frame(start + 10_000);
+		expect(log).toHaveBeenCalledTimes(2);
+
+		// Once its settings are fixed it draws again on the next frame.
+		c.update("broken", cfg());
+		c.frame(start + 10_000);
+		expect(broken.draw).toHaveBeenCalledTimes(1);
+	});
+
+	test("a draw that throws synchronously is retried on the next frame", () => {
+		const log = vi.fn();
+		const c = new ClockController(new CountdownRegistry(), log);
+		const a = target("a");
+		const b = target("b");
+		a.draw.mockImplementationOnce(() => {
+			throw new Error("sync");
+		});
+		c.add(a, cfg());
+		c.add(b, cfg());
+		expect(() => c.frame(T0 + 700)).not.toThrow();
+		expect(b.draw).toHaveBeenCalledTimes(1);
+		c.frame(T0 + 700);
+		expect(a.draw).toHaveBeenCalledTimes(2);
+		expect(log).toHaveBeenCalledTimes(1);
+	});
 });
 
 describe("ClockController with a countdown", () => {

@@ -4,6 +4,7 @@ import type { ClockConfig } from "../core/settings";
 import { animState, BLINK_MS, isAnimating } from "../render/animation";
 import { renderFace } from "../render/faces";
 import { toDataUri } from "../render/svg";
+import { ThrottledLog } from "./throttled-log";
 import type { FrameResult } from "./ticker";
 
 /** A visible clock: a key, or a dial's touch display on the Stream Deck+. */
@@ -25,11 +26,14 @@ const mod1000 = (ms: number): number => ((ms % 1000) + 1000) % 1000;
 /** Renders all visible clocks. Free of the Stream Deck SDK; the action only feeds it. */
 export class ClockController {
 	private readonly entries = new Map<string, Entry>();
+	private readonly errors: ThrottledLog;
 
 	constructor(
 		private readonly registry: CountdownRegistry,
-		private readonly log: (message: string) => void = () => {},
-	) {}
+		log: (message: string) => void = () => {},
+	) {
+		this.errors = new ThrottledLog(log);
+	}
 
 	add(t: ClockTarget, cfg: ClockConfig): void {
 		this.entries.set(t.id, { target: t, cfg });
@@ -52,45 +56,68 @@ export class ClockController {
 			this.registry.cancel(e.target.deviceId);
 	}
 
-	/** Renders every clock and draws only the ones whose image changed. */
+	/**
+	 * Renders every clock and draws only the ones whose image changed. A clock that
+	 * fails to render is skipped (and retried next frame); the others still draw.
+	 */
 	frame(nowMs: number): FrameResult {
 		let fast = false;
 		const phases = new Set<number>([0]);
 		for (const e of this.entries.values()) {
-			const countdown = this.registry.get(e.target.deviceId, nowMs);
-			const model = buildFaceModel(
-				nowMs,
-				e.cfg,
-				countdown
-					? { countdown, view: viewCountdown(countdown, nowMs) }
-					: undefined,
-			);
-			const anim = animState(model, e.cfg);
-			if (isAnimating(anim)) fast = true;
-
-			if (model.mode === "clock" && e.cfg.blinkColon) phases.add(BLINK_MS);
-			if (countdown) {
-				phases.add(mod1000(countdown.startMs));
-				// The ring blinks on the countdown's own second, half a second after each tick.
-				const phase = model.countdown?.phase;
-				if (phase === "overtime" || phase === "hold" || phase === "flash")
-					phases.add(mod1000(countdown.startMs + BLINK_MS));
-			}
-
-			const svg = renderFace(e.cfg.face, model, e.cfg.colors, anim);
-			if (svg !== e.lastSvg) {
-				e.lastSvg = svg;
-				this.draw(e, svg);
+			try {
+				const r = this.frameEntry(e, nowMs);
+				fast ||= r.fast;
+				for (const p of r.phasesMs) phases.add(p);
+			} catch (err) {
+				e.lastSvg = undefined;
+				this.errors.warn(
+					e.target.id,
+					`rendering clock ${e.target.id} failed: ${String(err)}`,
+					nowMs,
+				);
 			}
 		}
 		return { fast, phasesMs: [...phases] };
 	}
 
-	private draw(e: Entry, svg: string): void {
+	private frameEntry(e: Entry, nowMs: number): FrameResult {
+		const phasesMs: number[] = [];
+		const countdown = this.registry.get(e.target.deviceId, nowMs);
+		const model = buildFaceModel(
+			nowMs,
+			e.cfg,
+			countdown
+				? { countdown, view: viewCountdown(countdown, nowMs) }
+				: undefined,
+		);
+		const anim = animState(model, e.cfg);
+
+		if (model.mode === "clock" && e.cfg.blinkColon) phasesMs.push(BLINK_MS);
+		if (countdown) {
+			phasesMs.push(mod1000(countdown.startMs));
+			// The ring blinks on the countdown's own second, half a second after each tick.
+			const phase = model.countdown?.phase;
+			if (phase === "overtime" || phase === "hold" || phase === "flash")
+				phasesMs.push(mod1000(countdown.startMs + BLINK_MS));
+		}
+
+		const svg = renderFace(e.cfg.face, model, e.cfg.colors, anim);
+		if (svg !== e.lastSvg) {
+			e.lastSvg = svg;
+			this.draw(e, svg, nowMs);
+		}
+		return { fast: isAnimating(anim), phasesMs };
+	}
+
+	private draw(e: Entry, svg: string, nowMs: number): void {
 		e.target.draw(toDataUri(svg)).catch((err: unknown) => {
 			// Retry on the next frame unless a newer image is already on its way.
 			if (e.lastSvg === svg) e.lastSvg = undefined;
-			this.log(`drawing clock ${e.target.id} failed: ${String(err)}`);
+			this.errors.warn(
+				e.target.id,
+				`drawing clock ${e.target.id} failed: ${String(err)}`,
+				nowMs,
+			);
 		});
 	}
 }

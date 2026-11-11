@@ -1,4 +1,5 @@
 import { planNextFrame } from "../render/animation";
+import { ThrottledLog } from "./throttled-log";
 
 /** What a frame needs next: fast frames, and the ms offsets within a second to wake up at. */
 export interface FrameResult {
@@ -10,15 +11,26 @@ export type FrameFn = (nowMs: number) => FrameResult;
 
 const IDLE: FrameResult = { fast: false, phasesMs: [0] };
 
-/** One frame function over several controllers: fast if any is fast, phases united. */
-export function combineFrames(frames: readonly FrameFn[]): FrameFn {
+/**
+ * One frame function over several named controllers: fast if any is fast, phases
+ * united. A controller that throws contributes nothing; the others still run.
+ */
+export function combineFrames(
+	frames: Readonly<Record<string, FrameFn>>,
+	log: (message: string) => void = () => {},
+): FrameFn {
+	const errors = new ThrottledLog(log);
 	return (nowMs) => {
 		let fast = false;
 		const phases = new Set<number>([0]);
-		for (const frame of frames) {
-			const r = frame(nowMs);
-			fast ||= r.fast;
-			for (const p of r.phasesMs) phases.add(p);
+		for (const [name, frame] of Object.entries(frames)) {
+			try {
+				const r = frame(nowMs);
+				fast ||= r.fast;
+				for (const p of r.phasesMs) phases.add(p);
+			} catch (err) {
+				errors.warn(name, `${name} frame failed: ${String(err)}`, nowMs);
+			}
 		}
 		return { fast, phasesMs: [...phases] };
 	};
@@ -34,13 +46,16 @@ export class Ticker {
 	private running = false;
 	private kicked = false;
 	private plan: FrameResult = IDLE;
+	private readonly errors: ThrottledLog;
 
 	constructor(
 		private readonly frame: FrameFn,
 		private readonly fastFps: number,
 		private readonly now: () => number = () => Date.now(),
-		private readonly log: (message: string) => void = () => {},
-	) {}
+		log: (message: string) => void = () => {},
+	) {
+		this.errors = new ThrottledLog(log);
+	}
 
 	start(): void {
 		if (this.running) return;
@@ -65,10 +80,13 @@ export class Ticker {
 
 	private tick(): void {
 		this.kicked = false;
+		const nowMs = this.now();
 		try {
-			this.plan = this.frame(this.now());
+			this.plan = this.frame(nowMs);
 		} catch (err) {
-			this.log(`frame failed: ${String(err)}`);
+			// Fall back to one frame per second rather than keep a stale fast plan.
+			this.plan = IDLE;
+			this.errors.warn("frame", `frame failed: ${String(err)}`, nowMs);
 		}
 		if (this.running) this.schedule();
 	}

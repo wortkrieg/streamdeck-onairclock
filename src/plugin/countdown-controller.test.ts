@@ -134,6 +134,31 @@ describe("CountdownController", () => {
 		expect(over.phasesMs).toContain(750);
 	});
 
+	test("a key whose render throws does not stop the others; retried, logged once per 10 s", () => {
+		const log = vi.fn();
+		const c = new CountdownController(new CountdownRegistry(), log);
+		const a = target("a");
+		const broken = target("broken");
+		const b = target("b", "B");
+		c.add(a, CFG);
+		c.add(broken, undefined as unknown as CountdownConfig);
+		c.add(b, CFG);
+		c.press("b", T0);
+		for (let i = 0; i < 30; i++)
+			expect(() => c.frame(T0 + i * 100)).not.toThrow();
+		expect(a.draw).toHaveBeenLastCalledWith(idle());
+		expect(b.draw.mock.calls.length).toBeGreaterThan(1);
+		expect(broken.draw).not.toHaveBeenCalled();
+		expect(log).toHaveBeenCalledTimes(1);
+		expect(log.mock.calls[0]?.[0]).toContain("broken");
+
+		c.frame(T0 + 10_000);
+		expect(log).toHaveBeenCalledTimes(2);
+		c.update("broken", CFG);
+		c.frame(T0 + 10_000);
+		expect(broken.draw).toHaveBeenCalledWith(idle());
+	});
+
 	test("flash is fast; a failed draw is retried", async () => {
 		const { c } = setup();
 		const t = target("k1");

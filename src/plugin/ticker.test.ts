@@ -133,6 +133,27 @@ describe("Ticker", () => {
 		expect(log).toHaveBeenCalledTimes(1);
 	});
 
+	test("a frame that keeps throwing is logged once per 10 s and falls back to the idle plan", () => {
+		const log = vi.fn();
+		let n = 0;
+		const t = new Ticker(
+			() => {
+				n++;
+				if (n === 1) return { fast: true, phasesMs: [0] };
+				throw new Error("boom");
+			},
+			10,
+			() => Date.now(),
+			log,
+		);
+		t.start();
+		vi.advanceTimersByTime(25_000);
+		t.stop();
+		// One fast frame, then one failing frame per second instead of ten.
+		expect(n).toBeLessThanOrEqual(27);
+		expect(log).toHaveBeenCalledTimes(3);
+	});
+
 	test("kick runs a frame right away and reschedules from there", () => {
 		const { times, frame } = recorder();
 		const t = new Ticker(frame, 10);
@@ -159,7 +180,7 @@ describe("combineFrames", () => {
 	test("fast if any frame is fast, phases are the union", () => {
 		const a = vi.fn(() => ({ fast: false, phasesMs: [0, 500] }));
 		const b = vi.fn(() => ({ fast: true, phasesMs: [0, 250] }));
-		const r = combineFrames([a, b])(T0);
+		const r = combineFrames({ a, b })(T0);
 		expect(a).toHaveBeenCalledWith(T0);
 		expect(b).toHaveBeenCalledWith(T0);
 		expect(r.fast).toBe(true);
@@ -167,6 +188,25 @@ describe("combineFrames", () => {
 	});
 
 	test("no frames: slow, phase 0", () => {
-		expect(combineFrames([])(T0)).toEqual({ fast: false, phasesMs: [0] });
+		expect(combineFrames({})(T0)).toEqual({ fast: false, phasesMs: [0] });
+	});
+
+	test("a throwing frame function contributes nothing; the others still count; logged once per 10 s", () => {
+		const log = vi.fn();
+		const bad = vi.fn((): FrameResult => {
+			throw new Error("boom");
+		});
+		const good = vi.fn(() => ({ fast: true, phasesMs: [250] }));
+		const frame = combineFrames({ clocks: bad, countdowns: good }, log);
+		const r = frame(T0);
+		expect(good).toHaveBeenCalledWith(T0);
+		expect(r.fast).toBe(true);
+		expect([...r.phasesMs].sort((x, y) => x - y)).toEqual([0, 250]);
+		for (let i = 1; i < 50; i++) frame(T0 + i * 100);
+		expect(good).toHaveBeenCalledTimes(50);
+		expect(log).toHaveBeenCalledTimes(1);
+		expect(log.mock.calls[0]?.[0]).toContain("clocks");
+		frame(T0 + 10_000);
+		expect(log).toHaveBeenCalledTimes(2);
 	});
 });

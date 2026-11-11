@@ -16,12 +16,12 @@ const clocks = new ClockController(countdowns, warn);
 const countdownKeys = new CountdownController(countdowns, warn);
 
 /** Every controller's frame; the shared ticker runs them together. */
-const frames: FrameFn[] = [
-	(nowMs) => clocks.frame(nowMs),
-	(nowMs) => countdownKeys.frame(nowMs),
-];
+const frames: Record<string, FrameFn> = {
+	clocks: (nowMs) => clocks.frame(nowMs),
+	countdowns: (nowMs) => countdownKeys.frame(nowMs),
+};
 const ticker = new Ticker(
-	combineFrames(frames),
+	combineFrames(frames, warn),
 	FAST_FPS,
 	() => Date.now(),
 	warn,
