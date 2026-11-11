@@ -10,3 +10,8 @@ dist/
 # Local tool artifacts (brainstorm mockups, browser automation)
 .superpowers/
 .playwright-mcp/
+
+# V2 build output
+build/
+*.sdPlugin/bin
+*.sdPlugin/logs
