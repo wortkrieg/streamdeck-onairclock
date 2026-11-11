@@ -39,7 +39,7 @@ export interface DigitOptions {
 	colonOpacity?: number;
 }
 
-const easeOutCubic = (k: number): number =>
+export const easeOutCubic = (k: number): number =>
 	1 - (1 - Math.min(1, Math.max(0, k))) ** 3;
 
 // Unknown characters (no glyph, no width entry, not ":") are skipped entirely: they
