@@ -1,21 +1,13 @@
 {
-  "Description": "Eine vielseitige und konfigurierbare On Air-Uhr, inspiriert vom professionellen Rundfunk.", 
-  "Name": "On Air Clock", 
-  "Category": "Templates", 
-  "fail.marc.onairclock.action": {
-    "Name": "On Air Clock", 
-    "Tooltip": "Eine klassiche On Air-Uhr"
-  },
-  "Localization": {
-    "Dot Color": "Punktfarbe",
-    "Inactive Color": "Inaktiv-Farbe",
-    "Background Color": "Hintergrund",
-    "Watchface": "Ziffernblatt",
-    "Default": "Standard",
-    "No Date": "Kein Datum",
-    "No Seconds": "Keine Sekunden",
-    "No Date & Seconds": "Kein Datum & Sekunden",
-    "Date Format": "Datumsformat",
-    "Modern Minimal": "Modern Minimal"
-  }
+	"Name": "On Air Clock",
+	"Description": "Eine Rundfunk-Studiouhr für dein Stream Deck: fünf Ziffernblätter, jede Farbe, Zeitzonen und ein Countdown.",
+	"Category": "On Air Clock",
+	"fail.marc.onairclock.action": {
+		"Name": "On Air Clock",
+		"Tooltip": "Eine Studiouhr mit Zeitzonen."
+	},
+	"fail.marc.onairclock.countdown": {
+		"Name": "Countdown",
+		"Tooltip": "Startet einen Countdown auf den Uhren dieses Stream Decks."
+	}
 }

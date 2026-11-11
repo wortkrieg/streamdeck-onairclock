@@ -60,3 +60,13 @@ Measured with local Node v24.14.0 on the dev machine. This is only a proxy for t
 - `process.versions.icu`: 78.2
 - `process.versions.tz`: 2025c
 - `America/Vancouver` offset on 2026-11-11 (`Intl.DateTimeFormat`, `timeZoneName: "longOffset"`): `GMT-08:00` = -480 minutes (correct for PST; the date is after the November DST end, so tz data is current here)
+
+## PI localization
+
+Finding: not applied, the property inspectors stay English.
+
+- The sdpi-components v4 docs pages (sdpi-components.dev/docs, /docs/localization) returned 404 when fetched. The only evidence is the shipped bundle https://sdpi-components.dev/releases/v4/sdpi-components.js.
+- The bundle supports `__MSG_key__` in `label` attributes and `<option>` text. It resolves them from an internal `locales` object (`<lang>.<key>`, fallback `en`).
+- Nothing in the bundle ever assigns `locales`, and it reads neither the plugin's `en.json`/`de.json` nor a `Localization` block. Every lookup therefore returns an empty string and falls back to the raw key text. There is no verified way to feed it the plugin's locale files.
+- Keys are split on `.`, so keys containing dots would not work anyway.
+- Decision: PI labels remain English. `en.json`/`de.json` carry only manifest texts (Name, Description, Category, action Name/Tooltip). Revisit if a future sdpi-components release documents locale loading.

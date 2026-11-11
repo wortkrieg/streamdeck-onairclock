@@ -3,7 +3,7 @@
 	"Version": "2.0.0.0",
 	"Author": "Marc Herrmann",
 	"URL": "https://github.com/wortkrieg/streamdeck-onairclock",
-	"Description": "A versatile and configurable broadcast-inspired on air clock.",
+	"Description": "A broadcast studio clock for your Stream Deck: five watchfaces, any color, time zones and a countdown.",
 	"Category": "On Air Clock",
 	"CategoryIcon": "action/images/category",
 	"Icon": "action/images/actionimage",
@@ -21,10 +21,10 @@
 	},
 	"Actions": [
 		{
-			"Name": "OnAir Clock",
+			"Name": "On Air Clock",
 			"UUID": "fail.marc.onairclock.action",
 			"Icon": "action/images/actionimage",
-			"Tooltip": "A versatile On Air Clock",
+			"Tooltip": "A studio clock with time zones.",
 			"PropertyInspectorPath": "ui/clock.html",
 			"Controllers": ["Keypad", "Encoder"],
 			"States": [
