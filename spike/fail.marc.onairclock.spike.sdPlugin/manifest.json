@@ -1,0 +1,27 @@
+{
+	"Name": "On Air Clock Spike",
+	"Version": "0.0.0.1",
+	"Author": "Marc Herrmann",
+	"Description": "Throwaway hardware spike for On Air Clock V2.",
+	"Category": "On Air Clock Spike",
+	"Icon": "imgs/plugin-icon",
+	"CodePath": "bin/plugin.js",
+	"SDKVersion": 3,
+	"Software": { "MinimumVersion": "7.1" },
+	"OS": [
+		{ "Platform": "mac", "MinimumVersion": "12" },
+		{ "Platform": "windows", "MinimumVersion": "10" }
+	],
+	"Nodejs": { "Version": "24" },
+	"Actions": [
+		{
+			"Name": "Spike",
+			"UUID": "fail.marc.onairclock.spike.action",
+			"Icon": "imgs/action-icon",
+			"Tooltip": "Press to cycle through the SVG test images",
+			"Controllers": ["Keypad"],
+			"States": [{ "Image": "imgs/key" }]
+		}
+	],
+	"UUID": "fail.marc.onairclock.spike"
+}

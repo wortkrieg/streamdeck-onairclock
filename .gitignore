@@ -15,3 +15,5 @@ dist/
 build/
 *.sdPlugin/bin
 *.sdPlugin/logs
+spike/**/bin
+spike/**/logs
