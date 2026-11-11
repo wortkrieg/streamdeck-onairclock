@@ -97,6 +97,30 @@ export function animState(
 	};
 }
 
+/** Largest ring movement per frame of a running countdown, in degrees. */
+const RING_STEP_DEG = 3;
+
+/**
+ * Evenly spaced phases (ms within the countdown's own second) at which a running
+ * countdown redraws, so that its ring moves smoothly by at most RING_STEP_DEG per frame:
+ * 8 per second at 15 s, 4 at 30 s, 2 at 60 s, none extra from 2 minutes on. Capped at
+ * fastFps. Uneven frames (only the afterglow steps) made short countdowns jump.
+ */
+export function countdownRingPhasesMs(
+	startMs: number,
+	durationMs: number,
+	fastFps: number,
+): number[] {
+	const degPerSec = durationMs > 0 ? 360_000 / durationMs : 0;
+	const n = Math.min(
+		fastFps,
+		Math.max(1, Math.ceil(degPerSec / RING_STEP_DEG - 1e-9)),
+	);
+	return Array.from({ length: n }, (_, k) =>
+		mod(startMs + Math.round((k * 1000) / n), 1000),
+	);
+}
+
 /**
  * True while a faster frame rate is needed: digit roll, ring reset, countdown pulse and
  * flash. The stepped afterglow and seconds roll only need frames at STEP_PHASES_MS.

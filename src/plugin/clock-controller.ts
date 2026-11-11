@@ -1,9 +1,11 @@
 import { buildFaceModel } from "../core/clock-model";
 import { type CountdownRegistry, viewCountdown } from "../core/countdown";
 import type { ClockConfig } from "../core/settings";
+import { FAST_FPS } from "../hardware";
 import {
 	animState,
 	BLINK_MS,
+	countdownRingPhasesMs,
 	isAnimating,
 	STEP_PHASES_MS,
 } from "../render/animation";
@@ -113,6 +115,15 @@ export class ClockController {
 			if (phase === "running" && e.cfg.animations)
 				for (const p of STEP_PHASES_MS)
 					phasesMs.push(mod1000(countdown.startMs + p));
+			// Even frames so the ring of a short countdown moves smoothly.
+			if (phase === "running")
+				phasesMs.push(
+					...countdownRingPhasesMs(
+						countdown.startMs,
+						countdown.durationMs,
+						FAST_FPS,
+					),
+				);
 		}
 
 		const svg = renderFace(e.cfg.face, model, e.cfg.colors, anim);

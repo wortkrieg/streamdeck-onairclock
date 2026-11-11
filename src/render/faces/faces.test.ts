@@ -38,7 +38,7 @@ const clock = (face: FaceId, over: Partial<ClockConfig> = {}, now = NOW) =>
 
 // Countdown of 5 s; `elapsedMs` since start decides the phase.
 const PHASES: Record<string, { endMode: EndMode; elapsedMs: number }> = {
-	running: { endMode: "overtime", elapsedMs: 1800 }, // "00:04", ring 4/5
+	running: { endMode: "overtime", elapsedMs: 1800 }, // "00:04", ring 0.64
 	overtime: { endMode: "overtime", elapsedMs: 6300 },
 	hold: { endMode: "hold", elapsedMs: 7400 },
 	flash: { endMode: "clock", elapsedMs: 6100 },
@@ -355,7 +355,7 @@ describe("renderFace", () => {
 		const running = countdownModel("classic", "running");
 		expect(
 			fillCircles(renderFace("classic", running, STYLE, off), STYLE.active),
-		).toBe(48);
+		).toBe(39);
 	});
 
 	test("countdown start (fraction 1) keeps the moving head", () => {
@@ -395,7 +395,7 @@ describe("renderFace", () => {
 		const cdm = countdownModel("classic", "running");
 		expect(
 			fillCircles(renderFace("classic", cdm, STYLE, a), STYLE.active),
-		).toBe(48);
+		).toBe(39);
 	});
 
 	test("afterglow on classic only while glow > 0", () => {

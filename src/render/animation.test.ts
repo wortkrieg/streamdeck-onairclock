@@ -3,6 +3,7 @@ import type { FaceModel } from "../core/clock-model";
 import type { CountdownView } from "../core/countdown";
 import {
 	animState,
+	countdownRingPhasesMs,
 	GLOW_STEPS,
 	isAnimating,
 	planNextFrame,
@@ -193,5 +194,31 @@ describe("planNextFrame", () => {
 			expect(d).toBeGreaterThanOrEqual(10);
 			expect(d).toBeLessThanOrEqual(1010);
 		}
+	});
+});
+
+describe("countdownRingPhasesMs", () => {
+	const spacing = (p: number[]) =>
+		[...p]
+			.sort((a, b) => a - b)
+			.map((v, i, a) => (a[i + 1] ?? (a[0] ?? 0) + 1000) - v);
+
+	test("short countdowns redraw evenly, at most 3 degrees per frame", () => {
+		expect(countdownRingPhasesMs(0, 15_000, 10)).toHaveLength(8); // 24 deg/s
+		expect(spacing(countdownRingPhasesMs(0, 15_000, 10))).toEqual(
+			new Array(8).fill(125),
+		);
+		expect(countdownRingPhasesMs(0, 30_000, 10)).toHaveLength(4);
+		expect(countdownRingPhasesMs(0, 60_000, 10)).toHaveLength(2);
+	});
+	test("from two minutes on no extra frames, very short ones capped at fastFps", () => {
+		expect(countdownRingPhasesMs(0, 120_000, 10)).toEqual([0]);
+		expect(countdownRingPhasesMs(0, 300_000, 10)).toEqual([0]);
+		expect(countdownRingPhasesMs(0, 5_000, 10)).toHaveLength(10);
+	});
+	test("phases follow the countdown's own second", () => {
+		expect(countdownRingPhasesMs(1_000_300, 30_000, 10)).toEqual([
+			300, 550, 800, 50,
+		]);
 	});
 });

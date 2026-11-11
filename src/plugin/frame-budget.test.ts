@@ -26,7 +26,12 @@ interface Budget {
 	imagesPerSecond: number[];
 }
 
-function simulate(cfg: ClockConfig, startMs: number): Budget {
+/** Starts a countdown of `countdownSec` on device "A" at `startMs` when given. */
+function simulate(
+	cfg: ClockConfig,
+	startMs: number,
+	countdownSec?: number,
+): Budget {
 	vi.setSystemTime(startMs);
 	const firstSecond = Math.floor(startMs / 1000) + 1;
 	const frames = new Array<number>(SECONDS).fill(0);
@@ -35,7 +40,20 @@ function simulate(cfg: ClockConfig, startMs: number): Budget {
 	);
 	const slot = (nowMs: number) => Math.floor(nowMs / 1000) - firstSecond;
 
-	const clocks = new ClockController(new CountdownRegistry());
+	const registry = new CountdownRegistry();
+	if (countdownSec !== undefined)
+		registry.press(
+			"A",
+			"cd",
+			{
+				durationSec: countdownSec,
+				endMode: "overtime",
+				warn: false,
+				color: "#fff",
+			},
+			startMs,
+		);
+	const clocks = new ClockController(registry);
 	for (let k = 0; k < KEYS; k++) {
 		const perSecond = images[k] ?? [];
 		clocks.add(
@@ -129,5 +147,17 @@ describe("frame budget with 15 visible clocks", () => {
 		expect(minute).toBeLessThanOrEqual(Math.ceil(FAST_FPS * 0.8) + 2);
 		expect(max(rest)).toBeLessThanOrEqual(4);
 		expect(max(b.imagesPerSecond.slice(1))).toBeLessThanOrEqual(4);
+	});
+
+	test("a short countdown redraws evenly (8 per second at 15 s), a long one does not", () => {
+		const short = simulate(cfg({ face: "line" }), MID_MINUTE, 15);
+		// Running for 15 s from slot 0 on: the 8 even ring frames plus the afterglow
+		// steps that do not coincide with them, never more than FAST_FPS + 2.
+		const running = short.imagesPerSecond.slice(0, 9);
+		expect(Math.min(...running)).toBeGreaterThanOrEqual(8);
+		expect(max(running)).toBeLessThanOrEqual(FAST_FPS + 2);
+		// From 2 minutes on the ring adds no frames: still at most 6 per second.
+		const long = simulate(cfg({ face: "line" }), MID_MINUTE, 300);
+		expect(max(long.imagesPerSecond)).toBeLessThanOrEqual(6);
 	});
 });

@@ -1,6 +1,7 @@
 import { type CountdownRegistry, viewCountdown } from "../core/countdown";
 import type { CountdownConfig } from "../core/settings";
-import { BLINK_MS } from "../render/animation";
+import { FAST_FPS } from "../hardware";
+import { BLINK_MS, countdownRingPhasesMs } from "../render/animation";
 import { renderCountdownKey } from "../render/countdown-key";
 import { toDataUri } from "../render/svg";
 import { ThrottledLog } from "./throttled-log";
@@ -88,7 +89,13 @@ export class CountdownController {
 
 		if (own && view) {
 			phasesMs.push(mod1000(own.startMs));
-			if (view.phase === "running" && view.warn) fast = true;
+			if (view.phase === "running") {
+				if (view.warn) fast = true;
+				// Even frames so the ring of a short countdown moves smoothly.
+				phasesMs.push(
+					...countdownRingPhasesMs(own.startMs, own.durationMs, FAST_FPS),
+				);
+			}
 			if (
 				view.phase === "overtime" ||
 				view.phase === "hold" ||

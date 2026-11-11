@@ -37,19 +37,6 @@ describe("viewCountdown", () => {
 		});
 		expect(countdownDigits(v)).toBe("00:05");
 	});
-	test("ring fraction steps with the shown second, not continuously", () => {
-		const c = mk({ durationMs: 15000 });
-		const at = (ms: number) => {
-			const v = viewCountdown(c, t0 + ms);
-			return v.phase === "running" ? v.fraction : Number.NaN;
-		};
-		expect(at(0)).toBe(1);
-		expect(at(999)).toBe(1); // still "00:15"
-		expect(at(1000)).toBeCloseTo(14 / 15, 12); // "00:14"
-		expect(at(2400)).toBeCloseTo(13 / 15, 12);
-		expect(at(2999)).toBeCloseTo(13 / 15, 12);
-		expect(at(14001)).toBeCloseTo(1 / 15, 12); // "00:01"
-	});
 	test("digits round up", () => {
 		expect(countdownDigits(viewCountdown(mk(), t0 + 4001))).toBe("00:01");
 	});
