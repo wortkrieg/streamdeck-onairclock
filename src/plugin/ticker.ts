@@ -79,6 +79,8 @@ export class Ticker {
 	}
 
 	private tick(): void {
+		// A timer that outlived stop() (or a replaced one) must not run a frame.
+		if (!this.running) return;
 		this.kicked = false;
 		const nowMs = this.now();
 		try {
@@ -91,7 +93,14 @@ export class Ticker {
 		if (this.running) this.schedule();
 	}
 
+	/**
+	 * Replaces any pending timer, so there is only ever one chain, even when frame
+	 * calls kick() or stop()/start() itself. A kick from inside the frame is covered
+	 * by the frame that is running and does not block later kicks.
+	 */
 	private schedule(): void {
+		clearTimeout(this.timer);
+		this.kicked = false;
 		const delay = planNextFrame(
 			this.now(),
 			this.plan.phasesMs,

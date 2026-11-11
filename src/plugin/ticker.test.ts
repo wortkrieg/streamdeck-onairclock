@@ -154,6 +154,71 @@ describe("Ticker", () => {
 		expect(log).toHaveBeenCalledTimes(3);
 	});
 
+	test("kick from inside frame does not start a second timer chain", () => {
+		let n = 0;
+		const ticker: Ticker = new Ticker(() => {
+			n++;
+			if (n === 1) ticker.kick();
+			return { fast: true, phasesMs: [0] };
+		}, 10);
+		ticker.start();
+		vi.advanceTimersByTime(2000);
+		// One chain at 10 fps: the first frame at 12:00:01.005, then every 100 ms.
+		expect(n).toBe(13);
+		expect(vi.getTimerCount()).toBe(1);
+		ticker.stop();
+		vi.advanceTimersByTime(5000);
+		expect(n).toBe(13);
+		expect(vi.getTimerCount()).toBe(0);
+	});
+
+	test("kick on every frame keeps the planned rate", () => {
+		const { times, frame } = recorder();
+		const ticker: Ticker = new Ticker((nowMs) => {
+			ticker.kick();
+			return frame(nowMs);
+		}, 10);
+		ticker.start();
+		vi.advanceTimersByTime(5000);
+		ticker.stop();
+		expect(times).toHaveLength(5);
+		expect(diffs(times)).toEqual([1000, 1000, 1000, 1000]);
+	});
+
+	test("stop and start from inside frame leave exactly one timer chain", () => {
+		let n = 0;
+		const ticker: Ticker = new Ticker(() => {
+			n++;
+			ticker.stop();
+			ticker.start();
+			return SLOW;
+		}, 10);
+		ticker.start();
+		vi.advanceTimersByTime(5000);
+		expect(n).toBe(5);
+		expect(vi.getTimerCount()).toBe(1);
+		ticker.stop();
+		vi.advanceTimersByTime(5000);
+		expect(n).toBe(5);
+	});
+
+	test("a kick after a frame still runs right away", () => {
+		const { times, frame } = recorder();
+		const ticker: Ticker = new Ticker((nowMs) => {
+			if (times.length === 0) ticker.kick();
+			return frame(nowMs);
+		}, 10);
+		ticker.start();
+		vi.advanceTimersByTime(800);
+		expect(times).toHaveLength(1);
+		// The kick from inside the first frame must not swallow later kicks.
+		vi.advanceTimersByTime(100);
+		ticker.kick();
+		vi.advanceTimersByTime(1);
+		expect(times).toHaveLength(2);
+		ticker.stop();
+	});
+
 	test("kick runs a frame right away and reschedules from there", () => {
 		const { times, frame } = recorder();
 		const t = new Ticker(frame, 10);
