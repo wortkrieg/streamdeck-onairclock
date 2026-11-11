@@ -4,7 +4,7 @@ Device: any Stream Deck with display, Stream Deck software 7.1 or newer. Install
 
 ## Install and migration from V1
 
-- [ ] Install the `.streamDeckPlugin`; "On Air Clock" appears in the action list with a clock action and a countdown action.
+- [ ] Install the `.streamDeckPlugin`; "On Air Clock" appears in the action list with a clock action and a countdown action. On a fresh Stream Deck install the clock appears once Stream Deck has downloaded its Node.js runtime (needs internet once).
 - [ ] With V1 previously installed and configured: after installing V2 all keys are still there and keep colors, 12/24h, PM indicator and date format. A key that never had settings shows a clock with the V2 defaults.
 
 ## Faces and options
@@ -20,6 +20,7 @@ Device: any Stream Deck with display, Stream Deck software 7.1 or newer. Install
 - [ ] System time matches the Windows clock.
 - [ ] IANA zone (e.g. America/New_York) and label (e.g. `NYC`) are correct and readable.
 - [ ] Fixed UTC offset (try -07:00 and +05:45) shows the correct time. This is the fix for "Wrong time?".
+- [ ] Change the Windows time zone while Stream Deck runs (Settings > Time & language > Date & time). Clocks on "System time" follow within about 10 seconds; clocks with an IANA zone or fixed offset do not change. Switch back afterwards.
 
 ## Countdown
 

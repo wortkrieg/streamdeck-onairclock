@@ -1,17 +1,46 @@
 # Hardware spike findings (Task 2)
 
-**Status: PROVISIONAL.** The maintainer was not at the device and Stream Deck is still 6.8.1 (SDK 3 plugins need 7.1 or newer), so the spike could not run on hardware. The values below are educated defaults. Each must be confirmed in the hardware session. They live in `src/hardware.ts`.
+**Status: CONFIRMED on hardware, 2026-11-11** (Stream Deck MK.2, firmware 1.01.000, Stream Deck 7.6.1, @elgato/cli 1.10.4, macOS 26.3.1 on Apple silicon). Still open: the time zone change test (step 10, now with the re-detect fix below), the unplug test (step 11) and the Stream Deck+ (step 12).
 
-## Provisional values
+## Results
 
-| Constant | Value | Rationale | Status |
-|---|---|---|---|
-| `DATA_URI_FORMAT` | `"base64"` | Most widely accepted form for `setImage` with SVG, and what the Elgato docs use. | to be confirmed in hardware session |
-| `GLOW_TECHNIQUE` | `"stackedCircles"` | Plain translucent circles are the safest feature set for the key renderer; `radialGradient` support is unverified. | to be confirmed in hardware session |
-| `TEXT_SUPPORTED` | `true` | `<text font-family="sans-serif">` is basic SVG and expected to work; if not, Task 7 falls back to the native title. | to be confirmed in hardware session |
-| `FAST_FPS` | `10` | Middle of the allowed range [4, 15]; a typical conservative rate for per-frame `setImage` on a USB deck. | to be confirmed in hardware session |
+| Constant | Value | Rationale |
+|---|---|---|
+| `DATA_URI_FORMAT` | `"base64"` | 5a, 5b and 5c render identically on the key and in the app; base64 is the documented form. |
+| `GLOW_TECHNIQUE` | `"radialGradient"` | The gradient renders as a soft fade on the device; the stacked circles show visible rings. |
+| `TEXT_SUPPORTED` | `true` | "NYC" and "Vancouver" render sharp and legible in `sans-serif`. |
+| `FAST_FPS` | `10` | Used only for the short roll/wipe bursts at the minute change; the 60 s measurements of the real build include these bursts, and even 30 fps sustained on 15 keys stayed smooth. |
 
-`TZ_VANCOUVER_OFFSET_2026_11` is not a constant in `src/hardware.ts`, because V2 ships no time zone data of its own (ruling R7). The local proxy reads -480, which means stale tz data (see the proxy facts below). The value that counts comes from the Stream Deck Node runtime and must be read there in the hardware session.
+Runtime facts from `logs/spike-facts.json` (Stream Deck's own Node, downloaded by the app):
+
+- `node` v24.22.1, `icu` 78.3, `tz` 2026e
+- `America/Vancouver` on 2026-11-11: `GMT-07:00` = -420. The runtime's tz data is current, so "System time" and the IANA zone show British Columbia correctly. The fixed UTC offset stays as the documented fallback (README "Wrong time?").
+
+## CPU (15 keys on one MK.2 page, share of one core, cumulative CPU time over the window)
+
+V1 is an HTML plugin and renders inside the app's browser engine (QtWebEngineProcess), so that process group is measured too.
+
+| Configuration | App | Browser engine | Plugin | Total over idle |
+|---|---|---|---|---|
+| Empty page (idle) | 3.3-3.4 % | 4.2 % | - | - |
+| Spike, all keys @ 4 / 8 / 12 / 20 / 30 fps | 24.9 / 46.6 / 52.7 / 53.5 / 85.3 % | - | 1.0-3.1 % | - |
+| **V1, 15 clocks, defaults** | 16.9 % | 19.6 % | - | **+28.9 pp** |
+| V2 (old sizes, stacked circles), Classic defaults | 23.1 % | - | 2.1 % | - |
+| V2 (old sizes), Line / animations off / animations and colon off | 22.4 / 13.1 / 8.3 % | - | 0.9 / 0.8 / 0.4 % | - |
+| **V2 final, Classic defaults** | 20.5 % | 4.0 % | 1.2 % | **+18.1 pp** |
+| **V2 final, Line defaults** | 17.6 % | 3.7 % | 0.5 % | **+14.2 pp** |
+| V2 final, Classic, countdown running | 19.5 % | 4.2 % | 1.2 % | +17.3 pp |
+
+The app's cost is roughly linear in images per second (about 0.35 % of a core per image/s); the plugin itself stays far below 10 %. Keys and app stayed smooth in every configuration, including 30 fps.
+
+**Ruling R18 (replaces the +10 pp rule of R14):** the provisional rule "app within 10 pp of idle with 15 keys" is not met even by V1 (+28.9 pp in total), so it would have forced V2 below the V1 frame rate. The acceptance rule is now: with the same number of keys at defaults, V2's total load (app, browser engine, plugin) must not exceed V1's; the plugin stays below 10 %; keys and app stay smooth. V2 meets it with a clear margin (+18.1 pp and +14.2 pp against +28.9 pp).
+
+## Further findings
+
+- **Node runtime download.** SDK 3 plugins run on a Node.js runtime that Stream Deck downloads on first use from `node-sd.elgato.com` (to `~/Library/Application Support/com.elgato.StreamDeck/NodeJS/`). With all of Stream Deck's network access blocked (Little Snitch here), the download fails silently ("Failed to fetch Node.js manifest: canceled") and no SDK 3 plugin starts, Elgato's own included. V1 (HTML) did not need this. README "Installation" says so.
+- **CategoryIcon.** Stream Deck 7.6.1 refuses a plugin with `Category` but no `CategoryIcon` ("category icon not defined"), although `streamdeck validate` passes. The V2 manifest has it; only the spike lacked it.
+- **System time zone changes.** Node fixes the local zone at start-up. Deleting `process.env.TZ` makes it re-detect the host zone (checked with Stream Deck's Node 24.22.1: Tokyo -> delete -> Europe/Berlin again). V2 does this every 10 s (`src/plugin/system-zone.ts`, ruling R19), so clocks on "System time" should follow a changed zone within 10 s. Step 10 on hardware is still to be done to confirm it end to end.
+- **Legibility (maintainer feedback on the device).** Date, seconds and partly the main digits were too small to read from a distance. All faces were enlarged (ring moved out to r 65/64 like V1's r 66, main digits +20 to +40 %, seconds +55 to +70 %, date +55 %, labels up to +50 %, strokes 15 to 25 % heavier, long strings such as "+00:12" or "11-11-26" shrink to fit). The maintainer confirmed the new sizes on the MK.2.
 
 ## Spike plugin
 
@@ -20,6 +49,8 @@ Location: `spike/fail.marc.onairclock.spike.sdPlugin` (UUID `fail.marc.onaircloc
 Placeholder icons are committed under `imgs/`; `npx streamdeck validate spike/fail.marc.onairclock.spike.sdPlugin` passes with no errors.
 
 On startup the plugin writes the facts (ICU, tz data, Vancouver offset) to the SDK log and to `spike/fail.marc.onairclock.spike.sdPlugin/logs/spike-facts.json`. Each key press and each 10 s of animation append to `logs/spike-steps.log` in the same folder.
+
+Hardware-session helpers (added during the session): one key press switches all spike keys together; `gallery` shows image tests 1 to 7 on keys 1 to 7 at once; the plugin bundles two profiles ("On Air V2 Test": empty page, spike page, 15 clocks per configuration, countdown page, faces page; "On Air V1 Ref": 15 V1 clocks) and switches the MK.2 to them on command. Write one command into `logs/cmd.txt`: `page <0-based index>`, `step <index>`, `gallery`, `v1`, `back`, `devices`.
 
 ## Hardware-session procedure
 
@@ -56,7 +87,7 @@ On startup the plugin writes the facts (ICU, tz data, Vancouver offset) to the S
 11. Unplug the MK.2 for about 10 s and plug it back in while the V2 clocks run. The keys must show the clock again within a second or two, and the plugin log (`build/fail.marc.onairclock.dev.sdPlugin/logs/`) must show no repeating "failed" warnings.
 12. Stream Deck+ (in the maintainer's office, together with `docs/release/checklist-sdplus.md`): the dial's touch display shows the clock via `setFeedback` with the base64 SVG data URI (`DATA_URI_FORMAT`), updates every second, and shows a running countdown. If the touch display stays empty while the keys work, note it: the feedback path may need a different data URI format than `setImage`.
 
-## Decision rules (from the brief, Steps 3 and 4; the CPU rule amended after the final review, ruling R14)
+## Decision rules (from the brief, Steps 3 and 4; the CPU rule amended by R14 and replaced by R18, see "CPU" above)
 
 - `FAST_FPS` is the highest rate at which, with all 15 keys animating, the plugin process stays below 10 % CPU, the Stream Deck app process stays within 10 percentage points of its baseline (step 8), and the app and keys stay smooth. It is at most 15 and at least 4. The brief measured only the plugin process, which can miss a large part of the load because the app decodes every image.
 - The V2 dev build at defaults (step 9, Classic and Line) must meet the same two CPU limits. If it does not, the animations get sparser (lower `FAST_FPS`, shorter phases), as spec section 8 says; they are not switched off.
@@ -66,7 +97,7 @@ On startup the plugin writes the facts (ICU, tz data, Vancouver offset) to the S
 
 Mapping of results to constants: `DATA_URI_FORMAT` = the form from 5a/5b/5c that renders (prefer base64 if several do); `GLOW_TECHNIQUE` = `radialGradient` only if the left glow in test 1 renders well, else `stackedCircles`; `TEXT_SUPPORTED` = test 4 result; `FAST_FPS` = per rule above, clamped to [4, 15]. Update `src/hardware.ts`, remove the PROVISIONAL status here.
 
-## Proxy facts (LOCAL Node, NOT the Stream Deck runtime)
+## Proxy facts (LOCAL Node, NOT the Stream Deck runtime; superseded by "Results")
 
 Measured with local Node v24.14.0 on the dev machine. This is only a proxy for the Node 24 bundled with Stream Deck; Stream Deck may ship different ICU/tz data. Replace with the values from `logs/spike-facts.json` in the hardware session.
 
