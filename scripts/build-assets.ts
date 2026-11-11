@@ -72,8 +72,8 @@ const BERLIN = "Europe/Berlin";
 /** 2026-11-11 10:08:30 in Berlin (CET, UTC+1). */
 export const ASSET_TIME_MS = Date.UTC(2026, 10, 11, 9, 8, 30);
 /**
- * Stills are taken 400 ms into the second: digit rolls are done (380 ms), the colon is
- * still on (first 500 ms) and the ring head keeps a third of its afterglow.
+ * Stills are taken 400 ms into the second: digit rolls are done, the colon is still on
+ * (first 500 ms) and the ring head shows the last afterglow step (0.25 from 300 ms).
  */
 const STILL_MS = ASSET_TIME_MS + 400;
 

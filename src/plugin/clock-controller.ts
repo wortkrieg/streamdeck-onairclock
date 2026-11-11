@@ -1,7 +1,12 @@
 import { buildFaceModel } from "../core/clock-model";
 import { type CountdownRegistry, viewCountdown } from "../core/countdown";
 import type { ClockConfig } from "../core/settings";
-import { animState, BLINK_MS, isAnimating } from "../render/animation";
+import {
+	animState,
+	BLINK_MS,
+	isAnimating,
+	STEP_PHASES_MS,
+} from "../render/animation";
 import { renderFace } from "../render/faces";
 import { toDataUri } from "../render/svg";
 import { ThrottledLog } from "./throttled-log";
@@ -92,13 +97,22 @@ export class ClockController {
 		);
 		const anim = animState(model, e.cfg);
 
-		if (model.mode === "clock" && e.cfg.blinkColon) phasesMs.push(BLINK_MS);
+		if (model.mode === "clock") {
+			if (e.cfg.blinkColon) phasesMs.push(BLINK_MS);
+			// The stepped afterglow and seconds roll change only at these phases.
+			if (e.cfg.animations) phasesMs.push(...STEP_PHASES_MS);
+		}
 		if (countdown) {
 			phasesMs.push(mod1000(countdown.startMs));
 			// The ring blinks on the countdown's own second, half a second after each tick.
 			const phase = model.countdown?.phase;
 			if (phase === "overtime" || phase === "hold" || phase === "flash")
 				phasesMs.push(mod1000(countdown.startMs + BLINK_MS));
+			// A clock showing a running countdown steps its afterglow on the countdown's
+			// second; the fast roll frames cover the early steps, not the last one.
+			if (phase === "running" && e.cfg.animations)
+				for (const p of STEP_PHASES_MS)
+					phasesMs.push(mod1000(countdown.startMs + p));
 		}
 
 		const svg = renderFace(e.cfg.face, model, e.cfg.colors, anim);

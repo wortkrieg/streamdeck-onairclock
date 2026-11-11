@@ -1,7 +1,13 @@
 import { describe, expect, test } from "vitest";
 import type { FaceModel } from "../core/clock-model";
 import type { CountdownView } from "../core/countdown";
-import { animState, isAnimating, planNextFrame } from "./animation";
+import {
+	animState,
+	GLOW_STEPS,
+	isAnimating,
+	planNextFrame,
+	STEP_PHASES_MS,
+} from "./animation";
 import { STATIC_ANIM } from "./faces";
 
 const base: FaceModel = {
@@ -40,11 +46,61 @@ describe("animState", () => {
 		expect(a.glow).toBe(0);
 		expect(a.subRoll).toBe(1);
 	});
-	test("roll, subRoll, wipe, glow", () => {
+	test("roll and wipe are continuous", () => {
 		expect(animState({ ...base, mainAgeMs: 190 }, on).roll).toBeCloseTo(0.5);
-		expect(animState({ ...base, subAgeMs: 190 }, on).subRoll).toBeCloseTo(0.5);
 		expect(animState({ ...base, minuteAgeMs: 375 }, on).wipe).toBeCloseTo(0.5);
-		expect(animState({ ...base, secAgeMs: 300 }, on).glow).toBeCloseTo(0.5);
+	});
+	test("afterglow is stepped: full, 0.55, 0.25, off from 500 ms", () => {
+		const glow = (secAgeMs: number) =>
+			animState({ ...base, secAgeMs }, on).glow;
+		expect([0, 149, 150, 299, 300, 499, 500, 999].map(glow)).toEqual([
+			1, 1, 0.55, 0.55, 0.25, 0.25, 0, 0,
+		]);
+		expect(GLOW_STEPS).toEqual([
+			[0, 1],
+			[150, 0.55],
+			[300, 0.25],
+			[500, 0],
+		]);
+		expect(STEP_PHASES_MS).toEqual([0, 150, 300, 500]);
+	});
+	test("seconds roll in one in-between step, with the minutes at the full minute", () => {
+		const sub = (subAgeMs: number, mainAgeMs = 9999) =>
+			animState({ ...base, subAgeMs, mainAgeMs }, on).subRoll;
+		expect([0, 149, 150, 380, 999].map((t) => sub(t))).toEqual([
+			0.4, 0.4, 1, 1, 1,
+		]);
+		// At the full minute the main digits roll on fast frames; the seconds follow them.
+		expect(sub(190, 190)).toBeCloseTo(0.5);
+		expect(sub(50, 50)).toBeCloseTo(50 / 380);
+		expect(
+			animState({ ...base, subAgeMs: 10 }, { ...on, animations: false })
+				.subRoll,
+		).toBe(1);
+	});
+	test("stepped values change only at STEP_PHASES_MS", () => {
+		const at = (t: number) => {
+			const a = animState(
+				{ ...base, secAgeMs: t, subAgeMs: t, mainAgeMs: 5000 + t },
+				on,
+			);
+			return `${a.glow}/${a.subRoll}`;
+		};
+		for (let t = 0; t < 1000; t++) {
+			const phase = Math.max(...STEP_PHASES_MS.filter((p) => p <= t));
+			expect(at(t), `${t} ms`).toBe(at(phase));
+		}
+	});
+	test("countdown: the afterglow steps on the countdown's own second", () => {
+		const run = (secAgeMs: number) =>
+			animState(
+				cd(
+					{ phase: "running", remainingMs: 50000, fraction: 0.5, warn: false },
+					{ secAgeMs },
+				),
+				on,
+			).glow;
+		expect([0, 200, 400, 600].map(run)).toEqual([1, 0.55, 0.25, 0]);
 	});
 	test("countdown: roll yes, wipe always 1", () => {
 		const m = cd(
@@ -94,14 +150,26 @@ describe("animState", () => {
 
 describe("isAnimating", () => {
 	test("static is idle", () => expect(isAnimating(STATIC_ANIM)).toBe(false));
-	test.each([
-		{ roll: 0.5 },
-		{ subRoll: 0.5 },
-		{ wipe: 0.5 },
-		{ glow: 0.1 },
-		{ pulse: 0.8 },
-		{ flash: true },
-	])("%o", (p) => expect(isAnimating({ ...STATIC_ANIM, ...p })).toBe(true));
+	test.each([{ roll: 0.5 }, { wipe: 0.5 }, { pulse: 0.8 }, { flash: true }])(
+		"%o",
+		(p) => expect(isAnimating({ ...STATIC_ANIM, ...p })).toBe(true),
+	);
+	// Stepped animations are driven by STEP_PHASES_MS, not by fast frames.
+	test.each([{ glow: 1 }, { glow: 0.25 }, { subRoll: 0.4 }])(
+		"stepped %o is not fast",
+		(p) => expect(isAnimating({ ...STATIC_ANIM, ...p })).toBe(false),
+	);
+	test("a default clock is not fast between minute changes", () => {
+		for (const t of [5, 155, 305, 505])
+			expect(
+				isAnimating(
+					animState(
+						{ ...base, secAgeMs: t, subAgeMs: t, mainAgeMs: 7000 + t },
+						on,
+					),
+				),
+			).toBe(false);
+	});
 });
 
 describe("planNextFrame", () => {

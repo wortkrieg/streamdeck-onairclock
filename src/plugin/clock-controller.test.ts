@@ -257,7 +257,7 @@ describe("ClockController frame timing", () => {
 		const registry = new CountdownRegistry();
 		const c = new ClockController(registry);
 		// blinkColon on, but the target shows the countdown, where the colon does not blink.
-		c.add(target("cd", "A"), cfg({ blinkColon: true }));
+		c.add(target("cd", "A"), cfg({ blinkColon: true, animations: false }));
 		registry.press("A", "cd-key", CD, T0 + 250);
 		const { phasesMs } = c.frame(T0 + 5_700);
 		expect([...phasesMs].sort((x, y) => x - y)).toEqual([0, 250]);
@@ -273,10 +273,30 @@ describe("ClockController frame timing", () => {
 		expect([...phasesMs].sort((x, y) => x - y)).toEqual([0, 250, 750]);
 	});
 
-	test("fast while a target animates", () => {
+	test("fast only while the minute changes", () => {
 		const c = new ClockController(new CountdownRegistry());
 		c.add(target("a"), cfg({ animations: true }));
-		// 100 ms after a full second: digits roll, afterglow is on.
+		// 100 ms after the full minute: hours and minutes roll, the ring resets.
 		expect(c.frame(T0 + 100).fast).toBe(true);
+		// 100 ms after any other second: afterglow and seconds roll are stepped.
+		expect(c.frame(T0 + 5_100).fast).toBe(false);
+	});
+
+	test("animations add the step phases of the afterglow in clock mode", () => {
+		const c = new ClockController(new CountdownRegistry());
+		c.add(target("a"), cfg({ animations: true, blinkColon: false }));
+		const { phasesMs } = c.frame(T0 + 5_700);
+		expect([...phasesMs].sort((x, y) => x - y)).toEqual([0, 150, 300, 500]);
+	});
+
+	test("a clock showing a running countdown steps on the countdown's second", () => {
+		const registry = new CountdownRegistry();
+		const c = new ClockController(registry);
+		c.add(target("cd", "A"), cfg({ animations: true }));
+		registry.press("A", "cd-key", CD, T0 + 250);
+		const { phasesMs } = c.frame(T0 + 5_700);
+		expect([...phasesMs].sort((x, y) => x - y)).toEqual([
+			0, 250, 400, 550, 750,
+		]);
 	});
 });
