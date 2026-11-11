@@ -109,7 +109,13 @@ const C = "#FF3B2F";
 const svg = (body: string, defs = "") =>
 	`<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144"><defs>${defs}</defs><rect width="144" height="144" fill="#000"/>${body}</svg>`;
 
-function lineFace(frac: number, main: string, sub: string, id = "gl"): string {
+function lineFace(
+	frac: number,
+	main: string,
+	sub: string,
+	id = "gl",
+	label = "",
+): string {
 	const [hx, hy] = P(61, frac);
 	const defs = `<radialGradient id="${id}"><stop offset="0" stop-color="${C}" stop-opacity=".55"/><stop offset=".45" stop-color="${C}" stop-opacity=".18"/><stop offset="1" stop-color="${C}" stop-opacity="0"/></radialGradient>`;
 	const body =
@@ -117,7 +123,8 @@ function lineFace(frac: number, main: string, sub: string, id = "gl"): string {
 		`<path d="${arc(61, 0, frac)}" fill="none" stroke="${C}" stroke-width="4" stroke-linecap="round"/>` +
 		`<circle cx="${hx}" cy="${hy}" r="14.7" fill="url(#${id})"/><circle cx="${hx}" cy="${hy}" r="4.6" fill="${C}"/>` +
 		digits(main, 72, 66, 23, 2.9, C) +
-		digits(sub, 72, 96, 11, 2, C);
+		digits(sub, 72, 96, 11, 2, C) +
+		(label ? digits(label, 72, 124, 9, 1.6, "#FFFFFF") : "");
 	return svg(body, defs);
 }
 
@@ -210,6 +217,7 @@ class Spike extends SingletonAction {
 						"12:34",
 						String(Math.floor(f * 60)).padStart(2, "0"),
 						"glx",
+						String(fps),
 					),
 				),
 			);
