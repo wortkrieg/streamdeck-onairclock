@@ -1,6 +1,6 @@
 # Hardware spike findings (Task 2)
 
-**Status: CONFIRMED on hardware, 2026-11-11** (Stream Deck MK.2, firmware 1.01.000, Stream Deck 7.6.1, @elgato/cli 1.10.4, macOS 26.3.1 on Apple silicon). Still open: the time zone change test (step 10, now with the re-detect fix below), the unplug test (step 11) and the Stream Deck+ (step 12).
+**Status: CONFIRMED on hardware, 2026-11-11** (Stream Deck MK.2, firmware 1.01.000, Stream Deck 7.6.1, @elgato/cli 1.10.4, macOS 26.3.1 on Apple silicon). Step 11 (unplug) passed: the MK.2 was off for 6 s, the clocks came back right after plugging in, and the plugin logged no warning. Still open: the time zone change test (step 10, now with the re-detect fix below) and the Stream Deck+ (step 12).
 
 ## Results
 
