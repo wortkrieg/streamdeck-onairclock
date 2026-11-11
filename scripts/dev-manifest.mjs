@@ -13,6 +13,9 @@ export function toDevManifest(manifest) {
 	const dev = structuredClone(manifest);
 	dev.UUID = rewrite(dev.UUID);
 	dev.Name = `${manifest.Name} (Dev)`;
+	if (manifest.Category) {
+		dev.Category = `${manifest.Category} (Dev)`;
+	}
 	for (const action of dev.Actions ?? []) {
 		action.UUID = rewrite(action.UUID);
 	}
