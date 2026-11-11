@@ -173,16 +173,54 @@ describe("renderFace", () => {
 		expect(ys[0]).toBeLessThan(ys[1] ?? 0);
 	});
 
-	test("comet and big drop the overtime sign and split the digits", () => {
-		for (const face of ["comet", "big"] as const) {
+	test("overtime shows the + sign on every face, running and hold do not", () => {
+		const plus = `d="${GLYPHS["+"]}"`;
+		for (const face of FACES) {
+			const over = renderFace(
+				face,
+				countdownModel(face, "overtime"),
+				STYLE,
+				STATIC_ANIM,
+			);
+			expect(over.split(plus)).toHaveLength(2); // exactly one "+"
+			for (const phase of ["running", "hold"]) {
+				expect(
+					renderFace(face, countdownModel(face, phase), STYLE, STATIC_ANIM),
+				).not.toContain(plus);
+			}
+		}
+	});
+
+	test("stacked faces: small + left of the top row, digits stay two large rows", () => {
+		const plus = `d="${GLYPHS["+"]}"`;
+		for (const face of ["modern", "comet", "big"] as const) {
 			const svg = renderFace(
 				face,
 				countdownModel(face, "overtime"),
 				STYLE,
 				STATIC_ANIM,
 			);
-			expect(digitGroups(svg)).toBe(2);
-			expect(svg).not.toContain(`d="${GLYPHS["+"]}"`);
+			// no nested groups here (no colon), so a lazy match per digit group works
+			const groups = [
+				...svg.matchAll(
+					/<g transform="translate\(([\d.]+) ([\d.]+)\) scale\(([\d.]+)\)[^>]*>(.*?)<\/g>/g,
+				),
+			].map((g) => ({
+				x: Number(g[1]),
+				y: Number(g[2]),
+				scale: Number(g[3]),
+				isPlus: (g[4] ?? "").includes(plus),
+			}));
+			const sign = groups.find((g) => g.isPlus);
+			const rows = groups.filter((g) => !g.isPlus).sort((p, q) => p.y - q.y);
+			expect(rows).toHaveLength(2);
+			const [top, bottom] = rows;
+			expect(sign).toBeDefined();
+			if (!sign || !top || !bottom) return;
+			expect(sign.y).toBe(top.y); // vertically centred on the top row
+			expect(sign.x).toBeLessThan(top.x); // left of it
+			expect(sign.scale).toBeLessThan(top.scale); // smaller
+			expect(top.scale).toBe(bottom.scale); // MM and SS keep their size
 		}
 	});
 

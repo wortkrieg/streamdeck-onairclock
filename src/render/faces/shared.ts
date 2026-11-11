@@ -147,7 +147,7 @@ export function label(
 	return `<text x="72" y="${r2(cy + size * 0.35)}" font-family="Barlow, Arial, sans-serif" font-weight="600" font-size="${size}" text-anchor="middle" fill="${color}">${escapeXml(text.toUpperCase())}</text>`;
 }
 
-/** "16:59" / "+00:05" -> ["16", "59"] / ["00", "05"] for the two-line faces. */
+/** "16:59" / "+00:05" -> ["16", "59"] / ["00", "05"]; the two-row faces draw the "+" separately. */
 export function splitMain(main: string): [string, string] {
 	const [a = "", b = ""] = main.replace("+", "").split(":");
 	return [a, b];
@@ -195,7 +195,33 @@ export function mainTwoLines(
 			prev,
 			progress: a.roll,
 		});
-	return line(hh, ph, top) + line(mm, pm, bottom);
+	return (
+		line(hh, ph, top) +
+		line(mm, pm, bottom) +
+		(m.main.startsWith("+") ? overtimeSign(hh, color, top) : "")
+	);
+}
+
+// Digit glyph cell and gap in glyph units (see digits.ts); the "+" arms span +-4 units.
+const GLYPH_W = 10;
+const GLYPH_GAP = 3.4;
+const SIGN_SIZE = 0.8;
+
+/** Overtime "+" for the two-row faces: smaller, left of the top row, centred on it. */
+function overtimeSign(row: string, color: string, top: DigitBox): string {
+	const units = row.length * GLYPH_W + (row.length - 1) * GLYPH_GAP;
+	const rowHalf = (units * top.height) / 16 / 2 + top.stroke / 2;
+	const height = top.height * SIGN_SIZE;
+	const stroke = top.stroke * 0.9;
+	const signHalf = (4 * height) / 16 + stroke / 2;
+	const gap = top.height * 0.12;
+	return renderDigits("+", {
+		cx: (top.cx ?? 72) - rowHalf - gap - signHalf,
+		cy: top.cy,
+		height,
+		stroke,
+		color,
+	});
 }
 
 /** Seconds digits (only when the model has them). */
