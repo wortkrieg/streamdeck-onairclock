@@ -32,6 +32,8 @@ A broadcast studio clock for your Stream Deck: five watchfaces, any color, time 
 
 Requires Stream Deck software 7.1 or newer, on macOS 12+ or Windows 10+. If you stay on an older Stream Deck version, you keep On Air Clock V1.
 
+On first use, Stream Deck downloads the Node.js runtime that V2 runs on. It needs internet access once for that. If a firewall blocks Stream Deck, allow it to reach `node-sd.elgato.com`. Until the runtime is there, the clock keys show no time.
+
 ### From the Elgato Marketplace
 
 Search for "On Air Clock" in the Stream Deck Marketplace and click Install.
@@ -48,7 +50,7 @@ V2 keeps the plugin ID, so existing keys stay in place and keep their settings. 
 
 On Air Clock takes time zone data from the Node.js runtime that Stream Deck provides. If that runtime ships outdated time zone data, a time zone can be off by an hour after a recent rule change. A known example: British Columbia's switch to permanent UTC-7 can show as UTC-8 (see issue #10).
 
-Observed in local Node v24 (tzdata 2025c): `America/Vancouver` reports UTC-08:00 on 2026-11-11. This is what the development machine measured, and the Stream Deck runtime may differ.
+Observed with Stream Deck 7.6.1 (Node.js 24.22.1, tzdata 2026e): `America/Vancouver` reports UTC-07:00 on 2026-11-11, which is correct. Older runtimes can still carry outdated data.
 
 **Fix:** open the key settings, set "Time zone" to "Fixed UTC offset" and choose the correct offset, for example -07:00. This works without waiting for any update. Keep in mind that a fixed offset does not follow daylight saving changes by itself.
 

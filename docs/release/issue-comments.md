@@ -14,7 +14,7 @@ What did not make it: jumping to a folder or profile with a key press. The Strea
 
 ## #10 Wrong time (solved in 2.0.0)
 
-This looks like outdated time zone data in the Node.js runtime that Stream Deck provides: British Columbia's switch to permanent UTC-7 shows as UTC-8. We saw the same in local Node v24 (tzdata 2025c). Waiting for Elgato to update the runtime is not needed any more. In 2.0.0, open the key settings, set "Time zone" to "Fixed UTC offset" and choose -07:00. Note that a fixed offset does not follow daylight saving changes by itself. Closing this with the release.
+V1 ran inside Stream Deck's built-in browser engine and took its time zone data from there. That data was outdated: British Columbia's switch to permanent UTC-7 showed as UTC-8. V2 runs on the Node.js runtime of current Stream Deck versions instead. With Stream Deck 7.6.1 (Node.js 24.22.1, tzdata 2026e), `America/Vancouver` shows UTC-7 correctly, so "System time" should simply be right after updating to 2.0.0. If your time is still off by an hour, open the key settings, set "Time zone" to "Fixed UTC offset" and choose -07:00. Note that a fixed offset does not follow daylight saving changes by itself. Closing this with the release.
 
 ## #5 Clock across multiple keys (not implemented)
 
