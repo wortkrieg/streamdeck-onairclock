@@ -49,6 +49,11 @@
 			"Name": "profiles/onair-v1-ref",
 			"DeviceType": 0,
 			"DontAutoSwitchWhenInstalled": true
+		},
+		{
+			"Name": "profiles/onair-colors2",
+			"DeviceType": 0,
+			"DontAutoSwitchWhenInstalled": true
 		}
 	]
 }
