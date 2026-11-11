@@ -17,3 +17,6 @@ build/
 *.sdPlugin/logs
 spike/**/bin
 spike/**/logs
+
+# Agent worktrees
+.claude/worktrees/
