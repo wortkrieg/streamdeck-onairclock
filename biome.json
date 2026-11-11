@@ -12,6 +12,7 @@
 			"!fail.marc.onairclock.sdPlugin/de.json",
 			"!fail.marc.onairclock.sdPlugin/en.json",
 			"!.superpowers",
+			"!.claude",
 			"!fail.marc.onairclock.sdPlugin/action",
 			"!fail.marc.onairclock.sdPlugin/previews"
 		]
