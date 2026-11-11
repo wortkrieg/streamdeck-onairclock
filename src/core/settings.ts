@@ -167,7 +167,7 @@ function mapWatchface(
 		case 3:
 			return { face: "classic", showDate: false, showSeconds: false };
 		case 4:
-			return { face: "modern" };
+			return { face: "modern", showDate: false, showSeconds: true };
 		default:
 			return { face: "classic", showDate: true, showSeconds: true };
 	}

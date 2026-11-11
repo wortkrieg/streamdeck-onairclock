@@ -107,6 +107,8 @@ describe("migrateV1", () => {
 		const r = migrateV1({ watchface: "4" });
 		expect(r.changed).toBe(true);
 		expect(r.settings.face).toBe("modern");
+		expect(r.settings.showDate).toBe(false);
+		expect(r.settings.showSeconds).toBe(true);
 		expect("watchface" in r.settings).toBe(false);
 	});
 
