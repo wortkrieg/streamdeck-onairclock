@@ -1,0 +1,600 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:wght@400;500&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+  .oac { max-width: 1180px; margin: 0 auto; }
+  .oac h2 { font-size: 1.6rem; }
+  .oac section { margin: 2.5rem 0 3.5rem; }
+  .oac section > h3 { font-size: 1.25rem; margin-bottom: .2rem; }
+  .oac .lede { color: var(--text-secondary); max-width: 68ch; margin-bottom: 1.2rem; font-size: .95rem; }
+  .oac .jump { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 1.5rem; }
+  .oac .jump a { font-size: .85rem; color: var(--accent); text-decoration: none; padding: .3rem .7rem; border: 1px solid var(--border); border-radius: 999px; background: var(--bg-secondary); }
+
+  /* control bar */
+  .oac .controls { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: center;
+    background: var(--bg-primary); padding: .9rem 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+  .oac .ctl { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--text-secondary); }
+  .oac .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .oac .seg button { font: inherit; font-size: .8rem; padding: .35rem .7rem; border: 0; background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; }
+  .oac .seg button + button { border-left: 1px solid var(--border); }
+  .oac .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .oac .seg button:focus-visible, .oac .swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .oac .swatch { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--bg-secondary); box-shadow: 0 0 0 1px var(--border); cursor: pointer; padding: 0; }
+  .oac .swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--accent); }
+
+  /* keys */
+  .oac .keywrap { background: #0c0c0c; padding: 22px; display: flex; justify-content: center; align-items: center; }
+  .oac .key { width: 152px; height: 152px; border-radius: 18px; overflow: hidden; background: #000;
+    box-shadow: 0 0 0 1px #2a2a2a, 0 0 0 7px #161616, 0 0 0 8px #262626; }
+  .oac .key svg, .oac .tile svg { display: block; width: 100%; height: 100%; }
+  .oac .cards.faces { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 860px) { .oac .cards.faces { grid-template-columns: repeat(2, 1fr); } }
+  .oac .card-image.keywrap { aspect-ratio: auto; }
+  .oac .tag { display: inline-block; font-size: .72rem; color: var(--text-secondary); border: 1px solid var(--border); border-radius: 4px; padding: 0 .35rem; margin-left: .3rem; vertical-align: 1px; }
+
+  /* anim demos */
+  .oac .anims { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: .75rem; }
+  .oac .anims .option { flex-direction: column; align-items: stretch; }
+  .oac .anims .row { display: flex; gap: 1rem; align-items: center; }
+  .oac .mini { width: 96px; height: 96px; border-radius: 12px; overflow: hidden; background: #000; flex-shrink: 0; box-shadow: 0 0 0 1px #2a2a2a; }
+
+  /* countdown end */
+  .oac .cd-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+
+  /* device */
+  .oac .device { background: #121212; border-radius: 28px; padding: 26px 30px; display: inline-grid; gap: var(--gap);
+    grid-template-columns: repeat(5, var(--k)); grid-template-rows: repeat(3, var(--k));
+    box-shadow: inset 0 1px 0 #2a2a2a, 0 10px 30px rgba(0,0,0,.35); }
+  .oac .tile { width: var(--k); height: var(--k); border-radius: calc(var(--k) * .14); overflow: hidden; background: #000; box-shadow: 0 0 0 1px #262626; }
+  .oac .tile.other { display: grid; place-items: center; background: #050505; }
+  .oac .tile.other svg { width: 42%; height: 42%; }
+  .oac .tiling .card-image { aspect-ratio: auto; padding: 24px 12px; background: #0c0c0c; }
+  .oac .tiling { grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); }
+
+  /* branding */
+  .oac .brands { display: grid; gap: 1.5rem; }
+  .oac .brand-card { cursor: pointer; background: var(--bg-secondary); border: 2px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .oac .brand-card.selected { border-color: var(--selected-border); }
+  .oac .brand-card:hover { border-color: var(--accent); }
+  .oac .hero { aspect-ratio: 2 / 1; position: relative; overflow: hidden; }
+  .oac .brand-meta { display: grid; grid-template-columns: 96px 1fr 1fr; gap: 1.5rem; padding: 1.25rem 1.5rem; align-items: start; }
+  .oac .brand-meta h4 { font-size: 1rem; margin-bottom: .25rem; }
+  .oac .brand-meta p { font-size: .85rem; color: var(--text-secondary); max-width: 52ch; }
+  .oac .icon { width: 96px; height: 96px; border-radius: 22px; overflow: hidden; }
+  .oac .pal { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+  .oac .pal span { font-size: .72rem; color: var(--text-secondary); display: flex; align-items: center; gap: .35rem; }
+  .oac .pal i { width: 18px; height: 18px; border-radius: 4px; box-shadow: 0 0 0 1px var(--border); display: inline-block; }
+  @media (max-width: 760px) { .oac .brand-meta { grid-template-columns: 1fr; } .oac .tiling { grid-template-columns: 1fr; } }
+
+  /* Hero A: Rotlicht */
+  .hero-a { background: #E0201B; color: #FFF3EC; font-family: 'Archivo', sans-serif; }
+  .hero-a .ring { position: absolute; height: 116%; aspect-ratio: 1; right: -6%; top: 50%; transform: translateY(-50%); }
+  .hero-a .txt { position: absolute; left: 6%; top: 50%; transform: translateY(-50%); }
+  .hero-a .name { font-stretch: 68%; font-weight: 850; font-size: clamp(2.6rem, 8.2vw, 6.4rem); line-height: .86; letter-spacing: -.01em; }
+  .hero-a .tl { font-stretch: 100%; font-weight: 450; font-size: clamp(.9rem, 1.6vw, 1.3rem); margin-top: 1.1rem; max-width: 22ch; color: #FFE1D8; }
+
+  /* Hero B: Gehäuse */
+  .hero-b { background: repeating-linear-gradient(0deg, #DADCDE 0 1px, #D3D5D8 1px 3px); color: #222528; font-family: 'Barlow', sans-serif; }
+  .hero-b .name { position: absolute; left: 6%; top: 11%; font-family: 'Barlow Semi Condensed'; font-weight: 700; font-size: clamp(1.6rem, 4vw, 3rem); letter-spacing: .01em; }
+  .hero-b .tl { position: absolute; left: 6%; top: 25%; font-size: clamp(.85rem, 1.5vw, 1.15rem); color: #4A4F55; }
+  .hero-b .rack { position: absolute; left: 4%; right: 4%; bottom: 12%; height: 46%; border-radius: 10px; background: linear-gradient(#C9CCCF, #BFC2C6);
+    box-shadow: inset 0 1px 0 #EEF0F2, inset 0 -1px 0 #9EA2A7, 0 2px 0 #B0B4B8; display: flex; align-items: center; padding: 0 5%; gap: 4%; }
+  .hero-b .screw { width: 2.4%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #F4F5F6, #9DA1A6); box-shadow: 0 0 0 1px #8D9196; flex-shrink: 0; }
+  .hero-b .win { flex: 1; height: 72%; background: #000; border-radius: 6px; box-shadow: inset 0 0 0 2px #2B2E31, 0 1px 0 #E6E8EA; display: flex; align-items: center; justify-content: space-around; padding: 0 3%; }
+  .hero-b .slot { display: flex; flex-direction: column; align-items: center; gap: .35rem; height: 86%; }
+  .hero-b .slot .k { height: 82%; aspect-ratio: 1; }
+  .hero-b .slot small { font-family: 'Barlow Semi Condensed'; font-weight: 600; font-size: clamp(.5rem, .9vw, .72rem); color: #8C6A2E; letter-spacing: .06em; }
+
+  /* Hero C: Farbraum */
+  .hero-c { background: #2B3BFF; color: #F2F3FF; font-family: 'Unbounded', sans-serif; }
+  .hero-c .name { position: absolute; left: 6%; top: 12%; font-weight: 700; font-size: clamp(1.5rem, 4.2vw, 3.2rem); line-height: 1; letter-spacing: -.02em; }
+  .hero-c .tl { position: absolute; left: 6%; top: 32%; font-family: 'Barlow', sans-serif; font-size: clamp(.9rem, 1.6vw, 1.25rem); max-width: 24ch; color: #D6DAFF; }
+  .hero-c .grid { position: absolute; right: 5%; top: 50%; transform: translateY(-50%); height: 78%; aspect-ratio: 4 / 3; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); gap: 4%; }
+  .hero-c .grid > div { background: #000; border-radius: 14%; overflow: hidden; }
+  .hero-c .grid .big { grid-column: span 2; grid-row: span 2; border-radius: 7%; }
+</style>
+
+<div class="oac">
+  <h2>On Air Clock V2: Entwürfe</h2>
+  <p class="subtitle">Alles hier läuft live und wird mit derselben Technik gezeichnet, die V2 nutzen würde (SVG, eigene Ziffern als Linien statt Schrift). Klick an, was dir gefällt. Mehrfachauswahl ist bei Watchfaces und Animationen erlaubt.</p>
+
+  <nav class="jump" aria-label="Abschnitte">
+    <a href="#s-faces">Watchfaces</a><a href="#s-anim">Mikroanimationen</a><a href="#s-cd">Countdown-Ende</a><a href="#s-tile">Mehrere Tasten</a><a href="#s-brand">Branding</a>
+  </nav>
+
+  <div class="controls" role="group" aria-label="Vorschau-Einstellungen">
+    <div class="ctl">Zeit
+      <span class="seg" data-ctl="mode">
+        <button data-v="live" aria-pressed="true">Live</button>
+        <button data-v="rollover">Minutenwechsel</button>
+        <button data-v="countdown">Countdown</button>
+      </span>
+    </div>
+    <div class="ctl">Bildrate
+      <span class="seg" data-ctl="fps">
+        <button data-v="60" aria-pressed="true">flüssig</button>
+        <button data-v="12">12/s</button>
+        <button data-v="4">4/s (wie V1)</button>
+      </span>
+    </div>
+    <div class="ctl">Farbe
+      <button class="swatch" data-color="#FF3B2F" style="background:#FF3B2F" aria-label="Rot" aria-pressed="true"></button>
+      <button class="swatch" data-color="#F4F4F4" style="background:#F4F4F4" aria-label="Weiß" aria-pressed="false"></button>
+      <button class="swatch" data-color="#FFA516" style="background:#FFA516" aria-label="Amber" aria-pressed="false"></button>
+      <button class="swatch" data-color="#3DFFB5" style="background:#3DFFB5" aria-label="Mint" aria-pressed="false"></button>
+      <button class="swatch" data-color="#5B8CFF" style="background:#5B8CFF" aria-label="Blau" aria-pressed="false"></button>
+    </div>
+  </div>
+
+  <!-- ========== WATCHFACES ========== -->
+  <section id="s-faces">
+    <h3>Watchfaces</h3>
+    <p class="lede">„Klassik“ ist das heutige Default-Face, nur mit den neuen Ziffern. Die anderen sind Vorschläge für ein neues Face. Mit „Countdown“ oben siehst du, wie jedes Face einen laufenden Countdown zeigen würde: Der Ring zeigt dann die Restzeit.</p>
+    <div class="cards faces" data-multiselect>
+      <div class="card" data-choice="face-classic" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="classic"></div></div>
+        <div class="card-body"><h3>Klassik <span class="tag">heute</span></h3><p>60 Punkte, Stundenmarken, Datum. Die echte Studiouhr.</p></div>
+      </div>
+      <div class="card" data-choice="face-line" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="line"></div></div>
+        <div class="card-body"><h3>Linie</h3><p>Ein durchgehender Bogen statt Punkten, mit leuchtendem Kopf. Ruhig und modern.</p></div>
+      </div>
+      <div class="card" data-choice="face-ticks" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="ticks"></div></div>
+        <div class="card-body"><h3>Striche</h3><p>60 Striche wie auf einer analogen Studiouhr. Die Fünf-Minuten-Striche sind länger.</p></div>
+      </div>
+      <div class="card" data-choice="face-comet" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="comet"></div></div>
+        <div class="card-body"><h3>Komet</h3><p>Ein Lichtpunkt läuft mit Schweif über eine Haarlinie. Große gestapelte Ziffern.</p></div>
+      </div>
+      <div class="card" data-choice="face-analog" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="analog"></div></div>
+        <div class="card-body"><h3>Analog</h3><p>Zeiger mit gleitendem Sekundenzeiger. Für alle, die Zifferblätter lieber mögen.</p></div>
+      </div>
+      <div class="card" data-choice="face-big" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="big"></div></div>
+        <div class="card-body"><h3>Groß</h3><p>Maximale Ziffern, Sekunden als dünne Linie unten. Am besten aus der Entfernung lesbar.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MIKROANIMATIONEN ========== -->
+  <section id="s-anim">
+    <h3>Mikroanimationen</h3>
+    <p class="lede">Jede Demo läuft in einer Schleife um einen Minutenwechsel, damit du nicht warten musst. Was du hier anklickst, wird sofort in allen anderen Vorschauen auf der Seite eingeschaltet. Wie flüssig das echte Stream Deck animieren kann, müssen wir auf der Hardware testen. Stell die Bildrate oben auf 12/s, das ist eine realistische Annahme.</p>
+    <div class="options anims" data-multiselect>
+      <div class="option" data-choice="anim-wipe" data-anim="wipe" onclick="toggleSelect(this)">
+        <div class="row"><div class="mini" data-face="line" data-demo="wipe"></div>
+        <div class="content"><h3>Ring-Reset</h3><p>Zur vollen Minute läuft der volle Ring sich selbst hinterher, statt einfach zu verschwinden.</p></div></div>
+      </div>
+      <div class="option" data-choice="anim-roll" data-anim="roll" onclick="toggleSelect(this)">
+        <div class="row"><div class="mini" data-face="big" data-demo="roll"></div>
+        <div class="content"><h3>Ziffern rollen</h3><p>Geänderte Ziffern gleiten nach oben weg, die neuen kommen von unten.</p></div></div>
+      </div>
+      <div class="option" data-choice="anim-blink" data-anim="blink" onclick="toggleSelect(this)">
+        <div class="row"><div class="mini" data-face="classic" data-demo="blink"></div>
+        <div class="content"><h3>Doppelpunkt blinkt</h3><p>Der Doppelpunkt pulsiert im Sekundentakt, wie bei einer LED-Uhr.</p></div></div>
+      </div>
+      <div class="option" data-choice="anim-glow" data-anim="glow" onclick="toggleSelect(this)">
+        <div class="row"><div class="mini" data-face="ticks" data-demo="glow"></div>
+        <div class="content"><h3>Nachglühen</h3><p>Die aktuelle Sekunde leuchtet hell und klingt dann weich aus.</p></div></div>
+      </div>
+      <div class="option" data-choice="anim-alert" data-anim="alert" onclick="toggleSelect(this)">
+        <div class="row"><div class="mini" data-face="line" data-demo="alert"></div>
+        <div class="content"><h3>Countdown-Warnung</h3><p>In den letzten 10 Sekunden pulsiert die Uhr. Bei 0 blitzt sie kurz auf.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COUNTDOWN-ENDE ========== -->
+  <section id="s-cd">
+    <h3>Was passiert bei 0?</h3>
+    <p class="lede">Bei Broadcast- und Bühnen-Timern ist <b>Weiterzählen ins Überziehen</b> üblich. Wer moderiert, sieht dann sofort, wie viel er drüber ist. Mein Vorschlag: Das ist der Standard, und die anderen beiden gibt es als Einstellung. Die Demo läuft als 20-Sekunden-Countdown in Schleife.</p>
+    <div class="cards cd-row">
+      <div class="card" data-choice="cd-overtime" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="line" data-cd="overtime"></div></div>
+        <div class="card-body"><h3>Überziehen zählen <span class="tag">Vorschlag</span></h3><p>Läuft mit „+“ weiter hoch, der Ring blinkt. Üblich bei Broadcast-Timern.</p></div>
+      </div>
+      <div class="card" data-choice="cd-hold" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="line" data-cd="hold"></div></div>
+        <div class="card-body"><h3>Bei 00:00 stehen bleiben</h3><p>Blinkt bei 0, bis man die Taste noch mal drückt.</p></div>
+      </div>
+      <div class="card" data-choice="cd-back" onclick="toggleSelect(this)">
+        <div class="card-image keywrap"><div class="key" data-face="line" data-cd="back"></div></div>
+        <div class="card-body"><h3>Zurück zur Uhrzeit</h3><p>Kurzes Aufblitzen bei 0, danach zeigt die Taste wieder die Uhrzeit.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MEHRERE TASTEN ========== -->
+  <section id="s-tile">
+    <h3>Eine Uhr über mehrere Tasten</h3>
+    <p class="lede">Gezeigt auf einem Stream Deck MK.2 (5×3). Links wird die Uhr <b>hinter den Rahmen</b> gezeichnet: Die Proportionen stimmen, an den Lücken fehlt ein Streifen. Rechts wird sie <b>auf die Tasten verteilt</b>: Nichts fehlt, aber die Uhr wird durch die Lücken auseinandergezogen. Was auf echter Hardware besser aussieht, testen wir.</p>
+    <div class="ctl" style="margin-bottom:1rem">Größe
+      <span class="seg" data-ctl="tile">
+        <button data-v="2">2×2</button>
+        <button data-v="3" aria-pressed="true">3×3</button>
+      </span>
+      &nbsp; Face
+      <span class="seg" data-ctl="tileFace">
+        <button data-v="classic">Klassik</button>
+        <button data-v="line" aria-pressed="true">Linie</button>
+        <button data-v="ticks">Striche</button>
+        <button data-v="comet">Komet</button>
+        <button data-v="analog">Analog</button>
+      </span>
+    </div>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><g id="tileSrcA"></g><g id="tileSrcB"></g></defs></svg>
+    <div class="cards tiling">
+      <div class="card" data-choice="tile-behind" onclick="toggleSelect(this)">
+        <div class="card-image"><div class="device" data-variant="A" style="--k:74px; --gap:20px"></div></div>
+        <div class="card-body"><h3>Hinter dem Rahmen</h3><p>Die Uhr wirkt wie hinter einem Gitter. Kreis und Linien bleiben geometrisch korrekt.</p></div>
+      </div>
+      <div class="card" data-choice="tile-spread" onclick="toggleSelect(this)">
+        <div class="card-image"><div class="device" data-variant="B" style="--k:74px; --gap:20px"></div></div>
+        <div class="card-body"><h3>Auf die Tasten verteilt</h3><p>Jede Taste zeigt genau ihren Teil. Nichts geht verloren, die Form wird aber leicht verzerrt.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== BRANDING ========== -->
+  <section id="s-brand">
+    <h3>Branding: drei Richtungen</h3>
+    <p class="lede">Jede Richtung zeigt ein Marketplace-Vorschaubild (2:1), das Plugin-Icon, die Farben und die Schrift. Die Uhren darin laufen live. Den Namen „On Air Clock“ habe ich überall erst mal behalten.</p>
+    <div class="brands">
+
+      <div class="brand-card" data-choice="brand-tally" onclick="selectBrand(this)">
+        <div class="hero hero-a">
+          <div class="ring" data-brand-clock="a"></div>
+          <div class="txt"><div class="name">On Air<br>Clock</div><div class="tl">Die Studiouhr für dein Stream Deck.</div></div>
+        </div>
+        <div class="brand-meta">
+          <div class="icon" data-icon="a"></div>
+          <div><h4>A · Rotlicht</h4><p>Das Plugin ist die rote „On Air“-Leuchte. Signalrot als Fläche, nicht nur als Akzent, die Uhr leuchtet darauf wie hinterleuchtetes Acryl. Schrift: Archivo, schmal geschnitten und fett für den Namen. Laut und sofort wiederzuerkennen, auch als kleines Icon im Marketplace.</p></div>
+          <div><h4>Farben</h4><div class="pal">
+            <span><i style="background:#E0201B"></i>Leuchte #E0201B</span><span><i style="background:#8E0F0C"></i>Schatten #8E0F0C</span>
+            <span><i style="background:#FFF3EC"></i>Acryl #FFF3EC</span><span><i style="background:#000"></i>Gehäuse #000000</span></div></div>
+        </div>
+      </div>
+
+      <div class="brand-card" data-choice="brand-rack" onclick="selectBrand(this)">
+        <div class="hero hero-b">
+          <div class="name">On Air Clock</div>
+          <div class="tl">Eine Studiouhr für jede Taste. Mit Zeitzonen und Countdown.</div>
+          <div class="rack">
+            <div class="screw"></div>
+            <div class="win">
+              <div class="slot"><div class="k" data-brand-clock="b1"></div><small>STUDIO</small></div>
+              <div class="slot"><div class="k" data-brand-clock="b2"></div><small>NEW YORK</small></div>
+              <div class="slot"><div class="k" data-brand-clock="b3"></div><small>COUNTDOWN</small></div>
+            </div>
+            <div class="screw"></div>
+          </div>
+        </div>
+        <div class="brand-meta">
+          <div class="icon" data-icon="b"></div>
+          <div><h4>B · Gehäuse</h4><p>Präzise Broadcast-Hardware: eloxiertes Aluminium, gravierte Beschriftung, Amber-LEDs in einem schwarzen Fenster. Ruhig und professionell, spricht auch Studioleute an. Schrift: Barlow Semi Condensed, nah an DIN-Beschriftungen.</p></div>
+          <div><h4>Farben</h4><div class="pal">
+            <span><i style="background:#D9DBDD"></i>Alu #D9DBDD</span><span><i style="background:#222528"></i>Gravur #222528</span>
+            <span><i style="background:#FFA516"></i>Amber #FFA516</span><span><i style="background:#000"></i>Fenster #000000</span></div></div>
+        </div>
+      </div>
+
+      <div class="brand-card" data-choice="brand-color" onclick="selectBrand(this)">
+        <div class="hero hero-c">
+          <div class="name">On Air<br>Clock</div>
+          <div class="tl">Studiouhren in jeder Farbe, auf jeder Taste. Auch über mehrere Tasten.</div>
+          <div class="grid">
+            <div class="big" data-brand-clock="c0"></div>
+            <div data-brand-clock="c1"></div><div data-brand-clock="c2"></div>
+            <div data-brand-clock="c3"></div><div data-brand-clock="c4"></div>
+            <div data-brand-clock="c5"></div><div data-brand-clock="c6"></div><div data-brand-clock="c7"></div><div data-brand-clock="c8"></div>
+          </div>
+        </div>
+        <div class="brand-meta">
+          <div class="icon" data-icon="c"></div>
+          <div><h4>C · Farbraum</h4><p>Für Streamer: Die frei wählbaren Farben sind die Marke. Ein kräftiges Ultramarin als Bühne, darauf echte Tasten mit Uhren in allen Farben und eine große Uhr über 2×2. Schrift: Unbounded, breit und rund, dazu Barlow für Text.</p></div>
+          <div><h4>Farben</h4><div class="pal">
+            <span><i style="background:#2B3BFF"></i>Ultramarin #2B3BFF</span><span><i style="background:#F2F3FF"></i>Papier #F2F3FF</span>
+            <span><i style="background:#FF3B2F"></i>Rot #FF3B2F</span><span><i style="background:#3DFFB5"></i>Mint #3DFFB5</span><span><i style="background:#FFA516"></i>Amber #FFA516</span></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  /* ---------- state ---------- */
+  const S = { mode: 'live', fps: 60, color: '#FF3B2F', anims: new Set(), tile: 3, tileFace: 'line' };
+  const TAU = Math.PI * 2;
+  const pad = n => String(n).padStart(2, '0');
+  const ease = k => 1 - Math.pow(1 - Math.min(1, Math.max(0, k)), 3);
+  let uid = 0;
+
+  /* ---------- monoline digits (10x16 box) ---------- */
+  const G = {
+    '0': 'M5 0A5 5 0 0 1 10 5V11A5 5 0 0 1 0 11V5A5 5 0 0 1 5 0Z',
+    '1': 'M2 3.4L6.2 0V16',
+    '2': 'M0.4 4.6A4.8 4.6 0 1 1 8.4 8L0 16H10',
+    '3': 'M0.6 0H9.4L4.3 6.2A4.9 4.9 0 1 1 0.3 13.6',
+    '4': 'M7.4 16V0L0 11.2H10',
+    '5': 'M9.4 0H1.6L1 6.8A5 5 0 1 1 0.3 14',
+    '6': 'M7.6 0L0.9 8.2M10 11A5 5 0 1 1 0 11A5 5 0 1 1 10 11Z',
+    '7': 'M0 0H10L3.6 16',
+    '8': 'M5 7.4A3.7 3.7 0 1 1 5 0A3.7 3.7 0 1 1 5 7.4ZM5 7.4A4.3 4.3 0 1 0 5 16A4.3 4.3 0 1 0 5 7.4Z',
+    '9': 'M10 5A5 5 0 1 1 0 5A5 5 0 1 1 10 5ZM9.1 7.8L2.4 16',
+    '-': 'M1 8H7', '+': 'M1 8H9M5 4V12'
+  };
+  const GW = { ':': 4, '-': 8, '+': 10, ' ': 4 };
+  function digits(str, cx, cy, h, sw, color, o = {}) {
+    const sc = h / 16, gap = 3.4, chars = [...str];
+    let w = chars.reduce((a, c) => a + (GW[c] ?? 10) + gap, -gap), x = -w / 2, out = '';
+    const swU = sw / sc, k = o.k == null ? 1 : o.k;
+    chars.forEach((ch, i) => {
+      const gw = GW[ch] ?? 10, prev = o.prev ? o.prev[i] : ch;
+      if (ch === ':') {
+        out += `<g opacity="${o.colon ?? 1}" stroke="none" fill="${color}"><circle cx="${x + 2}" cy="4.6" r="${swU * .62}"/><circle cx="${x + 2}" cy="11.4" r="${swU * .62}"/></g>`;
+      } else if (G[ch]) {
+        if (prev !== undefined && prev !== ch && k < 1 && G[prev]) {
+          const e = ease(k);
+          out += `<path d="${G[prev]}" transform="translate(${x} ${-e * 9})" opacity="${1 - e}"/>`;
+          out += `<path d="${G[ch]}" transform="translate(${x} ${(1 - e) * 9})" opacity="${e}"/>`;
+        } else out += `<path d="${G[ch]}" transform="translate(${x} 0)"/>`;
+      }
+      x += gw + gap;
+    });
+    return `<g transform="translate(${cx} ${cy}) scale(${sc}) translate(0 -8)" fill="none" stroke="${color}" stroke-width="${swU}" stroke-linecap="round" stroke-linejoin="round">${out}</g>`;
+  }
+
+  /* ---------- geometry ---------- */
+  const P = (r, f) => [72 + r * Math.sin(f * TAU), 72 - r * Math.cos(f * TAU)];
+  function arc(r, f0, f1) {
+    if (f1 - f0 <= 0.0005) return '';
+    if (f1 - f0 >= 0.9995) return `M72 ${72 - r}A${r} ${r} 0 1 1 72 ${72 + r}A${r} ${r} 0 1 1 72 ${72 - r}`;
+    const [x0, y0] = P(r, f0), [x1, y1] = P(r, f1);
+    return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 ${f1 - f0 > .5 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  }
+
+  /* ---------- time model ---------- */
+  function clockParts(mode, t) {
+    if (mode === 'rollover') {
+      const tot = 16 * 3600 + 59 * 60 + 53 + (t / 1000) % 11, sec = Math.floor(tot);
+      return { h: Math.floor(sec / 3600) % 24, m: Math.floor(sec / 60) % 60, s: sec % 60, ms: (tot - sec) * 1000, day: 11, mon: 11 };
+    }
+    const d = new Date();
+    return { h: d.getHours(), m: d.getMinutes(), s: d.getSeconds(), ms: d.getMilliseconds(), day: d.getDate(), mon: d.getMonth() + 1 };
+  }
+  function clockModel(p) {
+    const prevMin = (p.h * 60 + p.m + 1439) % 1440;
+    return {
+      main: pad(p.h) + ':' + pad(p.m), prevMain: pad(Math.floor(prevMin / 60)) + ':' + pad(prevMin % 60), mainAge: p.s + p.ms / 1000,
+      sub: pad(p.s), prevSub: pad((p.s + 59) % 60), subAge: p.ms / 1000,
+      date: pad(p.day) + '-' + pad(p.mon),
+      frac: (p.s + p.ms / 1000) / 60, step: p.s + 1, secAge: p.ms / 1000,
+      hF: ((p.h % 12) + p.m / 60 + p.s / 3600) / 12, mF: (p.m + p.s / 60) / 60, sF: (p.s + p.ms / 1000) / 60,
+      cd: false, wipeAge: p.s + p.ms / 1000
+    };
+  }
+  const fmtMS = s => pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+  function countdownModel(t, end = 'overtime') {
+    const total = 20, cycle = end === 'back' ? 28 : 27, x = (t / 1000) % cycle;
+    if (x < total) {
+      const rem = total - x, remS = Math.ceil(rem), age = remS - rem;
+      return { cd: true, main: fmtMS(remS), prevMain: fmtMS(Math.min(remS + 1, total)), mainAge: age, sub: null, date: null,
+        frac: rem / total, step: Math.ceil(rem / total * 60), secAge: age, warn: remS <= 10, over: false, hF: 0, mF: 0, sF: 0, wipeAge: 99 };
+    }
+    const o = x - total, oS = Math.floor(o), age = o - oS;
+    if (end === 'hold') return { cd: true, main: '00:00', mainAge: 9, frac: 0, step: 0, secAge: age, warn: true, over: true, hold: true, wipeAge: 99 };
+    if (end === 'back') {
+      if (o < 2) return { cd: true, main: '00:00', mainAge: 9, frac: 0, step: 0, secAge: (o * 2) % 1, warn: true, over: true, hold: true, wipeAge: 99 };
+      return Object.assign(clockModel(clockParts('live', t)), { backFade: Math.min(1, (o - 2) / .4) });
+    }
+    return { cd: true, main: '+' + fmtMS(oS + 1), prevMain: '+' + fmtMS(oS), mainAge: age, frac: 0, step: 0, secAge: age, warn: true, over: true, wipeAge: 99 };
+  }
+
+  /* ---------- faces ---------- */
+  function glowDef(id, c) {
+    return `<radialGradient id="${id}"><stop offset="0" stop-color="${c}" stop-opacity=".55"/><stop offset=".45" stop-color="${c}" stop-opacity=".18"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`;
+  }
+  function render(face, m, A, c, opt = {}) {
+    const id = 'g' + (uid++), bg = opt.bg ?? '#000', dimOp = opt.dimOp ?? .24, dimC = opt.dim ?? c;
+    let defs = glowDef(id, c), body = '';
+    const roll = A.has('roll'), glow = A.has('glow');
+    const colon = A.has('blink') && !m.cd ? (m.secAge < .5 ? 1 : .2) : 1;
+    const mainO = { prev: roll ? m.prevMain : null, k: roll ? m.mainAge / .38 : 1, colon };
+    const subO = { prev: roll ? m.prevSub : null, k: roll ? m.subAge / .3 : 1 };
+    const wipeK = A.has('wipe') && !m.cd ? m.wipeAge / .75 : 1;
+    // countdown warning / over pulse
+    let gOp = 1, flash = 0;
+    if (m.cd && m.warn && (A.has('alert') || opt.forceAlert)) {
+      gOp = m.over ? (m.secAge < .5 ? 1 : .35) : .6 + .4 * Math.cos(m.secAge * Math.PI);
+      if (m.over && m.secAge < .18) flash = .22;
+    } else if (m.cd && m.over) gOp = m.secAge < .5 ? 1 : .35;
+
+    const dim = (r, sw) => `<circle cx="72" cy="72" r="${r}" fill="none" stroke="${dimC}" stroke-opacity="${dimOp}" stroke-width="${sw}"/>`;
+    const head = (r, f, rad) => { const [x, y] = P(r, f);
+      return (glow || face === 'line' || face === 'comet' ? `<circle cx="${x}" cy="${y}" r="${rad * 3.2}" fill="url(#${id})"/>` : '') + `<circle cx="${x}" cy="${y}" r="${rad}" fill="${c}"/>`; };
+
+    if (face === 'classic') {
+      for (let i = 0; i < 60; i++) {
+        const [x, y] = P(61, i / 60), on = i < m.step && !(wipeK < 1 && i / 60 < ease(wipeK) && m.wipeAge < .75 && false);
+        body += on ? `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="2.3" fill="${c}"/>` : `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="1.45" fill="${dimC}" fill-opacity="${dimOp + .1}"/>`;
+      }
+      if (wipeK < 1) for (let i = Math.max(m.step, Math.ceil(ease(wipeK) * 60)); i < 60; i++) { const [x, y] = P(61, i / 60); body += `<circle cx="${x}" cy="${y}" r="2.3" fill="${c}" opacity=".9"/>`; }
+      if (glow && m.step > 0) { const [x, y] = P(61, (m.step - 1) / 60); body += `<circle cx="${x}" cy="${y}" r="${9 - 5 * Math.min(1, m.secAge)}" fill="url(#${id})"/>`; }
+      for (let k = 0; k < 12; k++) { const [x, y] = P(53, k / 12); body += `<circle cx="${x}" cy="${y}" r="${k ? 1.7 : 2.3}" fill="${c}" fill-opacity=".5"/>`; }
+      if (m.date) body += digits(m.date, 72, 47, 9, 1.5, c);
+      body += digits(m.main, 72, m.cd ? 72 : 71, m.cd ? 21 : 19, 2.5, c, mainO);
+      if (m.sub) body += digits(m.sub, 72, 96, 10, 1.9, c, subO);
+    }
+
+    if (face === 'line') {
+      body += dim(61, 1.5);
+      if (wipeK < 1) body += `<path d="${arc(61, ease(wipeK), 1)}" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`;
+      body += `<path d="${arc(61, 0, m.frac)}" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`;
+      if (m.frac > 0.002) body += head(61, m.frac, 4.6 + (glow ? 1.2 * (1 - Math.min(1, m.secAge * 2)) : 0));
+      body += digits(m.main, 72, m.sub ? 66 : 72, m.cd ? 22 : 23, 2.9, c, mainO);
+      if (m.sub) body += digits(m.sub, 72, 96, 11, 2, c, subO);
+    }
+
+    if (face === 'ticks') {
+      for (let i = 0; i < 60; i++) {
+        const five = i % 5 === 0, on = i < m.step, [x0, y0] = P(five ? 50 : 55, i / 60), [x1, y1] = P(64, i / 60);
+        const fresh = glow && on && i === m.step - 1 ? 1 - Math.min(1, m.secAge) : 0;
+        body += `<line x1="${x0.toFixed(2)}" y1="${y0.toFixed(2)}" x2="${x1.toFixed(2)}" y2="${y1.toFixed(2)}" stroke="${c}" stroke-opacity="${on ? 1 : dimOp + .08}" stroke-width="${(on ? (five ? 3.4 : 2.6) : (five ? 2.6 : 1.6)) + fresh * 1.6}" stroke-linecap="round"/>`;
+        if (fresh) { const [gx, gy] = P(58, i / 60); body += `<circle cx="${gx}" cy="${gy}" r="${10 * fresh + 4}" fill="url(#${id})"/>`; }
+      }
+      if (wipeK < 1) for (let i = Math.max(m.step, Math.ceil(ease(wipeK) * 60)); i < 60; i++) { const [x0, y0] = P(i % 5 ? 55 : 50, i / 60), [x1, y1] = P(64, i / 60); body += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/>`; }
+      if (m.date) body += digits(m.date, 72, 50, 8, 1.4, c);
+      body += digits(m.main, 72, 72, m.cd ? 19 : 18, 2.4, c, mainO);
+      if (m.sub) body += digits(m.sub, 72, 94, 9, 1.8, c, subO);
+    }
+
+    if (face === 'comet') {
+      body += dim(60, 1);
+      if (m.frac > 0.002) {
+        const len = Math.min(.22, m.frac), n = 16;
+        for (let j = 0; j < n; j++) {
+          const a = m.frac - len * (j + 1) / n, b = m.frac - len * j / n;
+          body += `<path d="${arc(60, Math.max(0, a), b)}" fill="none" stroke="${c}" stroke-opacity="${(1 - j / n) * .9}" stroke-width="${3.4 * (1 - j / n * .6)}" stroke-linecap="round"/>`;
+        }
+        body += head(60, m.frac, 4.2);
+      }
+      const [hh, mm] = m.main.replace('+', '').split(':'), [ph, pm] = (m.prevMain || m.main).replace('+', '').split(':');
+      body += digits(hh, 72, 54, 27, 3.3, c, { prev: roll ? ph : null, k: mainO.k });
+      body += digits(mm, 72, 92, 27, 3.3, c, { prev: roll ? pm : null, k: mainO.k });
+    }
+
+    if (face === 'analog') {
+      for (let k = 0; k < 12; k++) { const [x0, y0] = P(k % 3 ? 55 : 51, k / 12), [x1, y1] = P(63, k / 12);
+        body += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${c}" stroke-opacity="${k % 3 ? .45 : .85}" stroke-width="${k % 3 ? 2.4 : 3.6}" stroke-linecap="round"/>`; }
+      if (m.cd) {
+        body += `<path d="${arc(44, 0, m.frac)}" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round" stroke-opacity=".9"/>`;
+        body += digits(m.main, 72, 72, 15, 2.2, c, mainO);
+      } else {
+        const hand = (f, len, sw, col, tail = 0) => { const [x, y] = P(len, f), [tx, ty] = P(-tail, f);
+          return `<line x1="${tx}" y1="${ty}" x2="${x}" y2="${y}" stroke="${col}" stroke-width="${sw}" stroke-linecap="round"/>`; };
+        body += hand(m.hF, 32, 5.2, c) + hand(m.mF, 47, 3.6, c);
+        const sF = S.fps >= 30 ? m.sF : (m.step - 1) / 60;
+        body += hand(sF, 54, 1.6, '#F4F4F4', 12) + `<circle cx="72" cy="72" r="3.6" fill="#F4F4F4"/>`;
+      }
+    }
+
+    if (face === 'big') {
+      const [hh, mm] = m.main.replace('+', '').split(':'), [ph, pm] = (m.prevMain || m.main).replace('+', '').split(':');
+      body += digits(hh, 72, 41, 44, 5, c, { prev: roll ? ph : null, k: mainO.k });
+      body += digits(mm, 72, 95, 44, 5, c, { prev: roll ? pm : null, k: mainO.k });
+      body += `<line x1="22" y1="131" x2="122" y2="131" stroke="${dimC}" stroke-opacity="${dimOp}" stroke-width="3" stroke-linecap="round"/>`;
+      if (m.frac > .002) body += `<line x1="22" y1="131" x2="${22 + 100 * m.frac}" y2="131" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+      if (wipeK < 1) body += `<line x1="${22 + 100 * ease(wipeK)}" y1="131" x2="122" y2="131" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+    }
+
+    const bgRect = bg === 'none' ? '' : `<rect width="144" height="144" fill="${bg}"/>`;
+    const fl = flash ? `<rect width="144" height="144" fill="${c}" opacity="${flash}"/>` : '';
+    const fade = m.backFade != null ? m.backFade : 1;
+    return `<defs>${defs}</defs>${bgRect}${fl}<g opacity="${gOp * fade}">${body}</g>`;
+  }
+  const svg = (inner, vb = '0 0 144 144') => `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+
+  /* ---------- device tiling ---------- */
+  const icons = [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="1.8"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="1.8" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="#c33" stroke="none"><circle cx="12" cy="12" r="6"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v18M3 12h18"/></svg>'
+  ];
+  function buildDevices() {
+    document.querySelectorAll('.oac .device').forEach(dev => {
+      const v = dev.dataset.variant, n = S.tile, k = 74, g = 20;
+      const c0 = 5 - n; // clock occupies right-most columns
+      let html = '', ic = 0;
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) {
+        const inClock = c >= c0 && r < n;
+        if (!inClock) { html += `<div class="tile other">${icons[ic++ % icons.length]}</div>`; continue; }
+        const cc = c - c0, rr = r;
+        let vb;
+        if (v === 'A') { const span = n * k + (n - 1) * g, u = 144 / span; vb = `${cc * (k + g) * u} ${rr * (k + g) * u} ${k * u} ${k * u}`; }
+        else { const s = 144 / n; vb = `${cc * s} ${rr * s} ${s} ${s}`; }
+        html += `<div class="tile">${svg(`<use href="#tileSrc${v}"/>`, vb)}</div>`;
+      }
+      dev.innerHTML = html;
+    });
+  }
+
+  /* ---------- branding clocks ---------- */
+  const brandSpecs = {
+    a:  { face: 'classic', c: '#FFF3EC', bg: 'none', dim: '#8E0F0C', dimOp: .9 },
+    b1: { face: 'ticks', c: '#FFA516' }, b2: { face: 'line', c: '#FFA516', tz: -6 }, b3: { face: 'line', c: '#FFA516', cd: true },
+    c0: { face: 'line', c: '#3DFFB5' }, c1: { face: 'classic', c: '#FF3B2F' }, c2: { face: 'big', c: '#F4F4F4' },
+    c3: { face: 'comet', c: '#FFA516' }, c4: { face: 'ticks', c: '#5B8CFF' }, c5: { face: 'analog', c: '#FF5FD2' },
+    c6: { face: 'line', c: '#FFA516', cd: true }, c7: { face: 'big', c: '#3DFFB5' }, c8: { face: 'classic', c: '#F4F4F4' }
+  };
+  function iconSvg(kind) {
+    if (kind === 'a') { let d = ''; for (let i = 0; i < 12; i++) { const [x, y] = P(44, i / 12); d += `<circle cx="${x}" cy="${y}" r="${i < 8 ? 7 : 4.5}" fill="#FFF3EC" fill-opacity="${i < 8 ? 1 : .35}"/>`; }
+      return svg(`<rect width="144" height="144" fill="#E0201B"/>${d}<circle cx="72" cy="72" r="9" fill="#FFF3EC"/>`); }
+    if (kind === 'b') return svg(`<rect width="144" height="144" fill="#D3D5D8"/><rect x="20" y="20" width="104" height="104" rx="20" fill="#000"/><circle cx="72" cy="72" r="34" fill="none" stroke="#FFA516" stroke-opacity=".25" stroke-width="3"/><path d="${arc(34, 0, .7)}" fill="none" stroke="#FFA516" stroke-width="7" stroke-linecap="round"/>`);
+    return svg(`<rect width="144" height="144" fill="#2B3BFF"/><rect x="22" y="22" width="100" height="100" rx="18" fill="#000"/><path d="${arc(32, 0, .33)}" fill="none" stroke="#FF3B2F" stroke-width="7" stroke-linecap="round"/><path d="${arc(32, .4, .66)}" fill="none" stroke="#3DFFB5" stroke-width="7" stroke-linecap="round"/><path d="${arc(32, .73, .93)}" fill="none" stroke="#FFA516" stroke-width="7" stroke-linecap="round"/>`);
+  }
+  document.querySelectorAll('.oac [data-icon]').forEach(el => el.innerHTML = iconSvg(el.dataset.icon));
+
+  /* ---------- render loop ---------- */
+  let last = 0;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    if (t - last < 1000 / S.fps - 1) return;
+    last = t;
+    uid = 0;
+    const mainModel = S.mode === 'countdown' ? countdownModel(t, 'overtime') : clockModel(clockParts(S.mode, t));
+
+    document.querySelectorAll('.oac .key[data-face]').forEach(el => {
+      const m = el.dataset.cd ? countdownModel(t, el.dataset.cd) : mainModel;
+      el.innerHTML = svg(render(el.dataset.face, m, S.anims, S.color, { forceAlert: !!el.dataset.cd }));
+    });
+    document.querySelectorAll('.oac .mini[data-demo]').forEach(el => {
+      const demo = el.dataset.demo;
+      const m = demo === 'alert' ? countdownModel(t + 8000, 'overtime') : clockModel(clockParts('rollover', t));
+      el.innerHTML = svg(render(el.dataset.face, m, new Set([demo]), S.color));
+    });
+    const tileSvg = render(S.tileFace, mainModel, S.anims, S.color);
+    document.getElementById('tileSrcA').innerHTML = tileSvg;
+    document.getElementById('tileSrcB').innerHTML = tileSvg;
+
+    const live = clockModel(clockParts('live', t));
+    document.querySelectorAll('.oac [data-brand-clock]').forEach(el => {
+      const sp = brandSpecs[el.dataset.brandClock]; let m = live;
+      if (sp.cd) m = countdownModel(t + 3000, 'overtime');
+      if (sp.tz) { const d = new Date(Date.now() + sp.tz * 3600e3); m = clockModel({ h: d.getHours(), m: d.getMinutes(), s: d.getSeconds(), ms: d.getMilliseconds(), day: d.getDate(), mon: d.getMonth() + 1 }); }
+      el.innerHTML = svg(render(sp.face, m, S.anims, sp.c, { bg: sp.bg, dim: sp.dim, dimOp: sp.dimOp, forceAlert: true }));
+    });
+  }
+
+  /* ---------- controls ---------- */
+  document.querySelectorAll('.oac .seg').forEach(seg => seg.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    const key = seg.dataset.ctl, v = b.dataset.v;
+    S[key] = key === 'fps' || key === 'tile' ? Number(v) : v;
+    if (key === 'tile') buildDevices();
+    if (window.brainstorm) window.brainstorm.send({ type: 'control', control: key, value: v });
+  }));
+  document.querySelectorAll('.oac .swatch').forEach(sw => sw.addEventListener('click', () => {
+    document.querySelectorAll('.oac .swatch').forEach(x => x.setAttribute('aria-pressed', x === sw));
+    S.color = sw.dataset.color;
+  }));
+  document.querySelectorAll('.oac .anims .option').forEach(op => op.addEventListener('click', () => {
+    setTimeout(() => { op.classList.contains('selected') ? S.anims.add(op.dataset.anim) : S.anims.delete(op.dataset.anim); });
+  }));
+  window.selectBrand = el => {
+    document.querySelectorAll('.oac .brand-card').forEach(x => x.classList.toggle('selected', x === el));
+    if (window.brainstorm) window.brainstorm.send({ type: 'click', choice: el.dataset.choice, text: el.querySelector('h4').textContent });
+  };
+
+  buildDevices();
+  requestAnimationFrame(frame);
+})();
+</script>
