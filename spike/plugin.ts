@@ -1,5 +1,10 @@
 // THROWAWAY hardware spike. See docs/superpowers/notes/2026-11-spike-findings.md
-import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
+import {
+	appendFileSync,
+	mkdirSync,
+	readFileSync,
+	writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import streamDeck, {
@@ -7,6 +12,7 @@ import streamDeck, {
 	type KeyDownEvent,
 	SingletonAction,
 	type WillAppearEvent,
+	type WillDisappearEvent,
 } from "@elgato/streamdeck";
 
 /* ---------- facts (Step 2) ---------- */
@@ -179,26 +185,62 @@ const steps: Step[] = [
 /* ---------- action ---------- */
 @action({ UUID: "fail.marc.onairclock.spike.action" })
 class Spike extends SingletonAction {
-	#index = new Map<string, number>();
+	// Hardware session: one global step, so a single press switches all keys at once.
+	#step = 0;
 	#timers = new Map<string, NodeJS.Timeout>();
 
 	override async onWillAppear(ev: WillAppearEvent): Promise<void> {
 		if (!ev.action.isKey()) return;
-		await this.#show(ev.action, this.#index.get(ev.action.id) ?? 0);
+		await this.#show(ev.action, this.#step);
 	}
 
-	override async onKeyDown(ev: KeyDownEvent): Promise<void> {
-		const next = ((this.#index.get(ev.action.id) ?? 0) + 1) % steps.length;
-		await this.#show(ev.action, next);
+	override onWillDisappear(ev: WillDisappearEvent): void {
+		const old = this.#timers.get(ev.action.id);
+		if (old) clearInterval(old);
+		this.#timers.delete(ev.action.id);
+	}
+
+	override async onKeyDown(): Promise<void> {
+		await this.setStep((this.#step + 1) % steps.length);
+	}
+
+	async setStep(i: number): Promise<void> {
+		this.#step = ((i % steps.length) + steps.length) % steps.length;
+		note(`global step ${this.#step}: ${(steps[this.#step] as Step).label}`);
+		for (const a of this.actions) {
+			if (a.isKey()) await this.#show(a, this.#step);
+		}
+	}
+
+	// Gallery: key n (row-major) shows image step n, so all image tests are visible at once.
+	async gallery(): Promise<void> {
+		const blank = b64(
+			'<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144"><rect width="144" height="144" fill="#000"/></svg>',
+		);
+		for (const a of this.actions) {
+			if (!a.isKey()) continue;
+			const c = a.coordinates;
+			const idx = c ? c.row * 5 + c.column : -1;
+			const step = steps[idx];
+			if (idx >= 0 && step?.image) await this.#show(a, idx);
+			else {
+				const old = this.#timers.get(a.id);
+				if (old) clearInterval(old);
+				this.#timers.delete(a.id);
+				await a.setImage(blank);
+			}
+		}
+		note("gallery shown");
 	}
 
 	async #show(a: KeyDownEvent["action"], i: number): Promise<void> {
-		this.#index.set(a.id, i);
 		const old = this.#timers.get(a.id);
 		if (old) clearInterval(old);
 		this.#timers.delete(a.id);
 		const step = steps[i] as Step;
-		note(`step ${i}: ${step.label} (pid ${process.pid})`);
+		note(
+			`key ${a.id.slice(0, 6)} step ${i}: ${step.label} (pid ${process.pid})`,
+		);
 		if (step.image) {
 			await a.setImage(step.image);
 			return;
@@ -233,6 +275,58 @@ class Spike extends SingletonAction {
 	}
 }
 
-streamDeck.actions.registerAction(new Spike());
+const spikeAction = new Spike();
+streamDeck.actions.registerAction(spikeAction);
+
+/* ---------- hardware-session remote control ----------
+ * Write one command into logs/cmd.txt: "page <0-based index>", "step <index>" or "back".
+ * The bundled profile (manifest "Profiles") lets the plugin switch the MK.2 page itself.
+ */
+const PROFILE = "profiles/onair-v2-test";
+const cmdFile = path.join(logsDir, "cmd.txt");
+function mk2(): string | undefined {
+	let id: string | undefined;
+	streamDeck.devices.forEach((d) => {
+		if (!id && d.isConnected && d.type === 0 && d.name === "Stream Deck 5")
+			id = d.id;
+	});
+	return id;
+}
+async function runCommand(line: string): Promise<void> {
+	const [cmd, arg] = line.trim().split(/\s+/);
+	const dev = mk2();
+	if (cmd === "step") return spikeAction.setStep(Number(arg));
+	if (cmd === "gallery") return spikeAction.gallery();
+	if (cmd === "devices") {
+		streamDeck.devices.forEach((d) => {
+			note(
+				`device ${d.id} type=${d.type} name=${d.name} connected=${d.isConnected}`,
+			);
+		});
+		return;
+	}
+	if (!dev) throw new Error("no connected Stream Deck (type 0)");
+	if (cmd === "page")
+		return streamDeck.profiles.switchToProfile(dev, PROFILE, Number(arg));
+	if (cmd === "back") return streamDeck.profiles.switchToProfile(dev);
+	if (cmd === "v1")
+		return streamDeck.profiles.switchToProfile(dev, "profiles/onair-v1-ref", 0);
+	throw new Error(`unknown command ${line}`);
+}
+setInterval(() => {
+	let line = "";
+	try {
+		line = readFileSync(cmdFile, "utf8");
+	} catch {
+		return;
+	}
+	if (!line.trim()) return;
+	writeFileSync(cmdFile, "");
+	runCommand(line).then(
+		() => note(`cmd ok: ${line.trim()} @ ${new Date().toISOString()}`),
+		(e) => note(`cmd failed: ${line.trim()}: ${e}`),
+	);
+}, 300);
+
 logFacts();
 streamDeck.connect();
