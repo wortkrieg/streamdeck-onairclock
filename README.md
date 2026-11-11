@@ -24,7 +24,7 @@ A broadcast studio clock for your Stream Deck: five watchfaces, any color, time 
   - **Back to clock**: flashes briefly, then shows the time again.
 
   An optional warning pulse marks the last 10 seconds.
-- **Subtle animations**, all on by default: rolling digits, ring reset at the full minute, blinking colon and an afterglow on the current second. Each can be switched off.
+- **Subtle animations**, all on by default: rolling digits, ring reset at the full minute, blinking colon and an afterglow on the current second. Animations and the blinking colon can each be switched off.
 - **Date and time formats.** Five date formats, 12 or 24 hour display and an optional PM indicator.
 - **Stream Deck+ touch display** supported.
 
@@ -84,7 +84,7 @@ MIT. See [LICENSE](LICENSE). Copyright (c) Marc Herrmann.
 
 ## Acknowledgements
 
-- Stream Deck+ support: thanks to Wolfgang Dworzak (#6).
-- Date format option order: thanks to Takumi Saito (#9).
+- Stream Deck+ support: thanks to [wolfgang-dworzak](https://github.com/wolfgang-dworzak) ([#6](https://github.com/wortkrieg/streamdeck-onairclock/pull/6)).
+- Date format option order: thanks to [umeruma](https://github.com/umeruma) ([#9](https://github.com/wortkrieg/streamdeck-onairclock/pull/9)).
 - V1 was based on the [Elgato plugin template](https://github.com/elgatosf/streamdeck-plugintemplate). The clock calculation and drawing routine was inspired by [this kirupa tutorial](https://www.kirupa.com/html5/create_an_analog_clock_using_the_canvas.htm).
 - V2 is built on the official [Stream Deck SDK](https://docs.elgato.com/streamdeck/sdk/introduction/getting-started) and the Elgato CLI.

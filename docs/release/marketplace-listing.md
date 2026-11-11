@@ -26,7 +26,7 @@ Time zones: every key can show the system time, an IANA time zone or a fixed UTC
 
 Countdown: the Countdown action starts a preset duration of up to 99:59 on all clocks of the same Stream Deck that have "Show countdown" enabled. Press it again, or press a clock, to cancel. At zero the clock counts overtime (+MM:SS), holds at 00:00 or goes back to the time. An optional warning pulse marks the last 10 seconds.
 
-Details: rolling digits, ring reset, blinking colon and afterglow (all on by default and switchable), five date formats, 12 or 24 hour display with a PM indicator, and Stream Deck+ touch display support.
+Details: rolling digits, ring reset, blinking colon and afterglow (all on by default; animations and the blinking colon can each be switched off), five date formats, 12 or 24 hour display with a PM indicator, and Stream Deck+ touch display support.
 
 Requires Stream Deck 7.1 or newer, macOS 12+ or Windows 10+.
 
@@ -42,7 +42,7 @@ Zeitzonen: Jede Taste zeigt die Systemzeit, eine IANA-Zeitzone oder einen festen
 
 Countdown: Die Countdown-Aktion startet eine voreingestellte Dauer von bis zu 99:59 auf allen Uhren desselben Stream Decks, bei denen "Countdown anzeigen" aktiviert ist. Ein erneuter Druck oder ein Druck auf eine Uhr bricht ab. Bei null zählt die Uhr das Überziehen weiter (+MM:SS), bleibt bei 00:00 stehen oder kehrt zur Uhrzeit zurück. Eine optionale Warnung pulsiert in den letzten 10 Sekunden.
 
-Details: rollende Ziffern, Ring-Reset, blinkender Doppelpunkt und Nachglühen (standardmäßig an, einzeln abschaltbar), fünf Datumsformate, 12- oder 24-Stunden-Anzeige mit PM-Markierung und Unterstützung für das Touch-Display des Stream Deck+.
+Details: rollende Ziffern, Ring-Reset, blinkender Doppelpunkt und Nachglühen (standardmäßig an; Animationen und der blinkende Doppelpunkt lassen sich jeweils abschalten), fünf Datumsformate, 12- oder 24-Stunden-Anzeige mit PM-Markierung und Unterstützung für das Touch-Display des Stream Deck+.
 
 Voraussetzung: Stream Deck 7.1 oder neuer, macOS 12+ oder Windows 10+.
 
