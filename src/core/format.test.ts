@@ -45,6 +45,8 @@ describe("format", () => {
 		expect(formatMMSS(300)).toBe("05:00");
 		expect(formatMMSS(6000)).toBe("99:59");
 		expect(formatMMSS(-3)).toBe("00:00");
+		expect(formatMMSS(Number.NaN)).toBe("00:00");
+		expect(formatMMSS(Number.POSITIVE_INFINITY)).toBe("99:59");
 	});
 	test("formatOffset", () => {
 		expect(formatOffset(-420)).toBe("UTC−07:00");

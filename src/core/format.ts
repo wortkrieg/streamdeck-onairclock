@@ -39,7 +39,9 @@ export function isPm(hour24: number): boolean {
 }
 
 export function formatMMSS(totalSeconds: number): string {
-	const s = Math.min(5999, Math.max(0, Math.floor(totalSeconds)));
+	const s = Number.isNaN(totalSeconds)
+		? 0
+		: Math.min(5999, Math.max(0, Math.floor(totalSeconds)));
 	return `${pad2(Math.floor(s / 60))}:${pad2(s % 60)}`;
 }
 

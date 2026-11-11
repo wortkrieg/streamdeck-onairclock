@@ -43,6 +43,13 @@ describe("wallTime", () => {
 		expect([t.day, t.hour, t.minute]).toEqual([12, 0, 30]);
 	});
 
+	test("invalid iana zone falls back to system without throwing", () => {
+		const ms = Date.UTC(2026, 5, 1, 10, 20, 30, 123);
+		const bad = { kind: "iana", zone: "Mars/Phobos" } as const;
+		expect(wallTime(ms, bad)).toEqual(wallTime(ms, { kind: "system" }));
+		expect(wallTime(ms, bad)).toEqual(wallTime(ms, { kind: "system" }));
+	});
+
 	test("system matches Date getters", () => {
 		const ms = Date.UTC(2026, 5, 1, 10, 20, 30, 123);
 		const d = new Date(ms);
