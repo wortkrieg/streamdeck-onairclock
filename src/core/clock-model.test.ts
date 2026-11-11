@@ -117,16 +117,16 @@ describe("buildFaceModel: countdown mode", () => {
 		expect(buildFaceModel(NOW, cfg(), cd(c)).step).toBe(31);
 	});
 
-	test("running 4200 of 5000 ms", () => {
+	test("running 4200 of 5000 ms: digits 00:05, ring still full", () => {
 		const m = buildFaceModel(NOW, cfg({ label: "NYC" }), cd(countdown()));
 		expect(m).toMatchObject({
 			mode: "countdown",
 			main: "00:05",
-			step: 51,
+			step: 60,
 			pm: false,
 			minuteAgeMs: 99999,
 		});
-		expect(m.fraction).toBeCloseTo(0.84, 10);
+		expect(m.fraction).toBe(1); // the ring steps with the shown second
 		expect(m.sub).toBeUndefined();
 		expect(m.date).toBeUndefined();
 		expect(m.label).toBeUndefined();

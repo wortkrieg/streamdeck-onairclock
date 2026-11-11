@@ -28,7 +28,13 @@ export function viewCountdown(c: Countdown, nowMs: number): CountdownView {
 		return {
 			phase: "running",
 			remainingMs,
-			fraction: c.durationMs > 0 ? remainingMs / c.durationMs : 0,
+			// The ring moves once per second, together with the digits. A continuous
+			// fraction drawn at the uneven frame rate jumps visibly on short
+			// countdowns (24 degrees per second at 15 s).
+			fraction:
+				c.durationMs > 0
+					? Math.min(1, (Math.ceil(remainingMs / 1000) * 1000) / c.durationMs)
+					: 0,
 			warn: c.warn && remainingMs <= WARN_MS,
 		};
 	}
