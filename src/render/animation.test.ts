@@ -8,6 +8,7 @@ import {
 	isAnimating,
 	planNextFrame,
 	STEP_PHASES_MS,
+	SWEEP_PHASES_MS,
 } from "./animation";
 import { STATIC_ANIM } from "./faces";
 
@@ -220,5 +221,16 @@ describe("countdownRingPhasesMs", () => {
 		expect(countdownRingPhasesMs(1_000_300, 30_000, 10)).toEqual([
 			300, 550, 800, 50,
 		]);
+	});
+});
+
+describe("SWEEP_PHASES_MS", () => {
+	test("with the afterglow steps no frame gap exceeds 250 ms", () => {
+		const p = [...new Set([...STEP_PHASES_MS, ...SWEEP_PHASES_MS])].sort(
+			(a, b) => a - b,
+		);
+		const gaps = p.map((v, i) => (p[i + 1] ?? (p[0] ?? 0) + 1000) - v);
+		expect(Math.max(...gaps)).toBeLessThanOrEqual(250);
+		expect(p).toHaveLength(5);
 	});
 });

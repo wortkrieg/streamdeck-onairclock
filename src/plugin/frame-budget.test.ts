@@ -6,6 +6,7 @@ import {
 	type FaceId,
 } from "../core/settings";
 import { FAST_FPS } from "../hardware";
+import { SWEEP_FACES } from "../render/animation";
 import { ClockController } from "./clock-controller";
 import { combineFrames, Ticker } from "./ticker";
 
@@ -107,21 +108,25 @@ afterEach(() => {
 
 describe("frame budget with 15 visible clocks", () => {
 	test.each(FACES)(
-		"%s at defaults: at most 4 frames and 4 images per key per second",
+		"%s at defaults: at most 4 images per second, 5 for the sweeping rings",
 		(face) => {
+			const limit = SWEEP_FACES.includes(face) ? 5 : 4;
 			const b = simulate(cfg({ face }), MID_MINUTE);
-			expect(max(b.framesPerSecond)).toBeLessThanOrEqual(4);
-			expect(max(b.imagesPerSecond)).toBeLessThanOrEqual(4);
+			expect(max(b.framesPerSecond)).toBeLessThanOrEqual(limit);
+			expect(max(b.imagesPerSecond)).toBeLessThanOrEqual(limit);
 			// Every second still gets its frames (the clock does not stall).
 			expect(Math.min(...b.framesPerSecond)).toBeGreaterThanOrEqual(1);
 		},
 	);
 
-	test("classic and line at defaults draw exactly 4 images per second (V1: 4)", () => {
-		for (const face of ["classic", "line"] as const) {
+	test("classic draws exactly 4 images per second (V1: 4), line 5 for the smooth ring", () => {
+		for (const [face, n] of [
+			["classic", 4],
+			["line", 5],
+		] as const) {
 			const b = simulate(cfg({ face }), MID_MINUTE);
-			expect(b.framesPerSecond).toEqual(new Array(SECONDS).fill(4));
-			expect(b.imagesPerSecond).toEqual(new Array(SECONDS).fill(4));
+			expect(b.framesPerSecond).toEqual(new Array(SECONDS).fill(n));
+			expect(b.imagesPerSecond).toEqual(new Array(SECONDS).fill(n));
 		}
 	});
 

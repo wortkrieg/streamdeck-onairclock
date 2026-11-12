@@ -1,6 +1,6 @@
 import type { FaceModel } from "../core/clock-model";
 import type { CountdownView } from "../core/countdown";
-import type { ClockConfig } from "../core/settings";
+import type { ClockConfig, FaceId } from "../core/settings";
 import type { AnimState } from "./faces";
 
 export const ROLL_MS = 380;
@@ -22,6 +22,14 @@ export const GLOW_STEPS: ReadonlyArray<readonly [number, number]> = [
 ];
 /** ms into the second at which the stepped animations (afterglow, seconds roll) change. */
 export const STEP_PHASES_MS: readonly number[] = GLOW_STEPS.map(([at]) => at);
+/** Faces whose seconds ring (or bar) is a continuous sweep rather than 60 dots. */
+export const SWEEP_FACES: readonly FaceId[] = ["line", "comet", "big"];
+/**
+ * Extra clock-mode phase for the sweeping faces: together with STEP_PHASES_MS no gap
+ * exceeds 250 ms, so the ring moves at most 1.5 degrees per frame instead of jumping
+ * 3 degrees after the 500 ms gap. One more image per second (5 instead of 4).
+ */
+export const SWEEP_PHASES_MS: readonly number[] = [750];
 /** The seconds digits show one in-between roll image until the first step, then settle. */
 const SUB_ROLL_STEP = 0.4;
 const [, SUB_ROLL_STEP_END_MS = 0] = STEP_PHASES_MS;
