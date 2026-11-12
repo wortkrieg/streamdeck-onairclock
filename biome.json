@@ -1,0 +1,24 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.6.6/schema.json",
+	"files": {
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!build",
+			"!**/*.sdPlugin/bin",
+			"!**/*.sdPlugin/logs",
+			"!docs",
+			"!README.md",
+			"!fail.marc.onairclock.sdPlugin/de.json",
+			"!fail.marc.onairclock.sdPlugin/en.json",
+			"!.superpowers",
+			"!.claude",
+			"!.playwright-mcp",
+			"!marketing/marc-fail",
+			"!marketing/upload",
+			"!fail.marc.onairclock.sdPlugin/ui/sdpi-components.js"
+		]
+	},
+	"formatter": { "indentStyle": "tab" },
+	"linter": { "enabled": true }
+}

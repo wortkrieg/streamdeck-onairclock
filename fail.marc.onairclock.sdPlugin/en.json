@@ -1,21 +1,13 @@
 {
-  "Description": "A versatile and configurable broadcast-inspired on air clock.", 
-  "Name": "On Air Clock", 
-  "Category": "Templates", 
-  "fail.marc.onairclock.action": {
-    "Name": "On Air Clock", 
-    "Tooltip": "On Air Clock"
-  },
-  "Localization": {
-    "Dot Color": "Dot Color",
-    "Inactive Color": "Inactive Color",
-    "Background Color": "Background Color",
-    "Watchface": "Watchface",
-    "Default": "Default",
-    "No Date": "No Date",
-    "No Seconds": "No Seconds",
-    "No Date & Seconds": "No Date & Seconds",
-    "Date Format": "Date Format",
-    "Modern Minimal": "Modern Minimal"
-  }
+	"Name": "On Air Clock",
+	"Description": "A broadcast studio clock for your Stream Deck: five watchfaces, any color, time zones and a countdown.",
+	"Category": "On Air Clock",
+	"fail.marc.onairclock.action": {
+		"Name": "On Air Clock",
+		"Tooltip": "A studio clock with time zones."
+	},
+	"fail.marc.onairclock.countdown": {
+		"Name": "Countdown",
+		"Tooltip": "Starts a countdown on the clocks of this Stream Deck."
+	}
 }

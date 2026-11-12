@@ -1,52 +1,60 @@
 {
-  "Actions": [
-    {
-      "Icon": "action/images/actionimage", 
-      "Name": "OnAir Clock", 
-      "States": [
-        {
-            "Image": "action/images/image"
-        }
-      ],
-      "Controllers": ["Keypad", "Encoder"],
-      "Encoder": {
-          "layout": "layout/sdplus.layout.json",
-          "Icon": "action/images/actionimage",
-          "StackColor": "#0000FF",
-          "TriggerDescription": {
-              "Rotate": "Unused",
-              "Push": "Unused",
-              "Touch": "Unused",
-              "LongTouch": "Unused"
-          }
-      },
-      "Tooltip": "A versatile On Air Clock", 
-      "UUID": "fail.marc.onairclock.action"
-    }
-  ], 
-  "SDKVersion": 2,
-  "Author": "Marc Herrmann", 
-  "CodePath": "index.html", 
-  "PropertyInspectorPath": "propertyinspector/index.html", 
-  "Description": "A versatile and configurable broadcast-inspired on air clock.", 
-  "Category": "On Air Clock",
-  "CategoryIcon": "action/images/category",
-  "Name": "On Air Clock", 
-  "Icon": "action/images/actionimage", 
-  "URL": "https://github.com/wortkrieg/streamdeck-onairclock", 
-  "Version": "1.3.0",
-  "OS": [
-    {
-        "Platform": "mac", 
-        "MinimumVersion" : "10.11"
-    },
-    {
-        "Platform": "windows", 
-        "MinimumVersion" : "10"
-    }
-  ],
-  "Software": 
-    {
-        "MinimumVersion" : "4.1"
-  }
+	"Name": "On Air Clock",
+	"Version": "2.0.0.0",
+	"Author": "Marc Herrmann",
+	"URL": "https://github.com/wortkrieg/streamdeck-onairclock",
+	"Description": "A broadcast studio clock for your Stream Deck: five watchfaces, any color, time zones and a countdown.",
+	"Category": "On Air Clock",
+	"CategoryIcon": "imgs/plugin/category",
+	"Icon": "imgs/plugin/icon",
+	"CodePath": "bin/plugin.js",
+	"SDKVersion": 3,
+	"Software": {
+		"MinimumVersion": "7.1"
+	},
+	"OS": [
+		{ "Platform": "mac", "MinimumVersion": "12" },
+		{ "Platform": "windows", "MinimumVersion": "10" }
+	],
+	"Nodejs": {
+		"Version": "24"
+	},
+	"Actions": [
+		{
+			"Name": "On Air Clock",
+			"UUID": "fail.marc.onairclock.action",
+			"Icon": "imgs/actions/clock/icon",
+			"Tooltip": "A studio clock with time zones.",
+			"PropertyInspectorPath": "ui/clock.html",
+			"Controllers": ["Keypad", "Encoder"],
+			"States": [
+				{
+					"Image": "imgs/actions/clock/key"
+				}
+			],
+			"Encoder": {
+				"layout": "layouts/clock.json",
+				"Icon": "imgs/actions/clock/encoder",
+				"StackColor": "#2B3BFF",
+				"TriggerDescription": {
+					"Push": "Cancel countdown",
+					"Touch": "Cancel countdown"
+				}
+			}
+		},
+		{
+			"Name": "Countdown",
+			"UUID": "fail.marc.onairclock.countdown",
+			"Icon": "imgs/actions/countdown/icon",
+			"Tooltip": "Starts a countdown on the clocks of this Stream Deck.",
+			"PropertyInspectorPath": "ui/countdown.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/countdown/key"
+				}
+			]
+		}
+	],
+	"UUID": "fail.marc.onairclock"
 }

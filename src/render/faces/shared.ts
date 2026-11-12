@@ -1,0 +1,302 @@
+// Types and drawing parts shared by the five faces. Geometry is 144x144, centre 72,72.
+import type { FaceModel } from "../../core/clock-model";
+import { GLOW_TECHNIQUE, TEXT_SUPPORTED } from "../../hardware";
+import { fitHeight, renderDigits, textUnits } from "../digits";
+import { polar, r2 } from "../geometry";
+
+export interface FaceStyle {
+	/** Ring, dots, bar, glow and flash. */
+	active: string;
+	inactive: string;
+	background: string;
+	/** Digits, date, label and PM dot. */
+	time: string;
+}
+
+/** Animation progress for one frame. Task 8 computes it; STATIC_ANIM is the neutral frame. */
+export interface AnimState {
+	/** Roll progress 0..1 of the main digits (linear; the digits ease themselves). */
+	roll: number;
+	/** Ring reset progress 0..1 after the full minute (linear, eased here). Clock mode only. */
+	wipe: number;
+	/** Afterglow intensity 1..0 of the current second / ring head. */
+	glow: number;
+	colonOpacity: number;
+	/** Opacity of the whole face (countdown warning). */
+	pulse: number;
+	/** Countdown ring visible (blinks in overtime, hold and flash). */
+	ringOn: boolean;
+	/** Full-key flash (countdown reached zero). */
+	flash: boolean;
+	/** Roll progress 0..1 of the seconds digits; omitted = no roll. */
+	subRoll?: number;
+}
+
+export const STATIC_ANIM: AnimState = Object.freeze({
+	roll: 1,
+	wipe: 1,
+	glow: 0,
+	colonOpacity: 1,
+	pulse: 1,
+	ringOn: true,
+	flash: false,
+});
+
+export type FaceRenderer = (m: FaceModel, s: FaceStyle, a: AnimState) => string;
+
+export const FLASH_OPACITY = 0.22;
+/** Below this the ring/line is not drawn (avoids a dot-sized arc at the minute). */
+export const MIN_FRACTION = 0.002;
+
+/** Countdown at zero (overtime, hold, flash): the ring is full and blinks via ringOn. */
+export function atZero(m: FaceModel): boolean {
+	return m.mode === "countdown" && m.countdown?.phase !== "running";
+}
+
+/** Share of the ring to draw: clock seconds, countdown remainder, or full/empty at zero. */
+export function ringFraction(m: FaceModel, a: AnimState): number {
+	if (atZero(m)) return a.ringOn ? 1 : 0;
+	return m.fraction;
+}
+
+/** Active dots 0-60, same rules as ringFraction. */
+export function ringSteps(m: FaceModel, a: AnimState): number {
+	if (atZero(m)) return a.ringOn ? 60 : 0;
+	return m.step;
+}
+
+/** The ring reset runs only in clock mode while wipe < 1. */
+export function wiping(m: FaceModel, a: AnimState): boolean {
+	return m.mode === "clock" && a.wipe < 1;
+}
+
+export function dot(
+	x: number,
+	y: number,
+	r: number,
+	color: string,
+	opacity = 1,
+): string {
+	const op = opacity < 1 ? ` opacity="${r2(opacity)}"` : "";
+	return `<circle cx="${r2(x)}" cy="${r2(y)}" r="${r2(r)}" fill="${color}"${op}/>`;
+}
+
+export function dimRing(r: number, width: number, color: string): string {
+	return `<circle cx="72" cy="72" r="${r}" fill="none" stroke="${color}" stroke-width="${width}"/>`;
+}
+
+export const GLOW_ID = "glow";
+
+/** Gradient for the radialGradient technique; renderFace adds it once when used. */
+export function glowDefs(color: string): string {
+	return `<defs><radialGradient id="${GLOW_ID}"><stop offset="0" stop-color="${color}" stop-opacity=".55"/><stop offset=".45" stop-color="${color}" stop-opacity=".18"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></radialGradient></defs>`;
+}
+
+/** Soft halo with outer radius `outer`, scaled by `opacity` (0..1). */
+export function glow(
+	x: number,
+	y: number,
+	outer: number,
+	color: string,
+	opacity = 1,
+): string {
+	if (opacity <= 0 || outer <= 0) return "";
+	if (GLOW_TECHNIQUE === "radialGradient") {
+		const op = opacity < 1 ? ` opacity="${r2(opacity)}"` : "";
+		return `<circle cx="${r2(x)}" cy="${r2(y)}" r="${r2(outer)}" fill="url(#${GLOW_ID})"${op}/>`;
+	}
+	// Three translucent discs (outer x1, x0.69, x0.47 like 3.2/2.2/1.5 of a head).
+	const layers: ReadonlyArray<[number, number]> = [
+		[1, 0.12],
+		[2.2 / 3.2, 0.2],
+		[1.5 / 3.2, 0.3],
+	];
+	return layers
+		.map(
+			([f, o]) =>
+				`<circle cx="${r2(x)}" cy="${r2(y)}" r="${r2(outer * f)}" fill="${color}" fill-opacity="${r2(o * opacity)}"/>`,
+		)
+		.join("");
+}
+
+/** Ring head: halo (3.2x) plus a solid core. */
+export function head(x: number, y: number, rad: number, color: string): string {
+	return glow(x, y, rad * 3.2, color) + dot(x, y, rad, color);
+}
+
+/** Small PM marker (V1 drew "*"). */
+export function pmDot(x: number, y: number, color: string): string {
+	return dot(x, y, 2.6, color);
+}
+
+/** PM dot just right of the top edge of a centred digit row (main text, or its top line). */
+export function pmPosition(text: string, box: DigitBox): [number, number] {
+	const h = boxHeight(text, box);
+	const half = (textUnits(text) * h) / 16 / 2;
+	return [(box.cx ?? 72) + half + box.stroke / 2 + 4.5, box.cy - h / 2 + 2.6];
+}
+
+export function escapeXml(s: string): string {
+	return s.replace(
+		/[&<>"']/g,
+		(c) =>
+			({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+				c
+			] ?? c,
+	);
+}
+
+// Generous average advance of bold caps (Arial Bold is ~0.72em), so the estimate errs wide.
+const CAP_ADVANCE = 0.7;
+
+/**
+ * Label text centred on cy (cap height ~0.7em), at `size` or smaller so that it stays
+ * within `maxWidth`. "" when the key cannot draw text.
+ */
+export function label(
+	text: string,
+	cy: number,
+	size: number,
+	color: string,
+	maxWidth = 144,
+): string {
+	if (!TEXT_SUPPORTED) return "";
+	const chars = [...text].length;
+	const fit = maxWidth / (Math.max(1, chars) * CAP_ADVANCE);
+	const fs = Math.min(size, Math.floor(fit * 100) / 100);
+	return `<text x="72" y="${r2(cy + fs * 0.35)}" font-family="Barlow, Arial, sans-serif" font-weight="600" font-size="${fs}" text-anchor="middle" fill="${color}">${escapeXml(text.toUpperCase())}</text>`;
+}
+
+/** "16:59" / "+00:05" -> ["16", "59"] / ["00", "05"]; the two-row faces draw the "+" separately. */
+export function splitMain(main: string): [string, string] {
+	const [a = "", b = ""] = main.replace("+", "").split(":");
+	return [a, b];
+}
+
+export interface DigitBox {
+	cx?: number;
+	cy: number;
+	height: number;
+	stroke: number;
+	/** Longer strings shrink below `height` to stay within this width. */
+	maxWidth?: number;
+}
+
+/** Height for `text` in `box`: `box.height`, or less when the text would exceed maxWidth. */
+export function boxHeight(text: string, box: DigitBox): number {
+	return box.maxWidth === undefined
+		? box.height
+		: fitHeight(text, box.height, box.maxWidth, box.stroke);
+}
+
+/** Main digits on one line, with roll and colon blink. */
+export function mainLine(
+	m: FaceModel,
+	a: AnimState,
+	color: string,
+	box: DigitBox,
+): string {
+	return renderDigits(m.main, {
+		...box,
+		height: boxHeight(m.main, box),
+		cx: box.cx ?? 72,
+		color,
+		prev: m.prevMain,
+		progress: a.roll,
+		colonOpacity: a.colonOpacity,
+	});
+}
+
+/** Main digits on two lines (hours/minutes or countdown minutes/seconds). */
+export function mainTwoLines(
+	m: FaceModel,
+	a: AnimState,
+	color: string,
+	top: DigitBox,
+	bottom: DigitBox,
+): string {
+	const [hh, mm] = splitMain(m.main);
+	const [ph, pm] = splitMain(m.prevMain);
+	const line = (text: string, prev: string, box: DigitBox) =>
+		renderDigits(text, {
+			...box,
+			cx: box.cx ?? 72,
+			color,
+			prev,
+			progress: a.roll,
+		});
+	return (
+		line(hh, ph, top) +
+		line(mm, pm, bottom) +
+		(m.main.startsWith("+") ? overtimeSign(hh, color, top) : "")
+	);
+}
+
+// Digit glyph cell and gap in glyph units (see digits.ts); the "+" arms span +-4 units.
+const GLYPH_W = 10;
+const GLYPH_GAP = 3.4;
+const SIGN_SIZE = 0.8;
+
+/** Overtime "+" for the two-row faces: smaller, left of the top row, centred on it. */
+function overtimeSign(row: string, color: string, top: DigitBox): string {
+	const units = row.length * GLYPH_W + (row.length - 1) * GLYPH_GAP;
+	const rowHalf = (units * top.height) / 16 / 2 + top.stroke / 2;
+	const height = top.height * SIGN_SIZE;
+	const stroke = top.stroke * 0.9;
+	const signHalf = (4 * height) / 16 + stroke / 2;
+	const gap = top.height * 0.12;
+	return renderDigits("+", {
+		cx: (top.cx ?? 72) - rowHalf - gap - signHalf,
+		cy: top.cy,
+		height,
+		stroke,
+		color,
+	});
+}
+
+/** Seconds digits (only when the model has them). */
+export function subLine(
+	m: FaceModel,
+	a: AnimState,
+	color: string,
+	box: DigitBox,
+): string {
+	if (m.sub === undefined) return "";
+	return renderDigits(m.sub, {
+		...box,
+		height: boxHeight(m.sub, box),
+		cx: box.cx ?? 72,
+		color,
+		prev: m.prevSub,
+		progress: a.subRoll ?? 1,
+	});
+}
+
+// Ring close to the key edge (V1 used r 66) so the digits get the space inside.
+export const DOT_RING_R = 65;
+const DOT_ON = 2.4;
+const DOT_OFF = 1.5;
+
+/**
+ * 60-dot seconds ring (classic, modern): active dots, inactive dots, the ring reset
+ * (the full ring of the past minute fades out, shrinking back to inactive dots) and
+ * the afterglow.
+ */
+export function dotRing(m: FaceModel, s: FaceStyle, a: AnimState): string {
+	const steps = ringSteps(m, a);
+	const fade = wiping(m, a) ? 1 - a.wipe : 0;
+	let out = "";
+	for (let i = 0; i < 60; i++) {
+		const [x, y] = polar(DOT_RING_R, i / 60);
+		if (i < steps) out += dot(x, y, DOT_ON, s.active);
+		else if (fade > 0) {
+			const r = DOT_OFF + (DOT_ON - DOT_OFF) * fade;
+			out += dot(x, y, r, s.inactive) + dot(x, y, r, s.active, fade);
+		} else out += dot(x, y, DOT_OFF, s.inactive);
+	}
+	if (a.glow > 0 && m.step > 0) {
+		const [x, y] = polar(DOT_RING_R, (m.step - 1) / 60);
+		out += glow(x, y, 4 + 5 * a.glow, s.active, a.glow);
+	}
+	return out;
+}

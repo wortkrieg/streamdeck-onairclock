@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Countdown Settings</title>
+		<script src="sdpi-components.js"></script>
+	</head>
+
+	<body>
+		<!-- Setting keys and defaults match CountdownSettingsStored and COUNTDOWN_DEFAULTS in src/core/settings.ts. -->
+		<sdpi-item label="Duration (MM:SS)">
+			<sdpi-textfield setting="duration" default="05:00" pattern="^\d{1,2}:[0-5]\d$" placeholder="05:00"></sdpi-textfield>
+		</sdpi-item>
+		<sdpi-item label="At zero">
+			<sdpi-select setting="endMode" default="overtime">
+				<option value="overtime">Count overtime</option>
+				<option value="hold">Hold at 00:00</option>
+				<option value="clock">Back to clock</option>
+			</sdpi-select>
+		</sdpi-item>
+		<sdpi-item label="Warn in last 10 s">
+			<!-- No default attribute: sdpi reads default="false" as a truthy string. -->
+			<sdpi-checkbox setting="warn"></sdpi-checkbox>
+		</sdpi-item>
+		<sdpi-item label="Color">
+			<sdpi-color setting="color" default="#FF3B2F"></sdpi-color>
+		</sdpi-item>
+	</body>
+</html>

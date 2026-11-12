@@ -1,82 +1,96 @@
-![GH_Banner](fail.marc.onairclock.sdPlugin/previews/1-preview.png)
+![On Air Clock](docs/images/readme-hero.png)
 
-# streamdeck-onairclock
+# On Air Clock
 
-A versatile and configurable broadcast-inspired on air clock for Elgato Stream Deck.
+**Studio clocks in any color, on any key.**
 
-![moving_preview](preview.gif)
+A broadcast studio clock for your Stream Deck: five watchfaces, any color, time zones and a countdown.
+
+![On Air Clock in action](docs/images/readme-demo.gif)
 
 ## Features
 
-![Features](fail.marc.onairclock.sdPlugin/previews/2-preview.png)
+- **Five watchfaces.**
+  - **Classic**: the on air clock with 60 dots, hour marks, and optional date and seconds.
+  - **Modern Minimal**: reduced and quiet.
+  - **Line**: a continuous arc with a glowing head.
+  - **Comet**: a light point with a fading tail circles a hairline ring.
+  - **Big**: hours and minutes as large as the key allows, readable from across the room.
+- **Any color.** Set the active color, the inactive color and the background freely. Optionally the time gets its own color, apart from the ring ("Time color").
 
-* Choose between different watchfaces - including classic on air clock or more modern clockface
-* Change the appearance colors by simply setting color values. 
-* Set the watch to display date (format can be configured) and/or seconds or just hh:mm.
+  ![Clocks with separate ring and time colors](docs/images/gif-colors.gif)
+- **Time zones per key.** Use the system time, pick an IANA time zone, or set a fixed UTC offset (-12:00 to +14:00 in 15-minute steps). An optional short label (up to 6 characters, e.g. `NYC`) tells your world clocks apart.
+- **Countdown.** A separate Countdown action starts a preset duration of up to 99:59 on all clocks of the same Stream Deck that have "Show countdown" enabled. Press the Countdown key again, or press a clock, to cancel. When the countdown reaches zero you choose what happens:
+  - **Count overtime** (default): keeps counting as `+MM:SS`.
+  - **Hold at 00:00**: stays at zero and blinks until you cancel.
+  - **Back to clock**: flashes briefly, then shows the time again.
 
-![PI](pi.png)
+  An optional warning pulse marks the last 10 seconds.
+
+  ![A countdown running on several clocks, into overtime](docs/images/gif-countdown.gif)
+- **Subtle animations**, all on by default: rolling digits, ring reset at the full minute, blinking colon, an afterglow on the current second and a smoothly sweeping ring on Line, Comet and Big. Animations and the blinking colon can each be switched off; with many clocks on one page, switching off animations lowers the load on your computer.
+- **Date and time formats.** Five date formats, 12 or 24 hour display and an optional PM indicator.
+- **Stream Deck+ touch display** supported.
 
 ## Installation
 
-### Package file
+Requires Stream Deck software 7.1 or newer, on macOS 12+ or Windows 10+. If you stay on an older Stream Deck version, you keep On Air Clock V1.
 
-Download the fail.marc.onairclock.streamDeckPlugin file from releases section and install it directly with streamdeck software.
+On first use, Stream Deck downloads the Node.js runtime that V2 runs on. It needs internet access once for that. If a firewall blocks Stream Deck, allow it to reach `node-sd.elgato.com`. Until the runtime is there, the clock keys show no time.
 
-### From elgato plugin store
+### From the Elgato Marketplace
 
-The plugin is not submitted yet. Will do this once all features are included and tested enough.
+Search for "On Air Clock" in the Stream Deck Marketplace and click Install.
 
-### Manually using sources from github
+### From a GitHub release
 
-#### Mac
+Download `fail.marc.onairclock.streamDeckPlugin` from the [releases section](../../releases) and open it. The Stream Deck software installs it.
 
-Go to 
+### Updating from V1
 
-    '~/Library/Application Support/com.elgato.StreamDeck/Plugins/'
+V2 keeps the plugin ID, so existing keys stay in place and keep their settings. Keys that never had settings changed pick up the V2 defaults. The look of the clock is refreshed (new digits, new details).
 
-and copy the fail.marc.onairclock.sdPlugin folder there.
+## Wrong time?
 
-Then relaunch streamdeck software.
+On Air Clock takes time zone data from the Node.js runtime that Stream Deck provides. If that runtime ships outdated time zone data, a time zone can be off by an hour after a recent rule change. A known example: British Columbia's switch to permanent UTC-7 can show as UTC-8 (see issue #10).
 
-#### Windows 
+Observed with Stream Deck 7.6.1 (Node.js 24.22.1, tzdata 2026e): `America/Vancouver` reports UTC-07:00 on 2026-11-11, which is correct. Older runtimes can still carry outdated data.
 
-Go to
+**Fix:** open the key settings, set "Time zone" to "Fixed UTC offset" and choose the correct offset, for example -07:00. This works without waiting for any update. Keep in mind that a fixed offset does not follow daylight saving changes by itself.
 
-    '%appdata%\Elgato\StreamDeck\Plugins'
-
-and copy the fail.marc.onairclock.sdPlugin folder there.
-
-Then relaunch streamdeck software.
-
-## Developing
-
-Follow [this tutorial](https://developer.elgato.com/documentation/stream-deck/sdk/create-your-own-plugin/) for advice on how to debug the plugin.
-
-## Distribution
-
-Not yet done. Should work using DistributionTool and this command:
+## Development
 
 ```sh
-./DistributionTool -b -i fail.marc.onairclock.sdPlugin/ -o release/
+npm ci
+npm test
+npm run build:dev
+npx streamdeck link build/fail.marc.onairclock.dev.sdPlugin
+npx streamdeck restart fail.marc.onairclock.dev
 ```
 
-Make sure to rm or rename file from release folder before calling DistributionTool.
+`npm run build:dev` builds the dev variant `fail.marc.onairclock.dev` into `build/`. It runs next to an installed release version and does not touch its profiles.
 
-## Dependencies
+### Release
 
-Currently just the official [Stream Deck SDK](https://developer.elgato.com/documentation/stream-deck/sdk/overview/).
+Pushing the tag `v2.0.0` starts the release workflow. It creates a draft GitHub release with the packed plugin attached.
 
 ## Disclaimer
 
-I made this plugin just for fun and because I thought it would be handy to have a plugin like that. Therefore, it is released under MIT license. Do whatever you want with it, but it comes without warranty or liability of any kind.
+I made this plugin just for fun and because I thought it would be handy to have a plugin like that. Therefore, it is released under the MIT license. Do whatever you want with it, but it comes without warranty or liability of any kind.
 
 However, an acknowledgement would be nice.
 
-## Feature & Pull Requests
+## Feature and pull requests
 
-Feel free to request features, but my time is very limited. So it is unlikely that any new features will be added in the future. If you want to contribute and add features yourself, feel free to create a PR. I'll review and merge if it makes the plugin any better!
+Feel free to request features, but my time is very limited. If you want to contribute, create a PR. I will review it and merge it if it makes the plugin better.
+
+## License
+
+MIT. See [LICENSE](LICENSE). Copyright (c) Marc Herrmann.
 
 ## Acknowledgements
 
-This plugin is based on the [elgato plugin template](https://github.com/elgatosf/streamdeck-plugintemplate).
-The clock calculation and drawing routine is inspired by [this kirupa tutorial](https://www.kirupa.com/html5/create_an_analog_clock_using_the_canvas.htm).
+- Stream Deck+ support: thanks to [wolfgang-dworzak](https://github.com/wolfgang-dworzak) ([#6](https://github.com/wortkrieg/streamdeck-onairclock/pull/6)).
+- Date format option order: thanks to [umeruma](https://github.com/umeruma) ([#9](https://github.com/wortkrieg/streamdeck-onairclock/pull/9)).
+- V1 was based on the [Elgato plugin template](https://github.com/elgatosf/streamdeck-plugintemplate). The clock calculation and drawing routine was inspired by [this kirupa tutorial](https://www.kirupa.com/html5/create_an_analog_clock_using_the_canvas.htm).
+- V2 is built on the official [Stream Deck SDK](https://docs.elgato.com/streamdeck/sdk/introduction/getting-started) and the Elgato CLI.

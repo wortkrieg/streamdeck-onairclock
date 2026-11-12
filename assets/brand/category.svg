@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+	<title>On Air Clock</title>
+	<!-- Category icon: a studio clock's dot ring, lit from 12 to 8 o'clock (larger dots), as on the Classic face. -->
+	<g fill="#FFFFFF">
+		<circle cx="14.00" cy="3.50" r="2.0"/>
+		<circle cx="19.25" cy="4.91" r="2.0"/>
+		<circle cx="23.09" cy="8.75" r="2.0"/>
+		<circle cx="24.50" cy="14.00" r="2.0"/>
+		<circle cx="23.09" cy="19.25" r="2.0"/>
+		<circle cx="19.25" cy="23.09" r="2.0"/>
+		<circle cx="14.00" cy="24.50" r="2.0"/>
+		<circle cx="8.75" cy="23.09" r="2.0"/>
+		<circle cx="4.91" cy="19.25" r="2.0"/>
+		<circle cx="3.50" cy="14.00" r="1.1"/>
+		<circle cx="4.91" cy="8.75" r="1.1"/>
+		<circle cx="8.75" cy="4.91" r="1.1"/>
+	</g>
+</svg>
