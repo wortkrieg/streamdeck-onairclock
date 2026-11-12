@@ -5,7 +5,6 @@ import {
 	animState,
 	BLINK_MS,
 	countdownRingPhasesMs,
-	GLOW_STEPS,
 	isAnimating,
 	planNextFrame,
 	STEP_PHASES_MS,
@@ -38,6 +37,39 @@ const cd = (
 	...o,
 });
 
+describe("animations at the device frame rate", () => {
+	// The device shows at most 10 frames per second. Eased motion put most of the
+	// change into the first frame or two (a 124 degree jump of the ring reset), so
+	// every animation must change in even steps at that rate.
+	const steps = (values: number[]) =>
+		values.slice(1).map((v, i) => v - (values[i] ?? 0));
+	const even = (values: number[]) => {
+		const d = steps(values);
+		return Math.max(...d) - Math.min(...d) < 0.02;
+	};
+	const at100 = (n: number) => Array.from({ length: n }, (_, i) => i * 100);
+
+	test("the ring reset fades evenly per 100 ms frame", () => {
+		const wipe = at100(6).map(
+			(t) => animState({ ...base, minuteAgeMs: t }, on).wipe,
+		);
+		expect(even(wipe)).toBe(true);
+		expect(wipe.at(-1)).toBe(1);
+	});
+	test("the afterglow fades evenly", () => {
+		const glow = (t: number) => animState({ ...base, secAgeMs: t }, on).glow;
+		expect(even(at100(6).map(glow))).toBe(true); // sweeping faces, 10 fps
+		expect([0, 250, 500].map(glow)).toEqual([1, 0.5, 0]); // dot faces
+		expect(STEP_PHASES_MS).toEqual([0, 250, 500]);
+	});
+	test("no half-rolled seconds image between minute changes", () => {
+		for (const t of [0, 100, 149, 250, 600])
+			expect(animState({ ...base, subAgeMs: t }, on).subRoll, `${t} ms`).toBe(
+				1,
+			);
+	});
+});
+
 describe("animState", () => {
 	test("animations off", () => {
 		const a = animState(
@@ -51,29 +83,18 @@ describe("animState", () => {
 	});
 	test("roll and wipe are continuous", () => {
 		expect(animState({ ...base, mainAgeMs: 190 }, on).roll).toBeCloseTo(0.5);
-		expect(animState({ ...base, minuteAgeMs: 375 }, on).wipe).toBeCloseTo(0.5);
+		expect(animState({ ...base, minuteAgeMs: 250 }, on).wipe).toBeCloseTo(0.5);
 	});
-	test("afterglow is stepped: full, 0.55, 0.25, off from 500 ms", () => {
+	test("afterglow fades linearly, off from 500 ms", () => {
 		const glow = (secAgeMs: number) =>
 			animState({ ...base, secAgeMs }, on).glow;
-		expect([0, 149, 150, 299, 300, 499, 500, 999].map(glow)).toEqual([
-			1, 1, 0.55, 0.55, 0.25, 0.25, 0, 0,
+		expect([0, 100, 250, 400, 500, 999].map(glow)).toEqual([
+			1, 0.8, 0.5, 0.2, 0, 0,
 		]);
-		expect(GLOW_STEPS).toEqual([
-			[0, 1],
-			[150, 0.55],
-			[300, 0.25],
-			[500, 0],
-		]);
-		expect(STEP_PHASES_MS).toEqual([0, 150, 300, 500]);
 	});
-	test("seconds roll in one in-between step, with the minutes at the full minute", () => {
+	test("seconds roll: with the minutes at the full minute, never as a held step", () => {
 		const sub = (subAgeMs: number, mainAgeMs = 9999) =>
 			animState({ ...base, subAgeMs, mainAgeMs }, on).subRoll;
-		expect([0, 149, 150, 380, 999].map((t) => sub(t))).toEqual([
-			0.4, 0.4, 1, 1, 1,
-		]);
-		// At the full minute the main digits roll on fast frames; the seconds follow them.
 		expect(sub(190, 190)).toBeCloseTo(0.5);
 		expect(sub(50, 50)).toBeCloseTo(50 / 380);
 		expect(
@@ -81,20 +102,7 @@ describe("animState", () => {
 				.subRoll,
 		).toBe(1);
 	});
-	test("stepped values change only at STEP_PHASES_MS", () => {
-		const at = (t: number) => {
-			const a = animState(
-				{ ...base, secAgeMs: t, subAgeMs: t, mainAgeMs: 5000 + t },
-				on,
-			);
-			return `${a.glow}/${a.subRoll}`;
-		};
-		for (let t = 0; t < 1000; t++) {
-			const phase = Math.max(...STEP_PHASES_MS.filter((p) => p <= t));
-			expect(at(t), `${t} ms`).toBe(at(phase));
-		}
-	});
-	test("countdown: the afterglow steps on the countdown's own second", () => {
+	test("countdown: the afterglow fades on the countdown's own second", () => {
 		const run = (secAgeMs: number) =>
 			animState(
 				cd(
@@ -103,7 +111,7 @@ describe("animState", () => {
 				),
 				on,
 			).glow;
-		expect([0, 200, 400, 600].map(run)).toEqual([1, 0.55, 0.25, 0]);
+		expect([0, 200, 400, 600].map(run)).toEqual([1, 0.6, 0.2, 0]);
 	});
 	test("countdown: roll yes, wipe always 1", () => {
 		const m = cd(

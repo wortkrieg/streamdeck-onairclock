@@ -1,7 +1,7 @@
 // Types and drawing parts shared by the five faces. Geometry is 144x144, centre 72,72.
 import type { FaceModel } from "../../core/clock-model";
 import { GLOW_TECHNIQUE, TEXT_SUPPORTED } from "../../hardware";
-import { easeOutCubic, fitHeight, renderDigits, textUnits } from "../digits";
+import { fitHeight, renderDigits, textUnits } from "../digits";
 import { polar, r2 } from "../geometry";
 
 export interface FaceStyle {
@@ -279,17 +279,20 @@ const DOT_OFF = 1.5;
 
 /**
  * 60-dot seconds ring (classic, modern): active dots, inactive dots, the ring reset
- * (dots from the wipe front to 12 o'clock stay lit and run out) and the afterglow.
+ * (the full ring of the past minute fades out, shrinking back to inactive dots) and
+ * the afterglow.
  */
 export function dotRing(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	const steps = ringSteps(m, a);
-	const wipeFrom = wiping(m, a) ? Math.ceil(easeOutCubic(a.wipe) * 60) : 60;
+	const fade = wiping(m, a) ? 1 - a.wipe : 0;
 	let out = "";
 	for (let i = 0; i < 60; i++) {
 		const [x, y] = polar(DOT_RING_R, i / 60);
 		if (i < steps) out += dot(x, y, DOT_ON, s.active);
-		else if (i >= wipeFrom) out += dot(x, y, DOT_ON, s.active, 0.9);
-		else out += dot(x, y, DOT_OFF, s.inactive);
+		else if (fade > 0) {
+			const r = DOT_OFF + (DOT_ON - DOT_OFF) * fade;
+			out += dot(x, y, r, s.inactive) + dot(x, y, r, s.active, fade);
+		} else out += dot(x, y, DOT_OFF, s.inactive);
 	}
 	if (a.glow > 0 && m.step > 0) {
 		const [x, y] = polar(DOT_RING_R, (m.step - 1) / 60);

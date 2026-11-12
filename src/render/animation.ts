@@ -3,25 +3,25 @@ import type { CountdownView } from "../core/countdown";
 import type { ClockConfig, FaceId } from "../core/settings";
 import type { AnimState } from "./faces";
 
+// The device shows at most FAST_FPS (10) frames per second. The ring reset and the
+// afterglow change linearly so they move in even steps there; an eased wipe put most of
+// its motion into the first frames (124 degrees in one frame) and read as a jump.
+
+/** Minute digit roll (eased in renderDigits: one short in-between image). */
 export const ROLL_MS = 380;
-export const WIPE_MS = 750;
+/** Ring reset at the full minute: the full ring fades out in 5 even steps. */
+export const WIPE_MS = 500;
+/** Afterglow on the current second: a linear fade, off when the colon dims. */
+export const GLOW_MS = 500;
 export const BLINK_MS = 500;
 export const WARN_LAST_MS = 10000;
 
 /**
- * The afterglow is stepped, not continuous: [ms into the second, glow]. Full at the
- * second, then fading, off from 500 ms (when the colon dims). The ticker wakes only at
- * these steps (STEP_PHASES_MS) instead of running fast frames every second, so a default
- * clock draws at most 4 images per second, like V1.
+ * Frame phases (ms into the second) of the dot faces between minute changes: evenly
+ * spaced, so the afterglow fades in two equal steps (1, 0.5, 0) and the colon dims on
+ * the last one. A default Classic clock draws 3 images per second (V1: 4).
  */
-export const GLOW_STEPS: ReadonlyArray<readonly [number, number]> = [
-	[0, 1],
-	[150, 0.55],
-	[300, 0.25],
-	[500, 0],
-];
-/** ms into the second at which the stepped animations (afterglow, seconds roll) change. */
-export const STEP_PHASES_MS: readonly number[] = GLOW_STEPS.map(([at]) => at);
+export const STEP_PHASES_MS: readonly number[] = [0, 250, 500];
 /** Faces whose seconds ring (or bar) is a continuous sweep rather than 60 dots. */
 export const SWEEP_FACES: readonly FaceId[] = ["line", "comet", "big"];
 /**
@@ -37,9 +37,6 @@ export function sweepPhasesMs(fps: number, offsetMs = 0): number[] {
 		mod(offsetMs + Math.round((k * 1000) / n), 1000),
 	);
 }
-/** The seconds digits show one in-between roll image until the first step, then settle. */
-const SUB_ROLL_STEP = 0.4;
-const [, SUB_ROLL_STEP_END_MS = 0] = STEP_PHASES_MS;
 
 const COLON_DIM = 0.2;
 const SAFETY_MS = 5;
@@ -73,17 +70,11 @@ export function countdownAnim(
 	};
 }
 
-/** Afterglow at `ageMs` into the second (see GLOW_STEPS). */
-function glowAt(ageMs: number): number {
-	let glow = 0;
-	for (const [at, value] of GLOW_STEPS) if (ageMs >= at) glow = value;
-	return glow;
-}
-
 /**
- * Animation parameters for one frame. roll, subRoll and wipe stay linear: the digits
- * and the ring apply the ease-out themselves. Roll and wipe are continuous and need
- * fast frames; the afterglow and the seconds roll are stepped (STEP_PHASES_MS).
+ * Animation parameters for one frame, linear (see above). Roll and wipe need fast
+ * frames; the afterglow is sampled at the face's own frame phases. The seconds digits
+ * switch directly (no held half-rolled image); only at the full minute do they roll
+ * with the minutes.
  */
 export function animState(
 	m: FaceModel,
@@ -94,18 +85,14 @@ export function animState(
 	const secPhase = mod(m.secAgeMs, 1000);
 	const roll = anim ? progress(m.mainAgeMs, ROLL_MS) : 1;
 
-	let subRoll = 1;
-	if (anim && clock) {
-		// At the full minute the seconds roll with the minutes on the fast frames.
-		if (roll < 1) subRoll = progress(m.subAgeMs, ROLL_MS);
-		else if (m.subAgeMs < SUB_ROLL_STEP_END_MS) subRoll = SUB_ROLL_STEP;
-	}
+	// At the full minute the seconds roll with the minutes on the fast frames.
+	const subRoll = anim && clock && roll < 1 ? progress(m.subAgeMs, ROLL_MS) : 1;
 
 	return {
 		roll,
 		subRoll,
 		wipe: anim && clock ? progress(m.minuteAgeMs, WIPE_MS) : 1,
-		glow: anim ? glowAt(m.secAgeMs) : 0,
+		glow: anim ? Math.max(0, (GLOW_MS - secPhase) / GLOW_MS) : 0,
 		colonOpacity:
 			cfg.blinkColon && clock && secPhase >= BLINK_MS ? COLON_DIM : 1,
 		...countdownAnim(m.countdown, m.secAgeMs),

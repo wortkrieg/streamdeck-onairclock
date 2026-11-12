@@ -286,7 +286,7 @@ describe("ClockController frame timing", () => {
 		const c = new ClockController(new CountdownRegistry());
 		c.add(target("a"), cfg({ animations: true, blinkColon: false }));
 		const { phasesMs } = c.frame(T0 + 5_700);
-		expect([...phasesMs].sort((x, y) => x - y)).toEqual([0, 150, 300, 500]);
+		expect([...phasesMs].sort((x, y) => x - y)).toEqual([0, 250, 500]);
 	});
 
 	test("a clock showing a running countdown steps on the countdown's second", () => {
@@ -295,8 +295,8 @@ describe("ClockController frame timing", () => {
 		c.add(target("cd", "A"), cfg({ animations: true }));
 		registry.press("A", "cd-key", CD, T0 + 250);
 		const { phasesMs } = c.frame(T0 + 5_700);
-		expect([...phasesMs].sort((x, y) => x - y)).toEqual([
-			0, 250, 400, 550, 750,
+		expect([...new Set(phasesMs)].sort((x, y) => x - y)).toEqual([
+			0, 250, 500, 750,
 		]);
 	});
 });

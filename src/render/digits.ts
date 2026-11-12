@@ -39,9 +39,6 @@ export interface DigitOptions {
 	colonOpacity?: number;
 }
 
-export const easeOutCubic = (k: number): number =>
-	1 - (1 - Math.min(1, Math.max(0, k))) ** 3;
-
 // Unknown characters (no glyph, no width entry, not ":") are skipped entirely: they
 // draw nothing and take up no width.
 function isKnown(ch: string): boolean {
@@ -70,6 +67,9 @@ export function fitHeight(
 	return Math.min(maxHeight, ((maxWidth - stroke) * 16) / units);
 }
 
+export const easeOutCubic = (k: number): number =>
+	1 - (1 - Math.min(1, Math.max(0, k))) ** 3;
+
 export function renderDigits(text: string, o: DigitOptions): string {
 	const sc = o.height / 16;
 	const swU = o.stroke / sc;
@@ -88,6 +88,8 @@ export function renderDigits(text: string, o: DigitOptions): string {
 			out += `<g opacity="${o.colonOpacity ?? 1}" stroke="none" fill="${o.color}"><circle cx="${r2(x + 2)}" cy="4.6" r="${r}"/><circle cx="${r2(x + 2)}" cy="11.4" r="${r}"/></g>`;
 		} else if (c in GLYPHS) {
 			if (prev !== undefined && prev !== c && k < 1 && prev in GLYPHS) {
+				// Ease-out: one short in-between image, then the new digit settles. A linear
+				// roll shows several half-overlapping images at the device's 10 fps.
 				const e = easeOutCubic(k);
 				out += `<path d="${GLYPHS[prev]}" transform="translate(${r2(x)} ${r2(-e * ROLL_DISTANCE)})" opacity="${r2(1 - e)}"/>`;
 				out += `<path d="${GLYPHS[c]}" transform="translate(${r2(x)} ${r2((1 - e) * ROLL_DISTANCE)})" opacity="${r2(e)}"/>`;

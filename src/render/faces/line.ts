@@ -1,8 +1,7 @@
 // Line: continuous arc with a glowing head over a thin background ring.
 // Time large, seconds small below. No date. Geometry from the v2 mockup.
 import type { FaceModel } from "../../core/clock-model";
-import { easeOutCubic } from "../digits";
-import { arcPath, polar } from "../geometry";
+import { arcPath, polar, r2 } from "../geometry";
 import {
 	type AnimState,
 	atZero,
@@ -22,10 +21,11 @@ import {
 const R = 64;
 const WIDTH = 4;
 
-function arc(f0: number, f1: number, color: string): string {
+function arc(f0: number, f1: number, color: string, opacity = 1): string {
 	const d = arcPath(R, f0, f1);
+	const op = opacity < 1 ? ` opacity="${r2(opacity)}"` : "";
 	return d
-		? `<path d="${d}" fill="none" stroke="${color}" stroke-width="${WIDTH}" stroke-linecap="round"/>`
+		? `<path d="${d}" fill="none" stroke="${color}" stroke-width="${WIDTH}" stroke-linecap="round"${op}/>`
 		: "";
 }
 
@@ -33,7 +33,8 @@ export function renderLine(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	const c = s.active;
 	const t = s.time;
 	let out = dimRing(R, 1.5, s.inactive);
-	if (wiping(m, a)) out += arc(easeOutCubic(a.wipe), 1, c);
+	// Ring reset: the full ring of the past minute fades out.
+	if (wiping(m, a)) out += arc(0, 1, c, 1 - a.wipe);
 	const frac = ringFraction(m, a);
 	out += arc(0, frac, c);
 	// The head marks the moving end; a full countdown ring at zero has none.

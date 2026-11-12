@@ -119,9 +119,9 @@ describe("frame budget with 15 visible clocks", () => {
 		},
 	);
 
-	test("classic draws exactly 4 images per second (V1: 4), line FAST_FPS for the smooth ring", () => {
+	test("classic draws exactly 3 images per second (V1: 4), line FAST_FPS for the smooth ring", () => {
 		for (const [face, n] of [
-			["classic", 4],
+			["classic", 3],
 			["line", FAST_FPS],
 		] as const) {
 			const b = simulate(cfg({ face }), MID_MINUTE);
