@@ -309,6 +309,12 @@ async function runCommand(line: string): Promise<void> {
 	if (cmd === "page")
 		return streamDeck.profiles.switchToProfile(dev, PROFILE, Number(arg));
 	if (cmd === "back") return streamDeck.profiles.switchToProfile(dev);
+	if (cmd === "migration")
+		return streamDeck.profiles.switchToProfile(
+			dev,
+			"profiles/onair-v1-migration",
+			0,
+		);
 	if (cmd === "combos")
 		return streamDeck.profiles.switchToProfile(dev, "profiles/onair-combos", 0);
 	if (cmd === "colors")

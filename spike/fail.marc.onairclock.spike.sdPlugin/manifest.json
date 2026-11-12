@@ -59,6 +59,11 @@
 			"Name": "profiles/onair-combos",
 			"DeviceType": 0,
 			"DontAutoSwitchWhenInstalled": true
+		},
+		{
+			"Name": "profiles/onair-v1-migration",
+			"DeviceType": 0,
+			"DontAutoSwitchWhenInstalled": true
 		}
 	]
 }
