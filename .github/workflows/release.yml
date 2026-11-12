@@ -18,6 +18,10 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx streamdeck pack fail.marc.onairclock.sdPlugin --output dist/
-      - run: gh release create "$GITHUB_REF_NAME" dist/*.streamDeckPlugin --draft --notes-file CHANGELOG.md
+      - name: Release notes (the CHANGELOG section of this version)
+        run: |
+          awk -v h="## ${GITHUB_REF_NAME#v}" 'index($0, h) == 1 {f = 1; next} f && /^## / {exit} f' CHANGELOG.md > notes.md
+          test -s notes.md
+      - run: gh release create "$GITHUB_REF_NAME" dist/*.streamDeckPlugin --draft --title "On Air Clock ${GITHUB_REF_NAME#v}" --notes-file notes.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

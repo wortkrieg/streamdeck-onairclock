@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0
+## 2.0.0 (2026-11-12)
 
 On Air Clock V2 is a complete rebuild. The plugin ID is unchanged, so existing keys keep their settings.
 
@@ -20,8 +20,10 @@ On Air Clock V2 is a complete rebuild. The plugin ID is unchanged, so existing k
 - One shared clock tick for all keys instead of one timer per key.
 - The former V1 faces without date and/or seconds are now options of Classic ("Show date", "Show seconds").
 - New defaults apply to every key without a stored value, including V1 clocks that were never configured.
-- Requires Stream Deck software 7.1 or newer, macOS 12+ or Windows 10+. Users on older Stream Deck versions keep V1.
+- Larger digits and labels that read well from a distance; lower CPU load than V1 with the dot faces.
+- Clocks on "System time" follow a changed system time zone within about 10 seconds.
+- Requires Stream Deck software 7.1 or newer, macOS 12+ or Windows 10+. Users on older Stream Deck versions keep V1. On first use Stream Deck downloads its Node.js runtime once (needs internet access).
 
 ### Fixed
 
-- Wrong time in regions whose time zone data is outdated in the runtime: choose "Fixed UTC offset" in the key settings (#10).
+- Wrong time in British Columbia (#10): V2 runs on Stream Deck's Node.js runtime, whose time zone data is current. If a region's time is ever off by an hour, choose "Fixed UTC offset" in the key settings.
