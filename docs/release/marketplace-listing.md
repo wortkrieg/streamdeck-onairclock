@@ -20,7 +20,7 @@ On Air Clock puts a broadcast-style studio clock on your Stream Deck keys: a rin
 
 Watchfaces: Classic (60 dots, hour marks, optional date and seconds), Modern Minimal, Line, Comet and Big.
 
-Colors: set the active color, the inactive color and the background yourself.
+Colors: set the active color, the inactive color and the background yourself. Optionally the time gets its own color, apart from the ring ("Time color").
 
 Time zones: every key can show the system time, an IANA time zone or a fixed UTC offset (-12:00 to +14:00 in 15-minute steps). Add a short label such as NYC to tell world clocks apart. If your region's time is off by an hour, choose "Fixed UTC offset".
 
@@ -36,7 +36,7 @@ On Air Clock bringt eine Studiouhr im Rundfunk-Stil auf deine Stream-Deck-Tasten
 
 Ziffernblätter: Klassik (60 Punkte, Stundenmarken, optional Datum und Sekunden), Modern Minimal, Linie, Komet und Groß.
 
-Farben: Aktiv-Farbe, Inaktiv-Farbe und Hintergrund stellst du selbst ein.
+Farben: Aktiv-Farbe, Inaktiv-Farbe und Hintergrund stellst du selbst ein. Auf Wunsch bekommt die Uhrzeit eine eigene Farbe, getrennt vom Ring ("Time color").
 
 Zeitzonen: Jede Taste zeigt die Systemzeit, eine IANA-Zeitzone oder einen festen UTC-Versatz (-12:00 bis +14:00 in 15-Minuten-Schritten). Mit einer kurzen Beschriftung wie NYC unterscheidest du Weltzeituhren. Stimmt die Zeit in deiner Region um eine Stunde nicht, wähle bei „Time zone“ die Option „Fixed UTC offset“.
 

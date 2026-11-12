@@ -12,6 +12,7 @@ Device: any Stream Deck with display, Stream Deck software 7.1 or newer. Install
 - [ ] Classic shows 60 dots and hour marks; "Show date" and "Show seconds" toggle correctly.
 - [ ] Modern Minimal, Line, Comet and Big each render correctly; digits look the same as on macOS.
 - [ ] Active, inactive and background colors change the clock immediately.
+- [ ] "Own color for the time" shows the time color picker, which starts with the active color; the digits, date and label change color, the ring keeps the active color. Unchecking returns the digits to the active color.
 - [ ] Animations (digit roll, ring reset, afterglow) and the blinking colon run smoothly and can each be switched off.
 - [ ] The five date formats and 12/24h with the PM indicator work.
 

@@ -25,12 +25,13 @@ function bar(f0: number, f1: number, color: string): string {
 
 export function renderBig(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	const c = s.active;
+	const t = s.time;
 	const top = { cy: 41, height: 44, stroke: 5.6 };
-	let out = mainTwoLines(m, a, c, top, { cy: 95, height: 44, stroke: 5.6 });
+	let out = mainTwoLines(m, a, t, top, { cy: 95, height: 44, stroke: 5.6 });
 	out += bar(0, 1, s.inactive);
 	const frac = ringFraction(m, a);
 	if (frac > MIN_FRACTION) out += bar(0, frac, c);
 	if (wiping(m, a)) out += bar(easeOutCubic(a.wipe), 1, c);
-	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], top), c);
+	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], top), t);
 	return out;
 }

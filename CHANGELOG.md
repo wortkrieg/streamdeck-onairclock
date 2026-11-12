@@ -11,6 +11,7 @@ On Air Clock V2 is a complete rebuild. The plugin ID is unchanged, so existing k
 - Countdown action with a preset duration of up to 99:59. It starts on all clocks of the same Stream Deck that have "Show countdown" enabled. Pressing the Countdown key again, or a clock, cancels it (#7).
 - Three end modes for the countdown: count overtime (+MM:SS, default), hold at 00:00, back to clock. Optional warning pulse in the last 10 seconds.
 - Micro animations, on by default: rolling digits, ring reset, blinking colon, afterglow, smoothly sweeping ring on Line, Comet and Big. Animations and the blinking colon can each be switched off.
+- Optional separate color for the time (digits, date, label), apart from the ring ("Time color").
 - New branding, icons and Marketplace artwork.
 
 ### Changed

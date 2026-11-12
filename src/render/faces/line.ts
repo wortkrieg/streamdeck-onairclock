@@ -31,6 +31,7 @@ function arc(f0: number, f1: number, color: string): string {
 
 export function renderLine(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	const c = s.active;
+	const t = s.time;
 	let out = dimRing(R, 1.5, s.inactive);
 	if (wiping(m, a)) out += arc(easeOutCubic(a.wipe), 1, c);
 	const frac = ringFraction(m, a);
@@ -41,15 +42,15 @@ export function renderLine(m: FaceModel, s: FaceStyle, a: AnimState): string {
 		out += head(x, y, 4.6 + 1.2 * a.glow, c);
 	}
 
-	if (m.label) out += label(m.label, 38, 19, c, 80);
+	if (m.label) out += label(m.label, 38, 19, t, 80);
 	const main = {
 		cy: m.sub ? 68 : 72,
 		height: 28,
 		stroke: 4.2,
 		maxWidth: 106,
 	};
-	out += mainLine(m, a, c, main);
-	out += subLine(m, a, c, { cy: 101, height: 17, stroke: 2.9 });
-	if (m.pm) out += pmDot(...pmPosition(m.main, main), c);
+	out += mainLine(m, a, t, main);
+	out += subLine(m, a, t, { cy: 101, height: 17, stroke: 2.9 });
+	if (m.pm) out += pmDot(...pmPosition(m.main, main), t);
 	return out;
 }

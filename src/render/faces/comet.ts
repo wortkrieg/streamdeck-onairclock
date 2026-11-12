@@ -38,6 +38,7 @@ function tail(frac: number, color: string): string {
 
 export function renderComet(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	const c = s.active;
+	const t = s.time;
 	let out = dimRing(R, 1, s.inactive);
 	const frac = ringFraction(m, a);
 	if (atZero(m)) {
@@ -51,7 +52,7 @@ export function renderComet(m: FaceModel, s: FaceStyle, a: AnimState): string {
 	}
 
 	const top = { cy: 48, height: 38, stroke: 5 };
-	out += mainTwoLines(m, a, c, top, { cy: 96, height: 38, stroke: 5 });
-	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], top), c);
+	out += mainTwoLines(m, a, t, top, { cy: 96, height: 38, stroke: 5 });
+	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], top), t);
 	return out;
 }

@@ -33,6 +33,8 @@ const STORED: Required<ClockSettingsStored> = {
 	dotcolor: CLOCK_DEFAULTS.colors.active,
 	inactivecolor: CLOCK_DEFAULTS.colors.inactive,
 	backgroundcolor: CLOCK_DEFAULTS.colors.background,
+	separateTimeColor: false,
+	timeColor: CLOCK_DEFAULTS.colors.time,
 	timezone: "system",
 	utcOffset: "0",
 	label: CLOCK_DEFAULTS.label,
@@ -92,6 +94,9 @@ describe("ui/clock.html", () => {
 		expect(hintFor("showDate")).toBe("Only Classic shows the date.");
 		expect(hintFor("showSeconds")).toBe(
 			"Seconds digits on Classic, Modern Minimal and Line.",
+		);
+		expect(hintFor("separateTimeColor")).toBe(
+			"Off: digits, date and label use the active color.",
 		);
 		expect(hintFor("label")).toBe(
 			"Shown on Classic (instead of the date), Modern Minimal and Line.",

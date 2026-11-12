@@ -29,7 +29,7 @@ export function renderCountdownKey(
 	return renderFace(
 		"line",
 		m,
-		{ active: color, inactive, background },
+		{ active: color, inactive, background, time: color },
 		{ ...STATIC_ANIM, ...countdownAnim(view, m.secAgeMs) },
 	);
 }

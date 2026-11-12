@@ -25,7 +25,7 @@ export function renderClassic(
 	s: FaceStyle,
 	a: AnimState,
 ): string {
-	const c = s.active;
+	const t = s.time;
 	let out = dotRing(m, s, a);
 	for (let k = 0; k < 12; k++) {
 		const [x, y] = polar(MARK_R, k / 12);
@@ -33,7 +33,7 @@ export function renderClassic(
 	}
 
 	// The label takes the date line; without text support the date stays.
-	const top = m.label ? label(m.label, DATE_CY, 20, c, 76) : "";
+	const top = m.label ? label(m.label, DATE_CY, 20, t, 76) : "";
 	if (top) out += top;
 	else if (m.date) {
 		const box = { cy: DATE_CY, height: 14, stroke: 2.6, maxWidth: 74 };
@@ -41,11 +41,11 @@ export function renderClassic(
 			...box,
 			cx: 72,
 			height: boxHeight(m.date, box),
-			color: c,
+			color: t,
 		});
 	}
-	out += mainLine(m, a, c, MAIN);
-	out += subLine(m, a, c, { cy: 103, height: 17, stroke: 2.9 });
-	if (m.pm) out += pmDot(...pmPosition(m.main, MAIN), c);
+	out += mainLine(m, a, t, MAIN);
+	out += subLine(m, a, t, { cy: 103, height: 17, stroke: 2.9 });
+	if (m.pm) out += pmDot(...pmPosition(m.main, MAIN), t);
 	return out;
 }

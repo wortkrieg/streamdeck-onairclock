@@ -25,6 +25,7 @@ const STYLE: FaceStyle = {
 	active: "#FF3B2F",
 	inactive: "#3D3D3D",
 	background: "#000000",
+	time: "#FF3B2F",
 };
 const FACES: readonly FaceId[] = ["classic", "modern", "line", "comet", "big"];
 
@@ -290,6 +291,24 @@ describe("renderFace", () => {
 		expect(digitGroups(svg)).toBe(2); // main + sub, no date
 	});
 
+	test("time color: digits and label in it, ring in the active color", () => {
+		const style = { ...STYLE, time: "#FFFFFF" };
+		for (const face of FACES) {
+			const m = clock(face, { label: "NYC", hour12: true, pmIndicator: true });
+			const svg = renderFace(face, m, style, STATIC_ANIM);
+			// every digit group is drawn in the time color
+			const strokes = [
+				...svg.matchAll(/<g transform="translate[^"]*"[^>]*stroke="([^"]+)"/g),
+			].map(([, c]) => c);
+			expect(strokes.length, face).toBeGreaterThan(0);
+			expect(new Set(strokes), face).toEqual(new Set(["#FFFFFF"]));
+			// the ring, dots or bar keep the active color
+			expect(svg, face).toMatch(/(fill|stroke)="#FF3B2F"/);
+			if (svg.includes(">NYC<"))
+				expect(svg, face).toMatch(/fill="#FFFFFF">NYC</);
+		}
+	});
+
 	test("long labels shrink to stay inside the face", async () => {
 		const h = await withHardware({ TEXT_SUPPORTED: true });
 		const size = (text: string) => {
@@ -506,7 +525,12 @@ describe("renderFace", () => {
 					renderFace(
 						face,
 						clock(face, { label: "BER" }),
-						{ active: "#1F3BFF", inactive: "#C8CCD6", background: "#F4F4F4" },
+						{
+							active: "#1F3BFF",
+							inactive: "#C8CCD6",
+							background: "#F4F4F4",
+							time: "#1F3BFF",
+						},
 						STATIC_ANIM,
 					),
 				);

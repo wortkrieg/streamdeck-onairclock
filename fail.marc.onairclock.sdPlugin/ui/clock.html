@@ -54,7 +54,14 @@
 			<sdpi-checkbox setting="ampmindicator"></sdpi-checkbox>
 		</sdpi-item>
 		<sdpi-item label="Active color">
-			<sdpi-color setting="dotcolor" default="#FF3B2F"></sdpi-color>
+			<sdpi-color id="dotcolor" setting="dotcolor" default="#FF3B2F"></sdpi-color>
+		</sdpi-item>
+		<sdpi-item label="Time color">
+			<sdpi-checkbox id="separateTimeColor" setting="separateTimeColor" label="Own color for the time"></sdpi-checkbox>
+			<p class="hint">Off: digits, date and label use the active color.</p>
+		</sdpi-item>
+		<sdpi-item id="timeColorItem" label="" hidden>
+			<sdpi-color id="timeColor" setting="timeColor" default="#FF3B2F"></sdpi-color>
 		</sdpi-item>
 		<sdpi-item label="Inactive color">
 			<sdpi-color setting="inactivecolor" default="#3D3D3D"></sdpi-color>
@@ -228,6 +235,23 @@
 				};
 				timezone.addEventListener("valuechange", sync);
 				sync();
+
+				// The time color picker only matters with "Own color for the time". It starts
+				// from the current active color; deferred like the offset above.
+				const separate = document.getElementById("separateTimeColor");
+				const timeColorItem = document.getElementById("timeColorItem");
+				const timeColor = document.getElementById("timeColor");
+				const dotcolor = document.getElementById("dotcolor");
+				const syncTime = () => {
+					timeColorItem.hidden = !separate.value;
+					if (separate.value)
+						setTimeout(() => {
+							if (timeColor.value === undefined)
+								timeColor.value = dotcolor.value ?? "#FF3B2F";
+						});
+				};
+				separate.addEventListener("valuechange", syncTime);
+				syncTime();
 			})();
 		</script>
 	</body>

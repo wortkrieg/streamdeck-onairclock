@@ -11,7 +11,13 @@ export interface ClockConfig {
 	dateFormat: DateFormat;
 	hour12: boolean;
 	pmIndicator: boolean;
-	colors: { active: string; inactive: string; background: string };
+	/** `time` colors digits, date, label and PM dot; it equals `active` unless set apart. */
+	colors: {
+		active: string;
+		inactive: string;
+		background: string;
+		time: string;
+	};
 	zone: ZoneSetting;
 	label: string;
 	animations: boolean;
@@ -37,6 +43,8 @@ export type ClockSettingsStored = Partial<{
 	dotcolor: string;
 	inactivecolor: string;
 	backgroundcolor: string;
+	separateTimeColor: boolean;
+	timeColor: string;
 	timezone: string; // "system" | "fixed" | IANA
 	utcOffset: string; // minutes as string, e.g. "-420"
 	label: string;
@@ -58,7 +66,12 @@ export const CLOCK_DEFAULTS: ClockConfig = {
 	dateFormat: "dd-mm",
 	hour12: false,
 	pmIndicator: false,
-	colors: { active: "#FF3B2F", inactive: "#3D3D3D", background: "#000000" },
+	colors: {
+		active: "#FF3B2F",
+		inactive: "#3D3D3D",
+		background: "#000000",
+		time: "#FF3B2F",
+	},
 	zone: { kind: "system" },
 	label: "",
 	animations: true,
@@ -90,6 +103,7 @@ const BOOLEAN_KEYS = [
 	"animations",
 	"blinkColon",
 	"showCountdown",
+	"separateTimeColor",
 	"warn",
 ] as const;
 const MAX_LABEL = 6;
@@ -202,6 +216,7 @@ export function migrateV1(raw: Record<string, unknown>): {
 
 export function normalizeClock(raw: Record<string, unknown>): ClockConfig {
 	const d = CLOCK_DEFAULTS;
+	const active = color(raw.dotcolor, d.colors.active);
 	return {
 		face: oneOf(raw.face, FACES, d.face),
 		showDate: bool(raw.showDate, d.showDate),
@@ -210,9 +225,13 @@ export function normalizeClock(raw: Record<string, unknown>): ClockConfig {
 		hour12: raw.hourFormat === "12" || raw.hourFormat === 12,
 		pmIndicator: bool(raw.ampmindicator, d.pmIndicator),
 		colors: {
-			active: color(raw.dotcolor, d.colors.active),
+			active,
 			inactive: color(raw.inactivecolor, d.colors.inactive),
 			background: color(raw.backgroundcolor, d.colors.background),
+			// Without "separate time color" the digits follow the active color.
+			time: bool(raw.separateTimeColor, false)
+				? color(raw.timeColor, active)
+				: active,
 		},
 		zone: parseZone(raw.timezone, raw.utcOffset),
 		label: parseLabel(raw.label),

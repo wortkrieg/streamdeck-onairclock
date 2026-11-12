@@ -5,9 +5,12 @@ import { easeOutCubic, fitHeight, renderDigits, textUnits } from "../digits";
 import { polar, r2 } from "../geometry";
 
 export interface FaceStyle {
+	/** Ring, dots, bar, glow and flash. */
 	active: string;
 	inactive: string;
 	background: string;
+	/** Digits, date, label and PM dot. */
+	time: string;
 }
 
 /** Animation progress for one frame. Task 8 computes it; STATIC_ANIM is the neutral frame. */

@@ -117,7 +117,7 @@ function clockConfig(k: ClockKey): ClockConfig {
 		zone: { kind: "iana", zone: k.zone ?? BERLIN },
 		showDate: k.showDate ?? CLOCK_DEFAULTS.showDate,
 		showSeconds: k.showSeconds ?? CLOCK_DEFAULTS.showSeconds,
-		colors: { ...CLOCK_DEFAULTS.colors, active: k.color },
+		colors: { ...CLOCK_DEFAULTS.colors, active: k.color, time: k.color },
 	};
 }
 

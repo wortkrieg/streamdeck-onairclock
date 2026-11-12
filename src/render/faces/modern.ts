@@ -27,13 +27,13 @@ const LABELLED = {
 };
 
 export function renderModern(m: FaceModel, s: FaceStyle, a: AnimState): string {
-	const c = s.active;
+	const t = s.time;
 	let out = dotRing(m, s, a);
-	const top = m.label ? label(m.label, 25, 17, c, 64) : "";
+	const top = m.label ? label(m.label, 25, 17, t, 64) : "";
 	const g = top ? LABELLED : PLAIN;
 	out += top;
-	out += mainTwoLines(m, a, c, g.top, g.bottom);
-	out += subLine(m, a, c, g.sub);
-	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], g.top), c);
+	out += mainTwoLines(m, a, t, g.top, g.bottom);
+	out += subLine(m, a, t, g.sub);
+	if (m.pm) out += pmDot(...pmPosition(splitMain(m.main)[0], g.top), t);
 	return out;
 }

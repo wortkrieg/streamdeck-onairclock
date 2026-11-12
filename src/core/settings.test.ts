@@ -8,6 +8,21 @@ import {
 } from "./settings";
 
 describe("normalizeClock", () => {
+	test("time color follows the active color unless set apart", () => {
+		const c = (raw: Record<string, unknown>) => normalizeClock(raw).colors;
+		expect(c({ dotcolor: "#00FF00" }).time).toBe("#00FF00");
+		expect(c({ dotcolor: "#00FF00", timeColor: "#FFFFFF" }).time).toBe(
+			"#00FF00",
+		);
+		expect(
+			c({ dotcolor: "#00FF00", separateTimeColor: true, timeColor: "#FFFFFF" }),
+		).toMatchObject({ active: "#00FF00", time: "#FFFFFF" });
+		expect(
+			c({ dotcolor: "#00FF00", separateTimeColor: true, timeColor: "white" })
+				.time,
+		).toBe("#00FF00");
+	});
+
 	test("empty settings give defaults", () => {
 		expect(normalizeClock({})).toEqual(CLOCK_DEFAULTS);
 		expect(CLOCK_DEFAULTS).toEqual({
@@ -17,7 +32,12 @@ describe("normalizeClock", () => {
 			dateFormat: "dd-mm",
 			hour12: false,
 			pmIndicator: false,
-			colors: { active: "#FF3B2F", inactive: "#3D3D3D", background: "#000000" },
+			colors: {
+				active: "#FF3B2F",
+				inactive: "#3D3D3D",
+				background: "#000000",
+				time: "#FF3B2F",
+			},
 			zone: { kind: "system" },
 			label: "",
 			animations: true,
