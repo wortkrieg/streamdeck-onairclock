@@ -1,21 +1,27 @@
 # Issue comment drafts
 
-Drafts only. Nothing is posted until the maintainer approves. The maintainer posts and closes the issues.
+Drafts only. The maintainer posts and closes the issues himself. "Where to get it" depends on the moment of posting: the GitHub release is out first, the Marketplace update follows after Elgato's review.
 
 ## #2 Time zones (solved in 2.0.0)
 
-Time zones are in On Air Clock 2.0.0. Each key now has its own time zone setting: system time, an IANA time zone from a list, or a fixed UTC offset (-12:00 to +14:00 in 15-minute steps). You can also add a short label such as "NYC" so several clocks stay easy to tell apart. It needs Stream Deck 7.1 or newer. Closing this with the release, thanks for the request.
+On Air Clock 2.0.0 is out, and it finally brings time zones. Every key has its own setting now: system time, any time zone from a list (e.g. America/New_York), or a fixed UTC offset (-12:00 to +14:00 in 15-minute steps). A short label of up to 6 characters, like "NYC", keeps several clocks apart, newsroom style. The date formats from earlier in this thread are still there (five formats, incl. MM-DD), as is 12 or 24 hours with a PM marker.
+
+You need Stream Deck 7.1 or newer. Get it from the [GitHub release](https://github.com/wortkrieg/streamdeck-onairclock/releases/tag/v2.0.0) now, or as an update in the Elgato Marketplace once Elgato has reviewed it. Your existing keys keep their settings. Closing this, thanks for the patience.
 
 ## #7 Button action (solved in 2.0.0)
 
-2.0.0 adds a Countdown action. Put it on a key, set a duration (up to 99:59) and press it: the countdown starts on all clocks of the same Stream Deck that have "Show countdown" enabled. Press the Countdown key again, or a clock, to cancel. At zero you can count overtime, hold at 00:00 or go back to the time.
+2.0.0 adds a Countdown action. Put it on a key, set a duration (up to 99:59) and press it: the countdown runs on all clocks of the same Stream Deck that have "Show countdown" enabled. Press the Countdown key again, or a clock, to cancel. At zero the clock counts the overtime (+MM:SS), holds at 00:00 or goes back to the time, and an optional pulse warns in the last 10 seconds.
 
-What did not make it: jumping to a folder or profile with a key press. The Stream Deck SDK does not allow plugins to navigate into folders a user created, so that part is not possible from a plugin. Closing this with the release.
+For your example: put several Countdown keys with different durations (1 min, 5 min, ...) into a folder. Pressing one starts it, and the clocks keep showing it after you leave the folder. What a plugin can't do is jump into or out of folders you created yourself; the Stream Deck SDK doesn't allow that. Closing this with the release.
 
 ## #10 Wrong time (solved in 2.0.0)
 
-V1 ran inside Stream Deck's built-in browser engine and took its time zone data from there. That data was outdated: British Columbia's switch to permanent UTC-7 showed as UTC-8. V2 runs on the Node.js runtime of current Stream Deck versions instead. With Stream Deck 7.6.1 (Node.js 24.22.1, tzdata 2026e), `America/Vancouver` shows UTC-7 correctly, so "System time" should simply be right after updating to 2.0.0. If your time is still off by an hour, open the key settings, set "Time zone" to "Fixed UTC offset" and choose -07:00. Note that a fixed offset does not follow daylight saving changes by itself. Closing this with the release.
+2.0.0 is out and should fix this. Version 1 ran inside Stream Deck's built-in browser engine, whose time zone data apparently still had British Columbia on the old rules. Version 2 runs on the Node.js runtime of current Stream Deck versions. With Stream Deck 7.6.1 (Node.js 24.22.1, time zone data 2026e) America/Vancouver shows UTC-7 correctly.
 
-## #5 Clock across multiple keys (not implemented)
+If "System time" is still an hour off after the update (Windows maps its own time zone names, so that path can differ): open the key settings and pick "America/Vancouver" from the time zone list. That uses the current data and follows future changes. As a last resort, "Fixed UTC offset" with -07:00 always works, but it does not follow daylight saving changes.
 
-Thanks for the idea. I tested a clock spanning several keys in mockups, and it did not look good across the gaps between the keys. So I decided not to build it. Each clock stays on a single key, with five watchfaces, free colors, time zones and a countdown instead. Closing this as not planned.
+You need Stream Deck 7.1 or newer. Get it from the [GitHub release](https://github.com/wortkrieg/streamdeck-onairclock/releases/tag/v2.0.0) or as an update in the Elgato Marketplace once Elgato has reviewed it. Closing this; if it's still wrong for you, reopen with your OS and Stream Deck version.
+
+## #5 Clock across multiple keys (not planned)
+
+Thanks for the idea. I mocked up a clock spanning several keys for 2.0.0, and it didn't look good with the gaps between the keys, so I left it out. Instead each key got bigger digits and a new face called Big (hours and minutes as large as the key allows), plus colors, time zones and a countdown. Closing this as not planned.
