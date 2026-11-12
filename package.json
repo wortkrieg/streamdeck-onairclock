@@ -5,7 +5,6 @@
 	"type": "module",
 	"scripts": {
 		"build": "rollup -c",
-		"spike:build": "rollup -c spike/rollup.config.mjs",
 		"build:dev": "node scripts/build-dev.mjs",
 		"watch:dev": "ONAIR_DEV=1 rollup -c -w",
 		"test": "vitest run",

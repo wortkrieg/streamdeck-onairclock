@@ -49,6 +49,9 @@ The app's cost is roughly linear in images per second (about 0.35 % of a core pe
 
 ## Spike plugin
 
+Removed after the hardware session (2026-11-12); it lives on in git history. The notes below describe it as it was.
+
+
 Location: `spike/fail.marc.onairclock.spike.sdPlugin` (UUID `fail.marc.onairclock.spike`, source `spike/plugin.ts`). Build with `npx rollup -c spike/rollup.config.mjs`. The spike must stay in the repo until the session is done; then `rm -rf spike/` and commit `docs: record hardware spike findings`.
 
 Placeholder icons are committed under `imgs/`; `npx streamdeck validate spike/fail.marc.onairclock.spike.sdPlugin` passes with no errors.
