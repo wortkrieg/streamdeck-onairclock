@@ -9,7 +9,7 @@ import {
 	isAnimating,
 	STEP_PHASES_MS,
 	SWEEP_FACES,
-	SWEEP_PHASES_MS,
+	sweepPhasesMs,
 } from "../render/animation";
 import { renderFace } from "../render/faces";
 import { toDataUri } from "../render/svg";
@@ -104,11 +104,13 @@ export class ClockController {
 		if (model.mode === "clock") {
 			if (e.cfg.blinkColon) phasesMs.push(BLINK_MS);
 			// The stepped afterglow and seconds roll change only at these phases; the
-			// sweeping rings get one more so they move smoothly.
-			if (e.cfg.animations) {
-				phasesMs.push(...STEP_PHASES_MS);
-				if (SWEEP_FACES.includes(e.cfg.face)) phasesMs.push(...SWEEP_PHASES_MS);
-			}
+			// sweeping rings run on an even grid instead so they move smoothly.
+			if (e.cfg.animations)
+				phasesMs.push(
+					...(SWEEP_FACES.includes(e.cfg.face)
+						? sweepPhasesMs(FAST_FPS)
+						: STEP_PHASES_MS),
+				);
 		}
 		if (countdown) {
 			phasesMs.push(mod1000(countdown.startMs));

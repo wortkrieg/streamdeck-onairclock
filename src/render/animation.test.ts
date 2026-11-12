@@ -3,12 +3,13 @@ import type { FaceModel } from "../core/clock-model";
 import type { CountdownView } from "../core/countdown";
 import {
 	animState,
+	BLINK_MS,
 	countdownRingPhasesMs,
 	GLOW_STEPS,
 	isAnimating,
 	planNextFrame,
 	STEP_PHASES_MS,
-	SWEEP_PHASES_MS,
+	sweepPhasesMs,
 } from "./animation";
 import { STATIC_ANIM } from "./faces";
 
@@ -224,13 +225,12 @@ describe("countdownRingPhasesMs", () => {
 	});
 });
 
-describe("SWEEP_PHASES_MS", () => {
-	test("with the afterglow steps no frame gap exceeds 250 ms", () => {
-		const p = [...new Set([...STEP_PHASES_MS, ...SWEEP_PHASES_MS])].sort(
-			(a, b) => a - b,
-		);
-		const gaps = p.map((v, i) => (p[i + 1] ?? (p[0] ?? 0) + 1000) - v);
-		expect(Math.max(...gaps)).toBeLessThanOrEqual(250);
-		expect(p).toHaveLength(5);
+describe("sweepPhasesMs", () => {
+	test("an even grid that contains the colon's 500 ms", () => {
+		expect(sweepPhasesMs(10)).toEqual([
+			0, 100, 200, 300, 400, 500, 600, 700, 800, 900,
+		]);
+		expect(sweepPhasesMs(10)).toContain(BLINK_MS);
+		expect(sweepPhasesMs(4)).toEqual([0, 250, 500, 750]);
 	});
 });

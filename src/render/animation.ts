@@ -25,11 +25,15 @@ export const STEP_PHASES_MS: readonly number[] = GLOW_STEPS.map(([at]) => at);
 /** Faces whose seconds ring (or bar) is a continuous sweep rather than 60 dots. */
 export const SWEEP_FACES: readonly FaceId[] = ["line", "comet", "big"];
 /**
- * Extra clock-mode phase for the sweeping faces: together with STEP_PHASES_MS no gap
- * exceeds 250 ms, so the ring moves at most 1.5 degrees per frame instead of jumping
- * 3 degrees after the 500 ms gap. One more image per second (5 instead of 4).
+ * Clock-mode phases of the sweeping faces: an even grid of `fps` frames per second
+ * (every 100 ms at 10 fps), so the ring moves smoothly. They replace STEP_PHASES_MS for
+ * these faces: the stepped afterglow and seconds roll are sampled on the grid, and the
+ * colon's 500 ms lies on it, so no extra frames come in between.
  */
-export const SWEEP_PHASES_MS: readonly number[] = [750];
+export function sweepPhasesMs(fps: number): number[] {
+	const n = Math.max(1, Math.round(fps));
+	return Array.from({ length: n }, (_, k) => Math.round((k * 1000) / n));
+}
 /** The seconds digits show one in-between roll image until the first step, then settle. */
 const SUB_ROLL_STEP = 0.4;
 const [, SUB_ROLL_STEP_END_MS = 0] = STEP_PHASES_MS;

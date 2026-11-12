@@ -108,9 +108,9 @@ afterEach(() => {
 
 describe("frame budget with 15 visible clocks", () => {
 	test.each(FACES)(
-		"%s at defaults: at most 4 images per second, 5 for the sweeping rings",
+		"%s at defaults: at most 4 images per second, FAST_FPS for the sweeping rings",
 		(face) => {
-			const limit = SWEEP_FACES.includes(face) ? 5 : 4;
+			const limit = SWEEP_FACES.includes(face) ? FAST_FPS : 4;
 			const b = simulate(cfg({ face }), MID_MINUTE);
 			expect(max(b.framesPerSecond)).toBeLessThanOrEqual(limit);
 			expect(max(b.imagesPerSecond)).toBeLessThanOrEqual(limit);
@@ -119,10 +119,10 @@ describe("frame budget with 15 visible clocks", () => {
 		},
 	);
 
-	test("classic draws exactly 4 images per second (V1: 4), line 5 for the smooth ring", () => {
+	test("classic draws exactly 4 images per second (V1: 4), line FAST_FPS for the smooth ring", () => {
 		for (const [face, n] of [
 			["classic", 4],
-			["line", 5],
+			["line", FAST_FPS],
 		] as const) {
 			const b = simulate(cfg({ face }), MID_MINUTE);
 			expect(b.framesPerSecond).toEqual(new Array(SECONDS).fill(n));
