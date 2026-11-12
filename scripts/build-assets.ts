@@ -41,15 +41,20 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BRAND_DIR = join(ROOT, "assets/brand");
 /**
  * Only these fonts are loaded (no system fonts), so the output is the same everywhere.
- * Barlow: google/fonts ofl/barlow. Unbounded-Bold: static instance from googlefonts/unbounded
- * (commit f3ec432, the upstream of google/fonts ofl/unbounded) because resvg does not apply
- * the weight axis of the variable font. Both OFL 1.1, licences next to the files.
+ * All static TTFs from google/fonts (resvg does not apply variable weight axes), OFL 1.1,
+ * licences next to the files.
  */
 const FONT_FILES = [
-	"Unbounded-Bold.ttf",
 	"Barlow-Regular.ttf",
 	"Barlow-Medium.ttf",
 	"Barlow-SemiBold.ttf",
+	// Broadcast type (Marc: "broadcast-ish"): signage and tally lettering, timecode.
+	// google/fonts ofl/barlowcondensed and ofl/ibmplexmono, static TTFs, OFL 1.1.
+	"BarlowCondensed-SemiBold.ttf",
+	"BarlowCondensed-Bold.ttf",
+	"BarlowCondensed-ExtraBold.ttf",
+	"IBMPlexMono-Medium.ttf",
+	"IBMPlexMono-SemiBold.ttf",
 ].map((f) => join(ROOT, "assets/fonts", f));
 
 const PLUGIN = "fail.marc.onairclock.sdPlugin";
@@ -71,10 +76,13 @@ export const BRAND = {
 /** Paper at ~78 % on ultramarine, for supporting text. */
 const PAPER_SOFT = "#C9CEFF";
 const SHADOW = "#0A1066";
-const HEAD = "Unbounded";
 const TEXT = "Barlow";
+/** Condensed grotesk for signage, tally and lower-third lettering (always uppercase). */
+const COND = "Barlow Condensed";
+const MONO = "IBM Plex Mono";
+/** On-air tally red, a touch warmer than the clock red so the lamp reads as light. */
+const TALLY = "#FF3B2F";
 /** Cap heights in em, measured from the bundled fonts. */
-const HEAD_CAP = 0.75;
 const TEXT_CAP = 0.7;
 
 // ---------- time ----------
@@ -342,40 +350,67 @@ function png(svg: string, width?: number): Buffer {
 
 // ---------- compositions ----------
 
-/** The six clock colours in a fixed order. */
-const COLORS = [
-	BRAND.red,
-	BRAND.white,
-	BRAND.amber,
-	BRAND.mint,
-	BRAND.blue,
-	BRAND.pink,
-] as const;
+/** Clock palette: ring colours and the time colours they pair with. */
+const CYAN = "#32D5FF";
+const WHITE = "#FFFFFF";
+const YELLOW = "#FFE600";
+const PURPLE = "#BF5AF2";
+const NAVY = "#1B1464";
 
-/** Hero grid, row by row: every face, every colour twice, a world clock and a countdown. */
-const HERO_KEYS: readonly KeySpec[] = [
-	clockKey("classic", BRAND.red),
-	clockKey("big", BRAND.white),
-	clockKey("comet", BRAND.amber),
-	clockKey("line", BRAND.mint),
-	clockKey("line", BRAND.blue, { label: "NYC", zone: "America/New_York" }),
-	clockKey("modern", BRAND.pink),
-	countdownKey(BRAND.red, 195_400),
-	clockKey("classic", BRAND.white, { label: "TYO", zone: "Asia/Tokyo" }),
-	clockKey("big", BRAND.amber),
-	clockKey("comet", BRAND.mint),
-	clockKey("modern", BRAND.blue),
-	clockKey("line", BRAND.pink),
+/**
+ * Ring and time colour pairs shown as swatches: an outer ring in the ring colour, a dot
+ * in the time colour. Since V2 the two can differ, which is the point of the swatches.
+ */
+const PAIRS: ReadonlyArray<readonly [string, string]> = [
+	[BRAND.red, BRAND.red],
+	[CYAN, WHITE],
+	[BRAND.pink, CYAN],
+	[BRAND.amber, WHITE],
+	[BRAND.mint, YELLOW],
+	[PURPLE, WHITE],
 ];
 
-/** 3x2 for the social preview: every colour once, a world clock among them. */
+/**
+ * Hero grid, row by row: every face, many colours, ring and time apart on all keys but
+ * the first (the classic red default), a world clock, a countdown.
+ */
+const HERO_KEYS: readonly KeySpec[] = [
+	clockKey("classic", BRAND.red),
+	clockKey("big", BRAND.mint, { time: WHITE }),
+	clockKey("comet", BRAND.pink, { time: CYAN }),
+	clockKey("line", CYAN, { time: WHITE }),
+	clockKey("line", BRAND.blue, {
+		time: BRAND.amber,
+		label: "NYC",
+		zone: "America/New_York",
+	}),
+	clockKey("modern", BRAND.pink, { time: WHITE }),
+	countdownKey(BRAND.mint, 195_400),
+	clockKey("classic", WHITE, {
+		time: YELLOW,
+		inactive: "#5560B0",
+		background: NAVY,
+		label: "TYO",
+		zone: "Asia/Tokyo",
+	}),
+	clockKey("big", BRAND.red, { time: WHITE }),
+	clockKey("comet", BRAND.mint, { time: BRAND.amber }),
+	clockKey("modern", BRAND.amber, { time: WHITE }),
+	clockKey("line", PURPLE, { time: YELLOW }),
+];
+
+/** 3x2 for the social preview: the default once, the other keys in pairs. */
 const SOCIAL_KEYS: readonly KeySpec[] = [
 	clockKey("classic", BRAND.red),
-	clockKey("big", BRAND.white),
-	clockKey("comet", BRAND.amber),
-	clockKey("line", BRAND.blue, { label: "NYC", zone: "America/New_York" }),
-	clockKey("modern", BRAND.pink),
-	clockKey("line", BRAND.mint),
+	clockKey("big", BRAND.mint, { time: WHITE }),
+	clockKey("comet", BRAND.pink, { time: CYAN }),
+	clockKey("line", BRAND.blue, {
+		time: BRAND.amber,
+		label: "NYC",
+		zone: "America/New_York",
+	}),
+	clockKey("modern", BRAND.amber, { time: WHITE }),
+	clockKey("line", PURPLE, { time: YELLOW }),
 ];
 
 interface HeroLayout {
@@ -391,8 +426,37 @@ interface HeroLayout {
 	keys: readonly KeySpec[];
 }
 
-/** Name and claim on the left, a grid of keys on the right; swatches close the column. */
-function hero(l: HeroLayout, nowMs = STILL_MS): string {
+const CLAIM = "Studio clocks in any color, on any key.";
+
+/** Ink width of one text line as resvg sets it (for layout and fitting). */
+function textWidth(s: string, o: TextOptions): number {
+	const probe = `<svg xmlns="http://www.w3.org/2000/svg" width="6000" height="${Math.ceil(o.size * 2)}">${text(s, 0, o.size * 1.4, { ...o, anchor: "start" })}</svg>`;
+	const b = resvg(probe).getBBox();
+	return b ? b.x + b.width : 0;
+}
+
+/** `o.size`, or smaller so that every line fits `maxW`. */
+function fitSize(
+	lines: readonly string[],
+	o: TextOptions,
+	maxW: number,
+): number {
+	const widest = Math.max(...lines.map((l) => textWidth(l, o)));
+	return widest > maxW ? Math.floor((o.size * maxW) / widest) : o.size;
+}
+
+interface HeroGrid {
+	body: string;
+	x0: number;
+	y0: number;
+	gw: number;
+	gh: number;
+	/** Width of the text column left of the grid. */
+	colW: number;
+}
+
+/** The key grid on the right; the text column takes the space left of it. */
+function heroGrid(l: HeroLayout, nowMs: number): HeroGrid {
 	keyCounter = 0;
 	const gw = l.cols * l.key + (l.cols - 1) * l.gap;
 	const gh = l.rows * l.key + (l.rows - 1) * l.gap;
@@ -409,39 +473,259 @@ function hero(l: HeroLayout, nowMs = STILL_MS): string {
 			keySvg(k, nowMs),
 		);
 	});
+	return { body, x0, y0, gw, gh, colW: x0 - l.margin - l.gap * 2.4 };
+}
 
-	// Name: cap top on the grid's top edge; optical left edge on the margin.
-	const name: TextOptions = {
-		family: HEAD,
-		weight: 700,
-		size: l.nameSize,
-		fill: BRAND.paper,
-		tracking: -0.02,
+/** Ring/time swatches along `y` (centre line), from `x`. */
+function pairSwatches(x: number, y: number, d: number): string {
+	const step = d * 1.75;
+	return PAIRS.map(([ring, time], i) => {
+		const cx = n2(x + d / 2 + i * step);
+		return `<circle cx="${cx}" cy="${n2(y)}" r="${n2(d / 2 - d * 0.08)}" fill="none" stroke="${ring}" stroke-width="${n2(d * 0.16)}"/><circle cx="${cx}" cy="${n2(y)}" r="${n2(d * 0.2)}" fill="${time}"/>`;
+	}).join("");
+}
+
+/** A lit on-air lamp: soft glow behind a red rounded plate. */
+function tallyPlate(
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	id: string,
+): { defs: string; body: string } {
+	const rx = n2(h * 0.14);
+	const defs = `<filter id="${id}-glow" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="${n2(h * 0.22)}"/></filter><linearGradient id="${id}-lit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6A55"/><stop offset="1" stop-color="#E5261C"/></linearGradient>`;
+	const box = `x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" rx="${rx}"`;
+	const body = `<rect ${box} fill="${TALLY}" opacity=".7" filter="url(#${id}-glow)"/><rect ${box} fill="url(#${id}-lit)"/><rect x="${n2(x + 3)}" y="${n2(y + 3)}" width="${n2(w - 6)}" height="${n2(h - 6)}" rx="${rx}" fill="none" stroke="#FFFFFF" stroke-opacity=".22" stroke-width="2"/>`;
+	return { defs, body };
+}
+
+/**
+ * Hero A, tally: "ON AIR" lit in a red on-air lamp, "CLOCK" below in the same condensed
+ * capitals, the claim under it, ring/time swatches on the grid's bottom line.
+ */
+function heroTally(l: HeroLayout, nowMs = STILL_MS): string {
+	const g = heroGrid(l, nowMs);
+	const word: TextOptions = {
+		family: COND,
+		weight: 800,
+		size: l.nameSize * 1.12,
+		fill: "#FFF6F2",
+		tracking: 0.06,
 	};
-	const tx = l.margin - l.nameSize * 0.037;
-	const line1 = y0 + l.nameSize * HEAD_CAP;
-	const line2 = line1 + l.nameSize * 1.04;
-	body += text("On Air", tx, line1, name);
-	body += text("Clock", tx, line2, name);
-
+	const padX = () => word.size * 0.3;
+	word.size = fitSize(
+		["ON AIR", "CLOCK"],
+		word,
+		g.colW - 2 * l.nameSize * 0.34,
+	);
+	const cap = word.size * TEXT_CAP;
+	const padY = word.size * 0.2;
+	const onAirW = textWidth("ON AIR", word);
+	const plateH = cap + 2 * padY;
+	const plateW = onAirW + 2 * padX() - word.size * 0.06;
+	const tally = tallyPlate(l.margin, g.y0, plateW, plateH, "tally");
+	let body = g.body + tally.body;
+	body += text("ON AIR", l.margin + padX(), g.y0 + padY + cap, word);
+	const clockBase = g.y0 + plateH + word.size * 0.3 + cap;
+	// "CLOCK" flush with the lamp's left edge (optical: condensed C overshoots a little).
+	body += text("CLOCK", l.margin - word.size * 0.01, clockBase, {
+		...word,
+		fill: BRAND.paper,
+	});
 	const claim: TextOptions = {
 		family: TEXT,
 		weight: 500,
 		size: l.claimSize,
 		fill: PAPER_SOFT,
 	};
-	const cx = l.margin - l.claimSize * 0.047;
-	const c1 = line2 + l.nameSize * 0.36 + l.claimSize * TEXT_CAP;
-	body += text("Studio clocks in any color,", cx, c1, claim);
-	body += text("on any key.", cx, c1 + l.claimSize * 1.3, claim);
+	const c1 = clockBase + word.size * 0.42 + l.claimSize * TEXT_CAP;
+	body += text("Studio clocks in any color,", l.margin, c1, claim);
+	body += text("on any key.", l.margin, c1 + l.claimSize * 1.3, claim);
+	const d = l.claimSize * 0.66;
+	body += pairSwatches(l.margin, g.y0 + g.gh - d / 2, d);
+	return page(l.w, l.h, body, shadowFilter(l.key) + tally.defs);
+}
 
-	// Six colour swatches, bottom edge on the grid's bottom edge.
-	const d = l.claimSize * 0.62;
-	const step = d * 1.6;
-	COLORS.forEach((color, i) => {
-		body += `<circle cx="${n2(l.margin + d / 2 + i * step)}" cy="${n2(y0 + gh - d / 2)}" r="${n2(d / 2)}" fill="${color}"/>`;
-	});
-	return page(l.w, l.h, body, shadowFilter(l.key));
+/**
+ * Hero B, lower third: title-safe corner marks, a timecode readout with a red tally dot,
+ * and the name as a two-tier lower third (white name plate, dark claim plate, red bar).
+ */
+function heroLowerThird(l: HeroLayout, nowMs = STILL_MS): string {
+	const g = heroGrid(l, nowMs);
+	let body = g.body;
+	// Title-safe corners (5 % inset), as on a broadcast monitor.
+	const inset = Math.round(l.h * 0.05);
+	const arm = Math.round(l.h * 0.05);
+	const corner = (x: number, y: number, dx: number, dy: number) =>
+		`<path d="M${x} ${y + dy * arm}V${y}H${x + dx * arm}" fill="none" stroke="${PAPER_SOFT}" stroke-opacity=".55" stroke-width="3"/>`;
+	body += corner(inset, inset, 1, 1);
+	body += corner(l.w - inset, inset, -1, 1);
+	body += corner(inset, l.h - inset, 1, -1);
+	body += corner(l.w - inset, l.h - inset, -1, -1);
+
+	// Timecode: red tally dot, then HH:MM:SS:FF in mono, cap top on the grid's top.
+	const tc: TextOptions = {
+		family: MONO,
+		weight: 600,
+		size: l.nameSize * 0.56,
+		fill: BRAND.paper,
+		tracking: 0.02,
+	};
+	const tcCap = tc.size * TEXT_CAP;
+	const dot = tc.size * 0.36;
+	body += `<circle cx="${n2(l.margin + dot / 2)}" cy="${n2(g.y0 + tcCap / 2)}" r="${n2(dot / 2)}" fill="${TALLY}"/>`;
+	body += `<circle cx="${n2(l.margin + dot / 2)}" cy="${n2(g.y0 + tcCap / 2)}" r="${n2(dot)}" fill="${TALLY}" opacity=".35" filter="url(#lt-glow)"/>`;
+	body += text("10:08:30:00", l.margin + dot * 1.9, g.y0 + tcCap, tc);
+	body += text(
+		"TIMECODE",
+		l.margin + dot * 1.9,
+		g.y0 + tcCap + tc.size * 0.95,
+		{
+			family: MONO,
+			weight: 500,
+			size: tc.size * 0.34,
+			fill: PAPER_SOFT,
+			tracking: 0.18,
+		},
+	);
+
+	// Lower third on the grid's bottom line: name plate over claim plate, red bar left.
+	const name: TextOptions = {
+		family: COND,
+		weight: 800,
+		size: l.nameSize * 0.92,
+		fill: "#0A1066",
+		tracking: 0.04,
+	};
+	const bar = Math.round(l.nameSize * 0.11);
+	const padX = l.nameSize * 0.2;
+	name.size = fitSize(["ON AIR CLOCK"], name, g.colW - bar - 2 * padX);
+	const claim: TextOptions = {
+		family: TEXT,
+		weight: 500,
+		size: l.claimSize,
+		fill: BRAND.paper,
+	};
+	claim.size = fitSize([CLAIM], claim, g.colW - bar - 2 * padX);
+	const nameCap = name.size * TEXT_CAP;
+	const namePlateH = nameCap + name.size * 0.42;
+	const claimPlateH = claim.size * TEXT_CAP + claim.size * 0.95;
+	const bottom = g.y0 + g.gh;
+	const top = bottom - namePlateH - claimPlateH;
+	const nameW = textWidth("ON AIR CLOCK", name) + 2 * padX;
+	const claimW = textWidth(CLAIM, claim) + 2 * padX;
+	body += `<rect x="${l.margin}" y="${n2(top)}" width="${bar}" height="${n2(namePlateH + claimPlateH)}" fill="${TALLY}"/>`;
+	body += `<rect x="${l.margin + bar}" y="${n2(top)}" width="${n2(nameW)}" height="${n2(namePlateH)}" fill="${BRAND.paper}"/>`;
+	body += `<rect x="${l.margin + bar}" y="${n2(top + namePlateH)}" width="${n2(claimW)}" height="${n2(claimPlateH)}" fill="#0A1066"/>`;
+	body += text(
+		"ON AIR CLOCK",
+		l.margin + bar + padX,
+		top + (namePlateH + nameCap) / 2,
+		name,
+	);
+	body += text(
+		CLAIM,
+		l.margin + bar + padX,
+		top + namePlateH + (claimPlateH + claim.size * TEXT_CAP) / 2,
+		claim,
+	);
+	const glow = `<filter id="lt-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${n2(dot * 0.5)}"/></filter>`;
+	return page(l.w, l.h, body, shadowFilter(l.key) + glow);
+}
+
+/**
+ * Hero C, studio sign: a plaque between two rules, mono labels above, "ON AIR / CLOCK"
+ * in large condensed capitals with a lit lamp, the claim below the lower rule.
+ */
+function heroSign(l: HeroLayout, nowMs = STILL_MS): string {
+	const g = heroGrid(l, nowMs);
+	let body = g.body;
+	const label: TextOptions = {
+		family: MONO,
+		weight: 500,
+		size: l.claimSize * 0.5,
+		fill: PAPER_SOFT,
+		tracking: 0.2,
+	};
+	const labelCap = label.size * TEXT_CAP;
+	const right = l.margin + g.colW;
+	body += text("STUDIO CLOCK", l.margin, g.y0 + labelCap, label);
+	// Flush right by measured width (tracking adds no space after the last letter).
+	body += text(
+		"STREAM DECK",
+		right - textWidth("STREAM DECK", label),
+		g.y0 + labelCap,
+		label,
+	);
+	const rule = (y: number) =>
+		`<rect x="${l.margin}" y="${n2(y)}" width="${n2(g.colW)}" height="3" fill="${BRAND.paper}"/>`;
+	const rule1 = g.y0 + labelCap + label.size * 0.7;
+	body += rule(rule1);
+
+	const word: TextOptions = {
+		family: COND,
+		weight: 800,
+		size: l.nameSize * 1.55,
+		fill: BRAND.paper,
+		tracking: 0.01,
+	};
+	const lamp = l.nameSize * 0.42;
+	word.size = fitSize(["ON AIR", "CLOCK"], word, g.colW - lamp * 1.6);
+	const cap = word.size * TEXT_CAP;
+	const line1 = rule1 + word.size * 0.22 + cap;
+	const line2 = line1 + cap + word.size * 0.14;
+	body += text("ON AIR", l.margin, line1, word);
+	body += text("CLOCK", l.margin, line2, word);
+	// The lamp sits at the right end of the "ON AIR" line.
+	const lx = right - lamp / 2;
+	const ly = line1 - cap / 2;
+	body += `<circle cx="${n2(lx)}" cy="${n2(ly)}" r="${n2(lamp)}" fill="${TALLY}" opacity=".45" filter="url(#sign-glow)"/><circle cx="${n2(lx)}" cy="${n2(ly)}" r="${n2(lamp / 2)}" fill="${TALLY}"/><circle cx="${n2(lx - lamp * 0.14)}" cy="${n2(ly - lamp * 0.14)}" r="${n2(lamp * 0.14)}" fill="#FFFFFF" opacity=".55"/>`;
+	const rule2 = line2 + word.size * 0.2;
+	body += rule(rule2);
+	const claim: TextOptions = {
+		family: TEXT,
+		weight: 500,
+		size: l.claimSize,
+		fill: PAPER_SOFT,
+	};
+	claim.size = fitSize([CLAIM], claim, g.colW);
+	body += text(
+		CLAIM,
+		l.margin,
+		rule2 + claim.size * 0.7 + claim.size * TEXT_CAP,
+		claim,
+	);
+	const d = l.claimSize * 0.66;
+	body += pairSwatches(l.margin, g.y0 + g.gh - d / 2, d);
+	const glow = `<filter id="sign-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="${n2(lamp * 0.35)}"/></filter>`;
+	return page(l.w, l.h, body, shadowFilter(l.key) + glow);
+}
+
+/** The Marketplace gallery hero and thumbnail (1920x960). */
+export const GALLERY_HERO: HeroLayout = {
+	w: 1920,
+	h: 960,
+	margin: 120,
+	cols: 4,
+	rows: 3,
+	key: 220,
+	gap: 30,
+	nameSize: 150,
+	claimSize: 46,
+	keys: HERO_KEYS,
+};
+
+export const HERO_VARIANTS = {
+	a: heroTally,
+	b: heroLowerThird,
+	c: heroSign,
+} as const;
+/** The variant used for the gallery hero, the README hero and the social preview. */
+export const HERO_CHOICE: keyof typeof HERO_VARIANTS = "a";
+
+function hero(l: HeroLayout, nowMs = STILL_MS): string {
+	return HERO_VARIANTS[HERO_CHOICE](l, nowMs);
 }
 
 interface RowLayout {
@@ -478,14 +762,15 @@ function row(l: RowLayout): string {
  */
 function rowPage(l: RowLayout, svgs: readonly string[], h: number): string {
 	keyCounter = 0;
-	const headBase = G_MARGIN + G_HEAD * HEAD_CAP;
+	const headBase = G_MARGIN + G_HEAD * 1.1 * TEXT_CAP;
 	const supportBase = headBase + 72;
-	let body = text(l.heading, G_MARGIN - G_HEAD * 0.037, headBase, {
-		family: HEAD,
-		weight: 700,
-		size: G_HEAD,
+	// Condensed capitals like the hero's lamp lettering (broadcast signage).
+	let body = text(l.heading.toUpperCase(), G_MARGIN - G_HEAD * 0.01, headBase, {
+		family: COND,
+		weight: 800,
+		size: G_HEAD * 1.1,
 		fill: BRAND.paper,
-		tracking: -0.01,
+		tracking: 0.03,
 	});
 	body += text(l.support, G_MARGIN - G_SUPPORT * 0.047, supportBase, {
 		family: TEXT,
@@ -534,10 +819,10 @@ const FACES_ROW: RowLayout = {
 	support: "Pick one per key, in any color.",
 	keys: [
 		clockKey("classic", BRAND.red),
-		clockKey("modern", BRAND.white),
-		clockKey("line", BRAND.mint),
-		clockKey("comet", BRAND.amber),
-		clockKey("big", BRAND.blue),
+		clockKey("modern", PURPLE, { time: WHITE }),
+		clockKey("line", CYAN, { time: YELLOW }),
+		clockKey("comet", BRAND.amber, { time: WHITE }),
+		clockKey("big", BRAND.pink, { time: WHITE }),
 	],
 	captions: ["Classic", "Modern Minimal", "Line", "Comet", "Big"],
 	key: 304,
@@ -547,11 +832,31 @@ const ZONES_ROW: RowLayout = {
 	heading: "World clocks with time zones",
 	support: "Any IANA zone or a fixed UTC offset.",
 	keys: [
-		clockKey("line", BRAND.red, { label: "BER", zone: "Europe/Berlin" }),
-		clockKey("line", BRAND.amber, { label: "NYC", zone: "America/New_York" }),
-		clockKey("line", BRAND.mint, { label: "TYO", zone: "Asia/Tokyo" }),
-		clockKey("line", BRAND.blue, { label: "LON", zone: "Europe/London" }),
-		clockKey("line", BRAND.pink, { label: "SYD", zone: "Australia/Sydney" }),
+		clockKey("classic", CYAN, {
+			time: WHITE,
+			label: "BER",
+			zone: "Europe/Berlin",
+		}),
+		clockKey("line", BRAND.amber, {
+			time: WHITE,
+			label: "NYC",
+			zone: "America/New_York",
+		}),
+		clockKey("modern", BRAND.mint, {
+			time: YELLOW,
+			label: "TYO",
+			zone: "Asia/Tokyo",
+		}),
+		clockKey("line", BRAND.pink, {
+			time: WHITE,
+			label: "LDN",
+			zone: "Europe/London",
+		}),
+		clockKey("classic", PURPLE, {
+			time: WHITE,
+			label: "SYD",
+			zone: "Australia/Sydney",
+		}),
 	],
 	captions: ["Berlin", "New York", "Tokyo", "London", "Sydney"],
 	key: 304,
@@ -569,11 +874,6 @@ const COUNTDOWN_ROW: RowLayout = {
 	key: 400,
 	arrows: true,
 };
-
-/** Ring and time colors of the "On Air Kombis" sample page. */
-const CYAN = "#32D5FF";
-const WHITE = "#FFFFFF";
-const YELLOW = "#FFE600";
 
 const COLORS_ROW: RowLayout = {
 	heading: "Two colors per clock",
@@ -762,10 +1062,10 @@ const ids = (n: number): string[] =>
 
 const FACE_KEYS: readonly ClockKey[] = [
 	clockKey("classic", BRAND.red),
-	clockKey("modern", BRAND.white),
-	clockKey("line", BRAND.mint),
-	clockKey("comet", BRAND.amber),
-	clockKey("big", BRAND.blue),
+	clockKey("modern", PURPLE, { time: WHITE }),
+	clockKey("line", CYAN, { time: YELLOW }),
+	clockKey("comet", BRAND.amber, { time: WHITE }),
+	clockKey("big", BRAND.pink, { time: WHITE }),
 ];
 const FACE_NAMES = ["Classic", "Modern", "Line", "Comet", "Big"];
 
@@ -780,9 +1080,9 @@ function facesSequence(durationMs: number): Sequence {
 }
 
 const COUNTDOWN_CLOCKS: readonly ClockKey[] = [
-	clockKey("classic", BRAND.red),
-	clockKey("line", BRAND.mint),
-	clockKey("big", BRAND.white),
+	clockKey("classic", CYAN, { time: WHITE }),
+	clockKey("line", PURPLE, { time: YELLOW }),
+	clockKey("big", BRAND.mint, { time: WHITE }),
 ];
 
 /**
@@ -840,7 +1140,7 @@ const COMBOS: ReadonlyArray<readonly ClockKey[]> = [
 			inactive: "#E0606F",
 			background: "#B00020",
 		}),
-		clockKey("comet", BRAND.mint, { time: "#8E8E93" }),
+		clockKey("comet", BRAND.mint, { time: "#C7C7CC" }),
 		clockKey("big", "#111111", {
 			time: "#111111",
 			inactive: "#B37300",
@@ -875,9 +1175,9 @@ function colorsSequence(stepMs: number): Sequence {
 
 const README_KEYS: readonly ClockKey[] = [
 	clockKey("classic", BRAND.red),
-	clockKey("line", BRAND.mint),
-	clockKey("comet", BRAND.amber),
-	clockKey("big", BRAND.blue),
+	clockKey("line", CYAN, { time: WHITE }),
+	clockKey("comet", BRAND.pink, { time: CYAN }),
+	clockKey("big", BRAND.mint, { time: WHITE }),
 ];
 
 /** The README demo: four faces from 10:08:58 across the minute change. */
@@ -921,11 +1221,31 @@ function rowScene(
 }
 
 const WORLD_KEYS: readonly ClockKey[] = [
-	clockKey("line", BRAND.red, { label: "BER", zone: "Europe/Berlin" }),
-	clockKey("line", BRAND.amber, { label: "NYC", zone: "America/New_York" }),
-	clockKey("line", BRAND.mint, { label: "TYO", zone: "Asia/Tokyo" }),
-	clockKey("line", BRAND.blue, { label: "LDN", zone: "Europe/London" }),
-	clockKey("line", BRAND.pink, { label: "SYD", zone: "Australia/Sydney" }),
+	clockKey("classic", CYAN, {
+		time: WHITE,
+		label: "BER",
+		zone: "Europe/Berlin",
+	}),
+	clockKey("line", BRAND.amber, {
+		time: WHITE,
+		label: "NYC",
+		zone: "America/New_York",
+	}),
+	clockKey("modern", BRAND.mint, {
+		time: YELLOW,
+		label: "TYO",
+		zone: "Asia/Tokyo",
+	}),
+	clockKey("line", BRAND.pink, {
+		time: WHITE,
+		label: "LDN",
+		zone: "Europe/London",
+	}),
+	clockKey("classic", PURPLE, {
+		time: WHITE,
+		label: "SYD",
+		zone: "Australia/Sydney",
+	}),
 ];
 
 function videoScenes(): Scene[] {
@@ -1142,23 +1462,13 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 	write(`${imgs}/actions/clock/encoder@2x.png`, png(encoder, 144));
 
 	// Marketplace gallery (1920x960) and social preview (1280x640).
-	write(
-		"marketing/gallery-1-hero.png",
-		png(
-			hero({
-				w: 1920,
-				h: 960,
-				margin: 120,
-				cols: 4,
-				rows: 3,
-				key: 220,
-				gap: 30,
-				nameSize: 150,
-				claimSize: 46,
-				keys: HERO_KEYS,
-			}),
-		),
-	);
+	write("marketing/gallery-1-hero.png", png(hero(GALLERY_HERO)));
+	// All hero directions for the maintainer's choice (HERO_CHOICE picks the one above).
+	for (const [name, variant] of Object.entries(HERO_VARIANTS))
+		write(
+			`marketing/hero-variants/hero-${name}.png`,
+			png(variant(GALLERY_HERO)),
+		);
 	write("marketing/gallery-2-faces.png", png(row(FACES_ROW)));
 	write("marketing/gallery-3-timezones.png", png(row(ZONES_ROW)));
 	write("marketing/gallery-4-countdown.png", png(row(COUNTDOWN_ROW)));
