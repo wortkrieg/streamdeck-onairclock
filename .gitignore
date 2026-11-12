@@ -22,3 +22,6 @@ spike/**/profiles
 
 # Agent worktrees
 .claude/worktrees/
+
+# handover folder for marc.fail (untracked)
+marketing/marc-fail/

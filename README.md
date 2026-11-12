@@ -17,6 +17,8 @@ A broadcast studio clock for your Stream Deck: five watchfaces, any color, time 
   - **Comet**: a light point with a fading tail circles a hairline ring.
   - **Big**: hours and minutes as large as the key allows, readable from across the room.
 - **Any color.** Set the active color, the inactive color and the background freely. Optionally the time gets its own color, apart from the ring ("Time color").
+
+  ![Clocks with separate ring and time colors](docs/images/gif-colors.gif)
 - **Time zones per key.** Use the system time, pick an IANA time zone, or set a fixed UTC offset (-12:00 to +14:00 in 15-minute steps). An optional short label (up to 6 characters, e.g. `NYC`) tells your world clocks apart.
 - **Countdown.** A separate Countdown action starts a preset duration of up to 99:59 on all clocks of the same Stream Deck that have "Show countdown" enabled. Press the Countdown key again, or press a clock, to cancel. When the countdown reaches zero you choose what happens:
   - **Count overtime** (default): keeps counting as `+MM:SS`.
@@ -24,6 +26,8 @@ A broadcast studio clock for your Stream Deck: five watchfaces, any color, time 
   - **Back to clock**: flashes briefly, then shows the time again.
 
   An optional warning pulse marks the last 10 seconds.
+
+  ![A countdown running on several clocks, into overtime](docs/images/gif-countdown.gif)
 - **Subtle animations**, all on by default: rolling digits, ring reset at the full minute, blinking colon, an afterglow on the current second and a smoothly sweeping ring on Line, Comet and Big. Animations and the blinking colon can each be switched off; with many clocks on one page, switching off animations lowers the load on your computer.
 - **Date and time formats.** Five date formats, 12 or 24 hour display and an optional PM indicator.
 - **Stream Deck+ touch display** supported.
