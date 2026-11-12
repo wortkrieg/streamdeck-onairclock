@@ -30,6 +30,7 @@ V1 is an HTML plugin and renders inside the app's browser engine (QtWebEnginePro
 | **V2 final, Classic defaults** | 20.5 % | 4.0 % | 1.2 % | **+18.1 pp** |
 | **V2 final, Line defaults** | 17.6 % | 3.7 % | 0.5 % | **+14.2 pp** |
 | V2 final, Classic, countdown running | 19.5 % | 4.2 % | 1.2 % | +17.3 pp |
+| V2 Line with smooth sweep (5 images/s), 2026-11-12, idle 2.5 % + 2.9 % | 15.0 % | 2.5 % | 0.7 % | +12.8 pp |
 
 The app's cost is roughly linear in images per second (about 0.35 % of a core per image/s); the plugin itself stays far below 10 %. Keys and app stayed smooth in every configuration, including 30 fps.
 
@@ -40,6 +41,7 @@ The app's cost is roughly linear in images per second (about 0.35 % of a core pe
 - **Node runtime download.** SDK 3 plugins run on a Node.js runtime that Stream Deck downloads on first use from `node-sd.elgato.com` (to `~/Library/Application Support/com.elgato.StreamDeck/NodeJS/`). With all of Stream Deck's network access blocked (Little Snitch here), the download fails silently ("Failed to fetch Node.js manifest: canceled") and no SDK 3 plugin starts, Elgato's own included. V1 (HTML) did not need this. README "Installation" says so.
 - **CategoryIcon.** Stream Deck 7.6.1 refuses a plugin with `Category` but no `CategoryIcon` ("category icon not defined"), although `streamdeck validate` passes. The V2 manifest has it; only the spike lacked it.
 - **System time zone changes.** Node fixes the local zone at start-up. Deleting `process.env.TZ` makes it re-detect the host zone (checked with Stream Deck's Node 24.22.1: Tokyo -> delete -> Europe/Berlin again). V2 does this every 10 s (`src/plugin/system-zone.ts`, ruling R19), so clocks on "System time" should follow a changed zone within 10 s. Step 10 on hardware is still to be done to confirm it end to end.
+- **Smooth rings (maintainer feedback on the device).** Short countdowns jumped because frames came only at the afterglow steps (uneven). A running countdown now adds evenly spaced frames so the ring moves at most 3 degrees per frame (8 per second at 15 s, 4 at 30 s, 2 at 60 s, none extra from 2 minutes on). In clock mode the sweeping faces (Line, Comet, Big) get one more frame at 750 ms, so no gap exceeds 250 ms (ruling R21: 5 instead of 4 images per second for these faces with animations on; measured +12.8 pp for 15 Line clocks, still far below V1).
 - **Legibility (maintainer feedback on the device).** Date, seconds and partly the main digits were too small to read from a distance. All faces were enlarged (ring moved out to r 65/64 like V1's r 66, main digits +20 to +40 %, seconds +55 to +70 %, date +55 %, labels up to +50 %, strokes 15 to 25 % heavier, long strings such as "+00:12" or "11-11-26" shrink to fit). The maintainer confirmed the new sizes on the MK.2.
 
 ## Spike plugin
