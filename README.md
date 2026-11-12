@@ -24,7 +24,7 @@ A broadcast studio clock for your Stream Deck: five watchfaces, any color, time 
   - **Back to clock**: flashes briefly, then shows the time again.
 
   An optional warning pulse marks the last 10 seconds.
-- **Subtle animations**, all on by default: rolling digits, ring reset at the full minute, blinking colon and an afterglow on the current second. Animations and the blinking colon can each be switched off.
+- **Subtle animations**, all on by default: rolling digits, ring reset at the full minute, blinking colon, an afterglow on the current second and a smoothly sweeping ring on Line, Comet and Big. Animations and the blinking colon can each be switched off; with many clocks on one page, switching off animations lowers the load on your computer.
 - **Date and time formats.** Five date formats, 12 or 24 hour display and an optional PM indicator.
 - **Stream Deck+ touch display** supported.
 

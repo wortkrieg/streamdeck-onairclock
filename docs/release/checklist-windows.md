@@ -26,4 +26,4 @@ Device: any Stream Deck with display, Stream Deck software 7.1 or newer. Install
 
 - [ ] Countdown starts on all clocks with "Show countdown" enabled; a clock with it disabled keeps showing the time. Pressing the Countdown key again, or a clock, cancels it.
 - [ ] End modes: "Count overtime" continues as +MM:SS, "Hold at 00:00" stays and blinks until canceled, "Back to clock" flashes and shows the time again.
-- [ ] With many clocks visible (e.g. 15 keys) the Stream Deck software stays responsive and CPU load is low.
+- [ ] With many clocks visible (e.g. 15 keys) the Stream Deck software stays responsive. The rings of Line, Comet and Big sweep smoothly; with "Animations" off the load drops clearly.
