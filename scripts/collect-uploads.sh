@@ -94,6 +94,6 @@ brand/                hero variants A/B/C (A chosen), icon variants A/B/C (B cho
 marc-fail/            blog post draft, product page, NOTES.md, media/ and faces/ (handed to
                       the marc.fail session)
 
-Regenerate: npm run assets && npm run assets:video && npm run assets:collect
+Regenerate: npm run assets && npm run assets:video && npm run assets:light && npm run assets:collect
 TXT
 echo "collected $(find "$U" -type f | wc -l | tr -d ' ') files into $U"

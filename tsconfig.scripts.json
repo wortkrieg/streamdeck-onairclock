@@ -2,6 +2,7 @@
 	"extends": "./tsconfig.json",
 	"include": [
 		"scripts/build-assets.ts",
+		"scripts/build-light-media.ts",
 		"scripts/build-assets.test.ts",
 		"scripts/gifenc.d.ts"
 	]
