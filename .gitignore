@@ -25,3 +25,5 @@ spike/**/profiles
 
 # handover folder for marc.fail (untracked)
 marketing/marc-fail/
+# collected assets for manual uploads (untracked)
+marketing/upload/

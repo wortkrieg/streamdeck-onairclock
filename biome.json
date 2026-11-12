@@ -15,6 +15,7 @@
 			"!.claude",
 			"!.playwright-mcp",
 			"!marketing/marc-fail",
+			"!marketing/upload",
 			"!fail.marc.onairclock.sdPlugin/ui/sdpi-components.js"
 		]
 	},
