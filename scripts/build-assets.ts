@@ -29,7 +29,8 @@ import { CountdownController } from "../src/plugin/countdown-controller";
 import { combineFrames } from "../src/plugin/ticker";
 import { animState, planNextFrame } from "../src/render/animation";
 import { renderCountdownKey } from "../src/render/countdown-key";
-import { renderFace } from "../src/render/faces/index";
+import { renderFace, STATIC_ANIM } from "../src/render/faces/index";
+import { dotRing } from "../src/render/faces/shared";
 
 // gifenc's ESM build only default-exports GIFEncoder; its CJS build has everything, the
 // same under tsx and vitest.
@@ -485,24 +486,10 @@ function pairSwatches(x: number, y: number, d: number): string {
 	}).join("");
 }
 
-/** A lit on-air lamp: soft glow behind a red rounded plate. */
-function tallyPlate(
-	x: number,
-	y: number,
-	w: number,
-	h: number,
-	id: string,
-): { defs: string; body: string } {
-	const rx = n2(h * 0.14);
-	const defs = `<filter id="${id}-glow" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="${n2(h * 0.22)}"/></filter><linearGradient id="${id}-lit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6A55"/><stop offset="1" stop-color="#E5261C"/></linearGradient>`;
-	const box = `x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}" rx="${rx}"`;
-	const body = `<rect ${box} fill="${TALLY}" opacity=".7" filter="url(#${id}-glow)"/><rect ${box} fill="url(#${id}-lit)"/><rect x="${n2(x + 3)}" y="${n2(y + 3)}" width="${n2(w - 6)}" height="${n2(h - 6)}" rx="${rx}" fill="none" stroke="#FFFFFF" stroke-opacity=".22" stroke-width="2"/>`;
-	return { defs, body };
-}
-
 /**
- * Hero A, tally: "ON AIR" lit in a red on-air lamp, "CLOCK" below in the same condensed
- * capitals, the claim under it, ring/time swatches on the grid's bottom line.
+ * Hero A, signage: "ON AIR" over "CLOCK" in condensed extra-bold capitals with tight
+ * signage leading, the claim under it, ring/time swatches on the grid's bottom line.
+ * Type only (Marc: no red plate behind "ON AIR").
  */
 function heroTally(l: HeroLayout, nowMs = STILL_MS): string {
 	const g = heroGrid(l, nowMs);
@@ -510,29 +497,19 @@ function heroTally(l: HeroLayout, nowMs = STILL_MS): string {
 		family: COND,
 		weight: 800,
 		size: l.nameSize * 1.12,
-		fill: "#FFF6F2",
+		fill: BRAND.paper,
 		tracking: 0.06,
 	};
-	const padX = () => word.size * 0.3;
-	word.size = fitSize(
-		["ON AIR", "CLOCK"],
-		word,
-		g.colW - 2 * l.nameSize * 0.34,
-	);
+	word.size = fitSize(["ON AIR", "CLOCK"], word, g.colW);
 	const cap = word.size * TEXT_CAP;
-	const padY = word.size * 0.2;
-	const onAirW = textWidth("ON AIR", word);
-	const plateH = cap + 2 * padY;
-	const plateW = onAirW + 2 * padX() - word.size * 0.06;
-	const tally = tallyPlate(l.margin, g.y0, plateW, plateH, "tally");
-	let body = g.body + tally.body;
-	body += text("ON AIR", l.margin + padX(), g.y0 + padY + cap, word);
-	const clockBase = g.y0 + plateH + word.size * 0.3 + cap;
-	// "CLOCK" flush with the lamp's left edge (optical: condensed C overshoots a little).
-	body += text("CLOCK", l.margin - word.size * 0.01, clockBase, {
-		...word,
-		fill: BRAND.paper,
-	});
+	const leading = word.size * 0.2;
+	// Optical alignment: the condensed O and C overshoot the left edge a little.
+	const x = l.margin - word.size * 0.01;
+	const onAirBase = g.y0 + cap;
+	let body = g.body;
+	body += text("ON AIR", x, onAirBase, word);
+	const clockBase = onAirBase + leading + cap;
+	body += text("CLOCK", x, clockBase, word);
 	const claim: TextOptions = {
 		family: TEXT,
 		weight: 500,
@@ -544,7 +521,7 @@ function heroTally(l: HeroLayout, nowMs = STILL_MS): string {
 	body += text("on any key.", l.margin, c1 + l.claimSize * 1.3, claim);
 	const d = l.claimSize * 0.66;
 	body += pairSwatches(l.margin, g.y0 + g.gh - d / 2, d);
-	return page(l.w, l.h, body, shadowFilter(l.key) + tally.defs);
+	return page(l.w, l.h, body, shadowFilter(l.key));
 }
 
 /**
@@ -876,8 +853,8 @@ const COUNTDOWN_ROW: RowLayout = {
 };
 
 const COLORS_ROW: RowLayout = {
-	heading: "Two colors per clock",
-	support: "Ring and time apart, on any background.",
+	heading: "Unlimited color combinations",
+	support: "Ring, time, dots and background, each in any color.",
 	keys: [
 		clockKey("classic", BRAND.red, { time: WHITE }),
 		clockKey("modern", CYAN, { time: WHITE }),
@@ -1409,6 +1386,101 @@ export async function buildVideo(
 	return { frames, seconds: frames / V_FPS };
 }
 
+// ---------- app icon ----------
+
+/**
+ * The plugin's own 60-dot seconds ring at `second` (dots up to it lit), straight from
+ * the renderer but without digits: the part of the clock that still reads at 32 px.
+ */
+function secondsRing(second: number, active: string, inactive: string): string {
+	const cfg = clockConfig(clockKey("classic", active, { inactive }));
+	const minute = ASSET_TIME_MS - 30_000;
+	const m = buildFaceModel(minute + second * 1000 + 400, cfg);
+	return dotRing(m, cfg.colors, STATIC_ANIM);
+}
+
+/** "ON" over "AIR" in the condensed broadcast capitals, centred in the 144 box. */
+function onAirStack(fill: string): string {
+	const word: TextOptions = {
+		family: COND,
+		weight: 800,
+		size: 46,
+		fill,
+		anchor: "middle",
+		tracking: 0.02,
+	};
+	const cap = word.size * TEXT_CAP;
+	const gap = word.size * 0.14;
+	const top = 72 - (2 * cap + gap) / 2;
+	return (
+		text("ON", 72, top + cap, word) + text("AIR", 72, top + 2 * cap + gap, word)
+	);
+}
+
+/** A: the product as its logo, a black key with the Classic face on ultramarine. */
+function iconKey(): string {
+	keyCounter = 0;
+	const face = keySvg(
+		clockKey("classic", BRAND.red, {
+			time: WHITE,
+			showDate: false,
+			showSeconds: false,
+		}),
+	);
+	const size = 118;
+	const pad = (144 - size) / 2;
+	return page(144, 144, keyAt(pad, pad - 2, size, face), shadowFilter(size));
+}
+
+/** B: studio black, the red seconds ring around "ON AIR". */
+function iconRing(): string {
+	return page(
+		144,
+		144,
+		secondsRing(44, BRAND.red, "#4A4A4A") + onAirStack(WHITE),
+		"",
+		BRAND.black,
+	);
+}
+
+/** C: brand ultramarine, a white seconds ring around "ON AIR". */
+function iconBrand(): string {
+	return page(144, 144, secondsRing(44, WHITE, "#7C86FF") + onAirStack(WHITE));
+}
+
+export const ICON_VARIANTS = { a: iconKey, b: iconRing, c: iconBrand } as const;
+/** The variant used for the Marketplace app icon and the plugin icon. */
+export const ICON_CHOICE: keyof typeof ICON_VARIANTS = "b";
+
+/** Every icon variant at 288, 64 and 32 px, on the dark and the light ground. */
+function iconSizesSheet(): string {
+	const sizes = [288, 64, 32];
+	const pad = 32;
+	const rowH = 288 + pad;
+	const colW = 288 + 64 + 32 + 4 * pad;
+	const variants = Object.values(ICON_VARIANTS);
+	const grounds = ["#1E1E24", "#F2F2EE"];
+	let body = "";
+	grounds.forEach((ground, gi) => {
+		const y0 = pad + gi * rowH;
+		body += `<rect x="0" y="${y0 - pad / 2}" width="${variants.length * colW + pad}" height="${rowH}" fill="${ground}"/>`;
+		variants.forEach((variant, vi) => {
+			let x = pad + vi * colW;
+			for (const s of sizes) {
+				const inner = variant().replace(
+					/^<svg[^>]*>/,
+					`<svg x="${x}" y="${y0 + (288 - s) / 2}" width="${s}" height="${s}" viewBox="0 0 144 144">`,
+				);
+				body += scopeIds(inner, `i${gi}${vi}${s}`);
+				x += s + pad;
+			}
+		});
+	});
+	const w = variants.length * colW + pad;
+	const h = grounds.length * rowH + pad;
+	return page(w, h, body, "", "#1E1E24");
+}
+
 // ---------- build ----------
 
 function brandSvg(name: string): string {
@@ -1426,11 +1498,14 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 	};
 	const imgs = `${PLUGIN}/imgs`;
 
-	// Plugin and Marketplace icon.
-	const icon = brandSvg("plugin-icon.svg");
+	// Plugin and Marketplace icon, with every variant for the maintainer's choice.
+	const icon = ICON_VARIANTS[ICON_CHOICE]();
 	write(`${imgs}/plugin/icon.png`, png(icon, 256));
 	write(`${imgs}/plugin/icon@2x.png`, png(icon, 512));
 	write("marketing/marketplace-icon.png", png(icon, 288));
+	for (const [name, variant] of Object.entries(ICON_VARIANTS))
+		write(`marketing/icon-variants/icon-${name}.png`, png(variant(), 288));
+	write("marketing/icon-variants/sizes.png", png(iconSizesSheet()));
 
 	// Monochrome white icons for the Stream Deck app.
 	write(`${imgs}/plugin/category.svg`, brandSvg("category.svg"));
