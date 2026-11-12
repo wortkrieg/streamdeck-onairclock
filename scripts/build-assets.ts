@@ -332,9 +332,13 @@ function page(
 
 // ---------- rasterising ----------
 
-function resvg(svg: string, width?: number): Resvg {
+function resvg(svg: string, width?: number, zoom = 1): Resvg {
 	return new Resvg(svg, {
-		fitTo: width ? { mode: "width", value: width } : { mode: "original" },
+		fitTo: width
+			? { mode: "width", value: width * zoom }
+			: zoom !== 1
+				? { mode: "zoom", value: zoom }
+				: { mode: "original" },
 		font: {
 			fontFiles: FONT_FILES,
 			loadSystemFonts: false,
@@ -345,8 +349,8 @@ function resvg(svg: string, width?: number): Resvg {
 	});
 }
 
-function png(svg: string, width?: number): Buffer {
-	return resvg(svg, width).render().asPng();
+function png(svg: string, width?: number, zoom = 1): Buffer {
+	return resvg(svg, width, zoom).render().asPng();
 }
 
 // ---------- compositions ----------
@@ -1497,15 +1501,20 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 		written.push(rel);
 	};
 	const imgs = `${PLUGIN}/imgs`;
+	/** Writes `rel` and a sharper `@2x` rendering from the same vector source. */
+	const writePng = (rel: string, svg: string, width?: number) => {
+		write(rel, png(svg, width));
+		write(rel.replace(/\.png$/, "@2x.png"), png(svg, width, 2));
+	};
 
 	// Plugin and Marketplace icon, with every variant for the maintainer's choice.
 	const icon = ICON_VARIANTS[ICON_CHOICE]();
 	write(`${imgs}/plugin/icon.png`, png(icon, 256));
 	write(`${imgs}/plugin/icon@2x.png`, png(icon, 512));
-	write("marketing/marketplace-icon.png", png(icon, 288));
+	writePng("marketing/marketplace-icon.png", icon, 288);
 	for (const [name, variant] of Object.entries(ICON_VARIANTS))
-		write(`marketing/icon-variants/icon-${name}.png`, png(variant(), 288));
-	write("marketing/icon-variants/sizes.png", png(iconSizesSheet()));
+		writePng(`marketing/icon-variants/icon-${name}.png`, variant(), 288);
+	writePng("marketing/icon-variants/sizes.png", iconSizesSheet());
 
 	// Monochrome white icons for the Stream Deck app.
 	write(`${imgs}/plugin/category.svg`, brandSvg("category.svg"));
@@ -1537,17 +1546,14 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 	write(`${imgs}/actions/clock/encoder@2x.png`, png(encoder, 144));
 
 	// Marketplace gallery (1920x960) and social preview (1280x640).
-	write("marketing/gallery-1-hero.png", png(hero(GALLERY_HERO)));
+	writePng("marketing/gallery-1-hero.png", hero(GALLERY_HERO));
 	// All hero directions for the maintainer's choice (HERO_CHOICE picks the one above).
 	for (const [name, variant] of Object.entries(HERO_VARIANTS))
-		write(
-			`marketing/hero-variants/hero-${name}.png`,
-			png(variant(GALLERY_HERO)),
-		);
-	write("marketing/gallery-2-faces.png", png(row(FACES_ROW)));
-	write("marketing/gallery-3-timezones.png", png(row(ZONES_ROW)));
-	write("marketing/gallery-4-countdown.png", png(row(COUNTDOWN_ROW)));
-	write("marketing/gallery-5-colors.png", png(row(COLORS_ROW)));
+		writePng(`marketing/hero-variants/hero-${name}.png`, variant(GALLERY_HERO));
+	writePng("marketing/gallery-2-faces.png", row(FACES_ROW));
+	writePng("marketing/gallery-3-timezones.png", row(ZONES_ROW));
+	writePng("marketing/gallery-4-countdown.png", row(COUNTDOWN_ROW));
+	writePng("marketing/gallery-5-colors.png", row(COLORS_ROW));
 	const social: HeroLayout = {
 		w: 1280,
 		h: 640,
@@ -1560,25 +1566,23 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 		claimSize: 32,
 		keys: SOCIAL_KEYS,
 	};
-	write("marketing/social-preview.png", png(hero(social)));
+	writePng("marketing/social-preview.png", hero(social));
 
 	// README.
-	write(
+	writePng(
 		"docs/images/readme-hero.png",
-		png(
-			hero({
-				w: 1600,
-				h: 640,
-				margin: 96,
-				cols: 4,
-				rows: 2,
-				key: 200,
-				gap: 28,
-				nameSize: 104,
-				claimSize: 34,
-				keys: HERO_KEYS,
-			}),
-		),
+		hero({
+			w: 1600,
+			h: 640,
+			margin: 96,
+			cols: 4,
+			rows: 2,
+			key: 200,
+			gap: 28,
+			nameSize: 104,
+			claimSize: 34,
+			keys: HERO_KEYS,
+		}),
 	);
 	write(
 		"docs/images/readme-demo.gif",
