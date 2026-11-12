@@ -232,5 +232,7 @@ describe("sweepPhasesMs", () => {
 		]);
 		expect(sweepPhasesMs(10)).toContain(BLINK_MS);
 		expect(sweepPhasesMs(4)).toEqual([0, 250, 500, 750]);
+		// on a countdown's own second
+		expect(sweepPhasesMs(4, 1_000_300)).toEqual([300, 550, 800, 50]);
 	});
 });

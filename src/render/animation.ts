@@ -28,11 +28,14 @@ export const SWEEP_FACES: readonly FaceId[] = ["line", "comet", "big"];
  * Clock-mode phases of the sweeping faces: an even grid of `fps` frames per second
  * (every 100 ms at 10 fps), so the ring moves smoothly. They replace STEP_PHASES_MS for
  * these faces: the stepped afterglow and seconds roll are sampled on the grid, and the
- * colon's 500 ms lies on it, so no extra frames come in between.
+ * colon's 500 ms lies on it, so no extra frames come in between. A running countdown
+ * uses the same grid on its own second (`offsetMs` = its start).
  */
-export function sweepPhasesMs(fps: number): number[] {
+export function sweepPhasesMs(fps: number, offsetMs = 0): number[] {
 	const n = Math.max(1, Math.round(fps));
-	return Array.from({ length: n }, (_, k) => Math.round((k * 1000) / n));
+	return Array.from({ length: n }, (_, k) =>
+		mod(offsetMs + Math.round((k * 1000) / n), 1000),
+	);
 }
 /** The seconds digits show one in-between roll image until the first step, then settle. */
 const SUB_ROLL_STEP = 0.4;

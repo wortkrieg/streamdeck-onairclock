@@ -154,15 +154,22 @@ describe("frame budget with 15 visible clocks", () => {
 		expect(max(b.imagesPerSecond.slice(1))).toBeLessThanOrEqual(4);
 	});
 
-	test("a short countdown redraws evenly (8 per second at 15 s), a long one does not", () => {
-		const short = simulate(cfg({ face: "line" }), MID_MINUTE, 15);
-		// Running for 15 s from slot 0 on: the 8 even ring frames plus the afterglow
-		// steps that do not coincide with them, never more than FAST_FPS + 2.
-		const running = short.imagesPerSecond.slice(0, 9);
-		expect(Math.min(...running)).toBeGreaterThanOrEqual(8);
-		expect(max(running)).toBeLessThanOrEqual(FAST_FPS + 2);
-		// From 2 minutes on the ring adds no frames: still at most 6 per second.
-		const long = simulate(cfg({ face: "line" }), MID_MINUTE, 300);
+	test("a running countdown sweeps Line at FAST_FPS evenly, dots only as needed", () => {
+		// Line: the clock's even grid, for short and long countdowns alike.
+		for (const sec of [15, 300]) {
+			const line = simulate(cfg({ face: "line" }), MID_MINUTE, sec);
+			expect(line.imagesPerSecond.slice(0, 9), `line ${sec}`).toEqual(
+				new Array(9).fill(FAST_FPS),
+			);
+		}
+		// Classic: a 15 s countdown changes 4 dots per second and redraws for them;
+		// a 5 min countdown adds no frames (at most 6 per second as before).
+		const short = simulate(cfg({ face: "classic" }), MID_MINUTE, 15);
+		expect(
+			Math.min(...short.imagesPerSecond.slice(0, 9)),
+		).toBeGreaterThanOrEqual(4);
+		expect(max(short.imagesPerSecond)).toBeLessThanOrEqual(FAST_FPS + 2);
+		const long = simulate(cfg({ face: "classic" }), MID_MINUTE, 300);
 		expect(max(long.imagesPerSecond)).toBeLessThanOrEqual(6);
 	});
 });

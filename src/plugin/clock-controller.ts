@@ -118,20 +118,27 @@ export class ClockController {
 			const phase = model.countdown?.phase;
 			if (phase === "overtime" || phase === "hold" || phase === "flash")
 				phasesMs.push(mod1000(countdown.startMs + BLINK_MS));
-			// A clock showing a running countdown steps its afterglow on the countdown's
-			// second; the fast roll frames cover the early steps, not the last one.
-			if (phase === "running" && e.cfg.animations)
-				for (const p of STEP_PHASES_MS)
-					phasesMs.push(mod1000(countdown.startMs + p));
-			// Even frames so the ring of a short countdown moves smoothly.
-			if (phase === "running")
-				phasesMs.push(
-					...countdownRingPhasesMs(
-						countdown.startMs,
-						countdown.durationMs,
-						FAST_FPS,
-					),
-				);
+			if (phase === "running") {
+				if (e.cfg.animations && SWEEP_FACES.includes(e.cfg.face)) {
+					// Sweeping rings: the clock's even grid on the countdown's second; the
+					// afterglow is sampled on it.
+					phasesMs.push(...sweepPhasesMs(FAST_FPS, countdown.startMs));
+				} else {
+					// The afterglow steps on the countdown's second; the fast roll frames
+					// cover the early steps, not the last one.
+					if (e.cfg.animations)
+						for (const p of STEP_PHASES_MS)
+							phasesMs.push(mod1000(countdown.startMs + p));
+					// Even frames so the dots of a short countdown change on time.
+					phasesMs.push(
+						...countdownRingPhasesMs(
+							countdown.startMs,
+							countdown.durationMs,
+							FAST_FPS,
+						),
+					);
+				}
+			}
 		}
 
 		const svg = renderFace(e.cfg.face, model, e.cfg.colors, anim);
