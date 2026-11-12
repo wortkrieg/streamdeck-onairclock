@@ -17,6 +17,8 @@ build/
 *.sdPlugin/logs
 spike/**/bin
 spike/**/logs
+# test profiles carry the device serial number
+spike/**/profiles
 
 # Agent worktrees
 .claude/worktrees/
