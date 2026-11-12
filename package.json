@@ -13,7 +13,8 @@
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"validate": "streamdeck validate fail.marc.onairclock.sdPlugin",
-		"assets": "tsx scripts/build-assets.ts"
+		"assets": "tsx scripts/build-assets.ts",
+		"assets:video": "tsx scripts/build-assets.ts --video"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.6.6",

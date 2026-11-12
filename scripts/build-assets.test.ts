@@ -24,6 +24,7 @@ const PNG_SIZES: ReadonlyArray<[string, number, number]> = [
 	["marketing/gallery-2-faces.png", 1920, 960],
 	["marketing/gallery-3-timezones.png", 1920, 960],
 	["marketing/gallery-4-countdown.png", 1920, 960],
+	["marketing/gallery-5-colors.png", 1920, 960],
 	["marketing/social-preview.png", 1280, 640],
 ];
 
@@ -77,6 +78,20 @@ describe("buildAssets", () => {
 		expect(w / h).toBeGreaterThanOrEqual(2);
 		const gif = readFileSync(join(out, "docs/images/readme-demo.gif"));
 		expect(gif.subarray(0, 6).toString("latin1")).toBe("GIF89a");
+	});
+
+	test.each([
+		"docs/images/gif-faces.gif",
+		"docs/images/gif-countdown.gif",
+		"docs/images/gif-colors.gif",
+	])("%s is an animated GIF of at most 1000 px and 2 MB", (file) => {
+		const gif = readFileSync(join(out, file));
+		expect(gif.subarray(0, 6).toString("latin1")).toBe("GIF89a");
+		// Logical screen width, little endian, right after the signature.
+		expect(gif.readUInt16LE(6)).toBeLessThanOrEqual(1000);
+		expect(gif.length).toBeLessThanOrEqual(2 * 1024 * 1024);
+		// More than one image descriptor (0x2C after a graphic control block).
+		expect(gif.toString("latin1").split("\x00\x2C").length).toBeGreaterThan(2);
 	});
 });
 
