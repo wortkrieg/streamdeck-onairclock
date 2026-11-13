@@ -27,6 +27,8 @@ A broadcast studio clock for your Stream Deck: five watchfaces, any color, time 
 
   An optional warning pulse marks the last 10 seconds.
 
+  **Countdown +** and **Countdown −** set the duration of the Countdown keys on the same page, in steps of 1 to 99 minutes or seconds; hold the key to repeat. While a countdown runs, they add or take time and all clocks follow. Switch off "Change the duration" on a Countdown key to keep its time fixed.
+
   ![A countdown running on several clocks, into overtime](docs/images/gif-countdown.gif)
 - **Subtle animations**, all on by default: rolling digits, ring reset at the full minute, blinking colon, an afterglow on the current second and a smoothly sweeping ring on Line, Comet and Big. Animations and the blinking colon can each be switched off; with many clocks on one page, switching off animations lowers the load on your computer.
 - **Date and time formats.** Five date formats, 12 or 24 hour display and an optional PM indicator.

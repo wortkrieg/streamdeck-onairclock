@@ -19,6 +19,10 @@ const PNG_SIZES: ReadonlyArray<[string, number, number]> = [
 	[`${PLUGIN}/imgs/actions/clock/encoder@2x.png`, 144, 144],
 	[`${PLUGIN}/imgs/actions/countdown/key.png`, 72, 72],
 	[`${PLUGIN}/imgs/actions/countdown/key@2x.png`, 144, 144],
+	[`${PLUGIN}/imgs/actions/countdown-plus/key.png`, 72, 72],
+	[`${PLUGIN}/imgs/actions/countdown-plus/key@2x.png`, 144, 144],
+	[`${PLUGIN}/imgs/actions/countdown-minus/key.png`, 72, 72],
+	[`${PLUGIN}/imgs/actions/countdown-minus/key@2x.png`, 144, 144],
 	["marketing/marketplace-icon.png", 288, 288],
 	["marketing/gallery-1-hero.png", 1920, 960],
 	["marketing/gallery-2-faces.png", 1920, 960],
@@ -35,6 +39,8 @@ const WHITE_SVGS = [
 	`${PLUGIN}/imgs/plugin/category.svg`,
 	`${PLUGIN}/imgs/actions/clock/icon.svg`,
 	`${PLUGIN}/imgs/actions/countdown/icon.svg`,
+	`${PLUGIN}/imgs/actions/countdown-plus/icon.svg`,
+	`${PLUGIN}/imgs/actions/countdown-minus/icon.svg`,
 ];
 
 let out = "";

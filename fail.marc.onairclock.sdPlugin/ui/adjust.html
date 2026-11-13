@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Countdown Step Settings</title>
+		<script src="sdpi-components.js"></script>
+		<style>
+			.hint {
+				color: #969696;
+				font-family: "Segoe UI", Arial, Roboto, Helvetica, sans-serif;
+				font-size: 8pt;
+				line-height: 1.4;
+				margin: 4px 0 0;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Shared by Countdown + and Countdown −. Setting keys and defaults match AdjustSettingsStored and ADJUST_DEFAULTS in src/core/settings.ts. -->
+		<sdpi-item label="Step">
+			<sdpi-textfield setting="step" default="1" pattern="^[1-9]\d?$" placeholder="1"></sdpi-textfield>
+			<p class="hint">1 to 99. Changes the running countdown, or else the Countdown keys on this page. Hold the key to repeat.</p>
+		</sdpi-item>
+		<sdpi-item label="Unit">
+			<!-- No default attribute: sdpi reads default="false" as a truthy string. -->
+			<sdpi-checkbox setting="seconds" label="Seconds instead of minutes"></sdpi-checkbox>
+		</sdpi-item>
+		<sdpi-item label="Color">
+			<sdpi-color setting="color" default="#FF3B2F"></sdpi-color>
+		</sdpi-item>
+	</body>
+</html>

@@ -13,7 +13,7 @@ const SDPI_SHA256 =
 	"f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b";
 
 describe("property inspectors work offline", () => {
-	for (const page of ["clock.html", "countdown.html"]) {
+	for (const page of ["clock.html", "countdown.html", "adjust.html"]) {
 		test(`${page} loads the vendored sdpi-components and nothing remote`, () => {
 			const html = readFileSync(ui(page), "utf8");
 			const srcs = [...html.matchAll(/<script\b[^>]*\bsrc="([^"]*)"/g)].map(

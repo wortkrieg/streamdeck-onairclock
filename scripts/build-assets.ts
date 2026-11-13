@@ -17,6 +17,7 @@ import {
 	viewCountdown,
 } from "../src/core/countdown";
 import {
+	ADJUST_DEFAULTS,
 	CLOCK_DEFAULTS,
 	type ClockConfig,
 	COUNTDOWN_DEFAULTS,
@@ -27,6 +28,7 @@ import { FAST_FPS } from "../src/hardware";
 import { ClockController } from "../src/plugin/clock-controller";
 import { CountdownController } from "../src/plugin/countdown-controller";
 import { combineFrames } from "../src/plugin/ticker";
+import { renderAdjustKey } from "../src/render/adjust-key";
 import { animState, planNextFrame } from "../src/render/animation";
 import { renderCountdownKey } from "../src/render/countdown-key";
 import { renderFace, STATIC_ANIM } from "../src/render/faces/index";
@@ -212,6 +214,7 @@ class DeviceSim {
 				this.shown.set(id, svgFromDataUri(uri));
 				return Promise.resolve();
 			},
+			saveDuration: () => Promise.resolve(),
 		};
 	}
 
@@ -1078,6 +1081,7 @@ function countdownSequence(durationSec: number, overtimeMs: number): Sequence {
 		endMode: "overtime",
 		warn: true,
 		color: BRAND.amber,
+		adjustable: true,
 	});
 	const pressAt = 1000;
 	return {
@@ -1520,6 +1524,8 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 	write(`${imgs}/plugin/category.svg`, brandSvg("category.svg"));
 	write(`${imgs}/actions/clock/icon.svg`, brandSvg("action-clock.svg"));
 	write(`${imgs}/actions/countdown/icon.svg`, brandSvg("action-countdown.svg"));
+	for (const dir of ["countdown-plus", "countdown-minus"])
+		write(`${imgs}/actions/${dir}/icon.svg`, brandSvg(`action-${dir}.svg`));
 
 	// Default key images: the plugin's default clock and the idle countdown key.
 	const clockDefault = keySvg(
@@ -1534,6 +1540,19 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 	);
 	write(`${imgs}/actions/countdown/key.png`, png(countdownIdle, 72));
 	write(`${imgs}/actions/countdown/key@2x.png`, png(countdownIdle, 144));
+	// Countdown + and − at their default step.
+	for (const direction of ["plus", "minus"] as const) {
+		const adjust = renderAdjustKey(
+			direction,
+			ADJUST_DEFAULTS.stepSec,
+			ADJUST_DEFAULTS.color,
+		);
+		write(`${imgs}/actions/countdown-${direction}/key.png`, png(adjust, 72));
+		write(
+			`${imgs}/actions/countdown-${direction}/key@2x.png`,
+			png(adjust, 144),
+		);
+	}
 
 	// Encoder (dial) icon: the default clock on a round black dial.
 	const encoder = keySvg(

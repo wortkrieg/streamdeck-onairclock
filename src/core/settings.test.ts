@@ -1,8 +1,10 @@
 import { describe, expect, test } from "vitest";
 import {
+	ADJUST_DEFAULTS,
 	CLOCK_DEFAULTS,
 	COUNTDOWN_DEFAULTS,
 	migrateV1,
+	normalizeAdjust,
 	normalizeClock,
 	normalizeCountdown,
 } from "./settings";
@@ -165,6 +167,7 @@ describe("normalizeCountdown", () => {
 			endMode: "overtime",
 			warn: false,
 			color: "#FF3B2F",
+			adjustable: true,
 		});
 	});
 	test("duration", () => {
@@ -182,5 +185,40 @@ describe("normalizeCountdown", () => {
 		expect(normalizeCountdown({ warn: "true" }).warn).toBe(true);
 		expect(normalizeCountdown({ color: "#00ff00" }).color).toBe("#00ff00");
 		expect(normalizeCountdown({ color: "green" }).color).toBe("#FF3B2F");
+	});
+});
+
+describe("countdown keys and the + and − keys", () => {
+	test("countdown keys follow + and − unless switched off", () => {
+		expect(normalizeCountdown({}).adjustable).toBe(true);
+		expect(normalizeCountdown({ adjustable: false }).adjustable).toBe(false);
+		expect(normalizeCountdown({ adjustable: "false" }).adjustable).toBe(false);
+	});
+
+	test("the step defaults to one minute", () => {
+		expect(ADJUST_DEFAULTS).toEqual({ stepSec: 60, color: "#FF3B2F" });
+		expect(normalizeAdjust({})).toEqual(ADJUST_DEFAULTS);
+	});
+
+	test("the step counts minutes, or seconds with the checkbox", () => {
+		expect(normalizeAdjust({ step: "5" }).stepSec).toBe(300);
+		expect(normalizeAdjust({ step: "10", seconds: true }).stepSec).toBe(10);
+		expect(normalizeAdjust({ step: "10", seconds: "true" }).stepSec).toBe(10);
+		expect(normalizeAdjust({ step: " 15 ", seconds: true }).stepSec).toBe(15);
+		expect(normalizeAdjust({ step: 2 }).stepSec).toBe(120);
+		expect(normalizeAdjust({ step: "99" }).stepSec).toBe(5940);
+	});
+
+	test("an invalid step falls back to 1", () => {
+		for (const step of ["0", "100", "-5", "1.5", "abc", "", null, 0])
+			expect(
+				normalizeAdjust({ step, seconds: true }).stepSec,
+				String(step),
+			).toBe(1);
+	});
+
+	test("the + and − keys take a color", () => {
+		expect(normalizeAdjust({ color: "#00ff00" }).color).toBe("#00ff00");
+		expect(normalizeAdjust({ color: "green" }).color).toBe("#FF3B2F");
 	});
 });

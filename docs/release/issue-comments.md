@@ -12,7 +12,7 @@ You need Stream Deck 7.1 or newer. Get it from the [GitHub release](https://gith
 
 2.0.0 adds a Countdown action. Put it on a key, set a duration (up to 99:59) and press it: the countdown runs on all clocks of the same Stream Deck that have "Show countdown" enabled. Press the Countdown key again, or a clock, to cancel. At zero the clock counts the overtime (+MM:SS), holds at 00:00 or goes back to the time, and an optional pulse warns in the last 10 seconds.
 
-For your example: put several Countdown keys with different durations (1 min, 5 min, ...) into a folder. Pressing one starts it, and the clocks keep showing it after you leave the folder. What a plugin can't do is jump into or out of folders you created yourself; the Stream Deck SDK doesn't allow that. Closing this with the release.
+For your example there are also Countdown + and Countdown − keys. Put them next to a Countdown key: each press changes its duration by a step you choose (1 to 99 minutes or seconds, hold to repeat), and while the countdown runs they add or take time. Or put several Countdown keys with fixed durations (1 min, 5 min, ...) into a folder. Pressing one starts it, and the clocks keep showing it after you leave the folder. What a plugin can't do is jump into or out of folders you created yourself; the Stream Deck SDK doesn't allow that. Closing this with the release.
 
 ## #10 Wrong time (solved in 2.0.0)
 

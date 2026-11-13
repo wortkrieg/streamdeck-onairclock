@@ -10,6 +10,7 @@ On Air Clock V2 is a complete rebuild. The plugin ID is unchanged, so existing k
 - Time zone per key: system time, IANA time zone or fixed UTC offset (-12:00 to +14:00, 15-minute steps), plus an optional short label of up to 6 characters (#2).
 - Countdown action with a preset duration of up to 99:59. It starts on all clocks of the same Stream Deck that have "Show countdown" enabled. Pressing the Countdown key again, or a clock, cancels it (#7).
 - Three end modes for the countdown: count overtime (+MM:SS, default), hold at 00:00, back to clock. Optional warning pulse in the last 10 seconds.
+- Countdown + and Countdown − actions: they set the duration of the Countdown keys on the same page in steps of 1 to 99 minutes or seconds, and add or take time while a countdown runs. Holding the key repeats the step. A Countdown key keeps a fixed duration with "Change the duration" switched off.
 - Micro animations, on by default: rolling digits, ring reset, blinking colon, afterglow, smoothly sweeping ring on Line, Comet and Big. Animations and the blinking colon can each be switched off.
 - Optional separate color for the time (digits, date, label), apart from the ring ("Time color").
 - New branding, icons and Marketplace artwork.

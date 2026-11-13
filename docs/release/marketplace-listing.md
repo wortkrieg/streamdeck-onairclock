@@ -24,7 +24,7 @@ Colors: set the active color, the inactive color and the background freely. Opti
 
 Time zones: every key can show the system time, an IANA time zone or a fixed UTC offset (-12:00 to +14:00 in 15-minute steps). Add a short label such as NYC to tell world clocks apart.
 
-Countdown: the Countdown action starts a preset duration of up to 99:59 on all clocks of the same Stream Deck that have "Show countdown" enabled. Press it again, or press a clock, to cancel. At zero the clock counts overtime (+MM:SS), holds at 00:00 or goes back to the time. An optional warning pulse marks the last 10 seconds.
+Countdown: the Countdown action starts a preset duration of up to 99:59 on all clocks of the same Stream Deck that have "Show countdown" enabled. Countdown + and − set the duration in steps of minutes or seconds, and add or take time while it runs. At zero the clock counts overtime (+MM:SS), holds at 00:00 or goes back to the time. An optional warning pulse marks the last 10 seconds.
 
 Details: rolling digits, ring reset, blinking colon and afterglow (each can be switched off), five date formats, 12 or 24 hour display with PM indicator, Stream Deck+ touch display support. Updating from version 1 keeps your keys and settings.
 
@@ -40,7 +40,7 @@ Farben: Aktiv-Farbe, Inaktiv-Farbe und Hintergrund stellst du frei ein. Auf Wuns
 
 Zeitzonen: Jede Taste zeigt die Systemzeit, eine IANA-Zeitzone oder einen festen UTC-Versatz (-12:00 bis +14:00 in 15-Minuten-Schritten). Mit einer kurzen Beschriftung wie NYC unterscheidest du Weltzeituhren.
 
-Countdown: Die Countdown-Aktion startet eine voreingestellte Dauer von bis zu 99:59 auf allen Uhren desselben Stream Decks, bei denen „Show countdown“ aktiviert ist. Ein erneuter Druck oder ein Druck auf eine Uhr bricht ab. Bei null zählt die Uhr das Überziehen weiter (+MM:SS), bleibt bei 00:00 stehen oder kehrt zur Uhrzeit zurück. Eine optionale Warnung pulsiert in den letzten 10 Sekunden.
+Countdown: Die Countdown-Aktion startet eine voreingestellte Dauer von bis zu 99:59 auf allen Uhren desselben Stream Decks, bei denen „Show countdown“ aktiviert ist. Countdown + und − stellen die Dauer in Minuten- oder Sekundenschritten ein und geben während des Laufs Zeit dazu oder ziehen sie ab. Bei null zählt die Uhr das Überziehen weiter (+MM:SS), bleibt bei 00:00 stehen oder kehrt zur Uhrzeit zurück. Eine optionale Warnung pulsiert in den letzten 10 Sekunden.
 
 Details: rollende Ziffern, Ring-Reset, blinkender Doppelpunkt und Nachglühen (jeweils abschaltbar), fünf Datumsformate, 12- oder 24-Stunden-Anzeige mit PM-Markierung, Unterstützung für das Touch-Display des Stream Deck+. Beim Update von Version 1 bleiben deine Tasten und Einstellungen erhalten.
 
@@ -64,7 +64,7 @@ Icon: `marketing/marketplace-icon.png`
 Checked against docs.elgato.com/guidelines/products and /guidelines/submissions (2026-11-12).
 
 - Name: "On Air Clock" (English, under 30 characters, no "Plugin", no Maker name).
-- Description: the EN long description above, 250 to 1,500 characters (currently about 1,400), the first 250 characters plain text and including the requirements.
+- Description: the EN long description above, 250 to 1,500 characters (currently about 1,460), the first 250 characters plain text and including the requirements.
 - Thumbnail: static PNG 1920 x 960 with English text: `marketing/gallery-1-hero.png`.
 - App icon: PNG 288 x 288: `marketing/marketplace-icon.png`.
 - Gallery (3 to 10 items, PNG 1920 x 960, video MP4 1920 x 1080 under 250 MB), in this order: hero, `marketing/store-video.mp4`, faces, colors (`gallery-5-colors.png`), time zones, countdown.

@@ -1,4 +1,8 @@
-import { type CountdownRegistry, viewCountdown } from "../core/countdown";
+import {
+	adjustDuration,
+	type CountdownRegistry,
+	viewCountdown,
+} from "../core/countdown";
 import type { CountdownConfig } from "../core/settings";
 import { FAST_FPS } from "../hardware";
 import { BLINK_MS, sweepPhasesMs } from "../render/animation";
@@ -12,6 +16,8 @@ export interface CountdownTarget {
 	id: string;
 	deviceId: string;
 	draw(dataUri: string): Promise<void>;
+	/** Stores a duration set with the + and − keys in the key's settings. */
+	saveDuration(durationSec: number): Promise<void>;
 }
 
 interface Entry {
@@ -53,6 +59,34 @@ export class CountdownController {
 		const e = this.entries.get(id);
 		if (!e) return "cancelled";
 		return this.registry.press(e.target.deviceId, id, e.cfg, nowMs);
+	}
+
+	/**
+	 * A + or − step on `deviceId`: changes the running countdown there, or else the duration
+	 * of every adjustable countdown key shown there. "none" when there is neither.
+	 */
+	adjust(
+		deviceId: string,
+		deltaSec: number,
+		nowMs: number,
+	): "running" | "keys" | "none" {
+		if (this.registry.adjust(deviceId, deltaSec, nowMs)) return "running";
+		let found = false;
+		for (const e of this.entries.values()) {
+			if (e.target.deviceId !== deviceId || !e.cfg.adjustable) continue;
+			found = true;
+			const durationSec = adjustDuration(e.cfg.durationSec, deltaSec);
+			if (durationSec === e.cfg.durationSec) continue;
+			e.cfg = { ...e.cfg, durationSec };
+			e.target.saveDuration(durationSec).catch((err: unknown) => {
+				this.errors.warn(
+					`save:${e.target.id}`,
+					`saving countdown key ${e.target.id} failed: ${String(err)}`,
+					nowMs,
+				);
+			});
+		}
+		return found ? "keys" : "none";
 	}
 
 	/**

@@ -30,6 +30,14 @@ export interface CountdownConfig {
 	endMode: EndMode;
 	warn: boolean;
 	color: string;
+	/** Countdown + and − keys change this key's duration. */
+	adjustable: boolean;
+}
+
+/** A Countdown + or − key. */
+export interface AdjustConfig {
+	stepSec: number;
+	color: string;
 }
 
 /** Stored per-key settings (written by the PI). V1 keys keep their names. */
@@ -56,6 +64,12 @@ export type CountdownSettingsStored = Partial<{
 	duration: string;
 	endMode: EndMode;
 	warn: boolean;
+	color: string;
+	adjustable: boolean;
+}>;
+export type AdjustSettingsStored = Partial<{
+	step: string; // 1 to 99, minutes unless `seconds`
+	seconds: boolean;
 	color: string;
 }>;
 
@@ -84,6 +98,12 @@ export const COUNTDOWN_DEFAULTS: CountdownConfig = {
 	endMode: "overtime",
 	warn: false,
 	color: "#FF3B2F",
+	adjustable: true,
+};
+
+export const ADJUST_DEFAULTS: AdjustConfig = {
+	stepSec: 60,
+	color: "#FF3B2F",
 };
 
 const FACES: readonly FaceId[] = ["classic", "modern", "line", "comet", "big"];
@@ -107,7 +127,8 @@ const BOOLEAN_KEYS = [
 	"warn",
 ] as const;
 const MAX_LABEL = 6;
-const MAX_DURATION_SEC = 99 * 60 + 59;
+export const MAX_DURATION_SEC = 99 * 60 + 59;
+const MAX_STEP = 99;
 
 function color(v: unknown, fallback: string): string {
 	return typeof v === "string" && HEX_COLOR.test(v) ? v : fallback;
@@ -250,5 +271,22 @@ export function normalizeCountdown(
 		endMode: oneOf(raw.endMode, END_MODES, d.endMode),
 		warn: bool(raw.warn, d.warn),
 		color: color(raw.color, d.color),
+		adjustable: bool(raw.adjustable, d.adjustable),
+	};
+}
+
+/** Step count 1 to 99 (string from the PI, or a number); anything else counts as 1. */
+function parseStep(v: unknown): number {
+	const s = typeof v === "number" ? String(v) : v;
+	if (typeof s !== "string" || !/^\d{1,2}$/.test(s.trim())) return 1;
+	const n = Number(s.trim());
+	return n >= 1 && n <= MAX_STEP ? n : 1;
+}
+
+export function normalizeAdjust(raw: Record<string, unknown>): AdjustConfig {
+	const n = parseStep(raw.step);
+	return {
+		stepSec: bool(raw.seconds, false) ? n : n * 60,
+		color: color(raw.color, ADJUST_DEFAULTS.color),
 	};
 }

@@ -50,6 +50,7 @@ function simulate(
 				durationSec: countdownSec,
 				endMode: "overtime",
 				warn: false,
+				adjustable: true,
 				color: "#fff",
 			},
 			startMs,

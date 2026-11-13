@@ -18,6 +18,7 @@ const CD: CountdownConfig = {
 	endMode: "overtime",
 	warn: false,
 	color: "#FF3B2F",
+	adjustable: true,
 };
 
 type FakeTarget = ClockTarget & { draw: Mock<(uri: string) => Promise<void>> };

@@ -14,6 +14,7 @@ const CFG: CountdownConfig = {
 	endMode: "overtime",
 	warn: false,
 	color: "#FF3B2F",
+	adjustable: true,
 };
 
 function target(id: string, deviceId = "A") {
@@ -21,6 +22,9 @@ function target(id: string, deviceId = "A") {
 		id,
 		deviceId,
 		draw: vi.fn<(uri: string) => Promise<void>>(() => Promise.resolve()),
+		saveDuration: vi.fn<(durationSec: number) => Promise<void>>(() =>
+			Promise.resolve(),
+		),
 	} satisfies CountdownTarget;
 }
 
@@ -171,5 +175,76 @@ describe("CountdownController", () => {
 		expect(t.draw).toHaveBeenCalledTimes(2);
 		c.press("k1", T0);
 		expect(c.frame(T0 + 60000).fast).toBe(true);
+	});
+});
+
+describe("CountdownController.adjust", () => {
+	test("changes a running countdown and leaves the keys' durations alone", () => {
+		const { registry, c } = setup();
+		const t1 = target("k1");
+		c.add(t1, CFG);
+		c.press("k1", T0);
+		expect(c.adjust("A", 60, T0 + 1000)).toBe("running");
+		expect(registry.get("A", T0 + 1000)?.durationMs).toBe(120_000);
+		expect(t1.saveDuration).not.toHaveBeenCalled();
+	});
+
+	test("without a running countdown it sets every adjustable countdown key on the device", () => {
+		const { registry, c } = setup();
+		const a = target("a");
+		const fixed = target("fixed");
+		const other = target("other", "B");
+		c.add(a, CFG);
+		c.add(fixed, { ...CFG, adjustable: false });
+		c.add(other, CFG);
+		expect(c.adjust("A", 60, T0)).toBe("keys");
+		expect(a.saveDuration).toHaveBeenCalledWith(120);
+		expect(fixed.saveDuration).not.toHaveBeenCalled();
+		expect(other.saveDuration).not.toHaveBeenCalled();
+		c.frame(T0);
+		expect(a.draw).toHaveBeenLastCalledWith(idle({ ...CFG, durationSec: 120 }));
+		expect(fixed.draw).toHaveBeenLastCalledWith(idle());
+		c.press("a", T0 + 1000);
+		expect(registry.get("A", T0 + 1000)?.durationMs).toBe(120_000);
+	});
+
+	test("after zero the countdown is over and the keys are set again", () => {
+		const { registry, c } = setup();
+		const a = target("a");
+		c.add(a, CFG);
+		c.press("a", T0);
+		expect(c.adjust("A", -10, T0 + 61_000)).toBe("keys");
+		expect(a.saveDuration).toHaveBeenCalledWith(50);
+		expect(registry.get("A", T0 + 61_000)?.durationMs).toBe(60_000);
+	});
+
+	test("a step that changes nothing saves nothing", () => {
+		const { c } = setup();
+		const a = target("a");
+		c.add(a, { ...CFG, durationSec: 30 });
+		expect(c.adjust("A", -60, T0)).toBe("keys");
+		expect(a.saveDuration).not.toHaveBeenCalled();
+	});
+
+	test("reports none when nothing on the device can be adjusted", () => {
+		const { c } = setup();
+		expect(c.adjust("A", 60, T0)).toBe("none");
+		c.add(target("fixed"), { ...CFG, adjustable: false });
+		c.add(target("elsewhere", "B"), CFG);
+		expect(c.adjust("A", 60, T0)).toBe("none");
+	});
+
+	test("a failed save is logged and the key keeps its new duration", async () => {
+		const log = vi.fn();
+		const c = new CountdownController(new CountdownRegistry(), log);
+		const a = target("a");
+		a.saveDuration.mockRejectedValueOnce(new Error("offline"));
+		c.add(a, CFG);
+		c.adjust("A", 60, T0);
+		await Promise.resolve();
+		await Promise.resolve();
+		expect(log).toHaveBeenCalledWith(expect.stringContaining("offline"));
+		c.frame(T0);
+		expect(a.draw).toHaveBeenLastCalledWith(idle({ ...CFG, durationSec: 120 }));
 	});
 });

@@ -54,6 +54,32 @@
 					"Image": "imgs/actions/countdown/key"
 				}
 			]
+		},
+		{
+			"Name": "Countdown +",
+			"UUID": "fail.marc.onairclock.countdown-plus",
+			"Icon": "imgs/actions/countdown-plus/icon",
+			"Tooltip": "Adds time to the countdown on this Stream Deck.",
+			"PropertyInspectorPath": "ui/adjust.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/countdown-plus/key"
+				}
+			]
+		},
+		{
+			"Name": "Countdown −",
+			"UUID": "fail.marc.onairclock.countdown-minus",
+			"Icon": "imgs/actions/countdown-minus/icon",
+			"Tooltip": "Takes time off the countdown on this Stream Deck.",
+			"PropertyInspectorPath": "ui/adjust.html",
+			"Controllers": ["Keypad"],
+			"States": [
+				{
+					"Image": "imgs/actions/countdown-minus/key"
+				}
+			]
 		}
 	],
 	"UUID": "fail.marc.onairclock"
