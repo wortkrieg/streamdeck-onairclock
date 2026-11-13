@@ -59,6 +59,31 @@ clock, time zone, countdown, broadcast, studio
 
 Icon: `marketing/marketplace-icon.png`
 
+## Release notes 2.0.0
+
+For the release notes field of the version in the Maker Console (under 1,500 characters, currently 1,264). Plain text.
+
+```text
+On Air Clock 2.0 is a complete rebuild. Your existing keys keep their settings.
+
+New
+- Three new watchfaces: Line, Comet and Big, next to Classic and Modern Minimal. All with larger digits that read well from a distance.
+- Time zone per key: system time, any time zone or a fixed UTC offset, plus a short label such as NYC for world clocks.
+- Countdown action: starts a preset duration of up to 99:59 on all clocks of the same Stream Deck. At zero it counts overtime, holds at 00:00 or goes back to the time. An optional pulse warns in the last 10 seconds.
+- Countdown + and Countdown −: set the duration in steps of minutes or seconds, and add or take time while the countdown runs.
+- The time can have its own color, apart from the ring.
+- Small animations: rolling digits, a smoothly sweeping ring and a blinking colon. Each can be switched off.
+
+Changed
+- Rebuilt on the current Stream Deck SDK. The clock looks the same on macOS and Windows and uses less CPU on the dot faces.
+- The V1 faces without date or seconds are now options of Classic.
+
+Fixed
+- Wrong time in British Columbia and other regions with outdated time zone data.
+
+Requires Stream Deck 7.1 or newer on macOS 12+ or Windows 10+. On first start, Stream Deck downloads its Node.js runtime once.
+```
+
 ## Submission (Maker Console)
 
 Checked against docs.elgato.com/guidelines/products and /guidelines/submissions (2026-11-12).
@@ -68,4 +93,5 @@ Checked against docs.elgato.com/guidelines/products and /guidelines/submissions 
 - Thumbnail: static PNG 1920 x 960 with English text: `marketing/gallery-1-hero.png`.
 - App icon: PNG 288 x 288: `marketing/marketplace-icon.png`.
 - Gallery (3 to 10 items, PNG 1920 x 960, video MP4 1920 x 1080 under 250 MB), in this order: hero, `marketing/store-video.mp4`, faces, colors (`gallery-5-colors.png`), time zones, countdown.
+- Release notes: the section "Release notes 2.0.0" above.
 - AI use must be declared: the plugin code, texts and generated artwork were created with AI assistance (Claude) and reviewed by the maintainer.

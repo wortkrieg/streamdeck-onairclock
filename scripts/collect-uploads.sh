@@ -66,6 +66,7 @@ writeFileSync(`${E}/short-description.txt`, en("## Short description") + "\n");
 writeFileSync(`${E}/description-en.txt`, long + "\n");
 writeFileSync(`${E}/description-de-for-blog-and-site.txt`, sec("## Long description (DE)").split("\n").slice(2).join("\n").trim() + "\n");
 writeFileSync(`${E}/tags.txt`, sec("## Tags") + "\n");
+writeFileSync(`${E}/release-notes.txt`, /```text\n([\s\S]*?)\n```/.exec(sec("## Release notes 2.0.0"))[1] + "\n");
 writeFileSync(`${E}/submission-notes.txt`, [
 	"Elgato Maker Console, checked against docs.elgato.com/guidelines (2026-11-12)",
 	"",
@@ -74,6 +75,7 @@ writeFileSync(`${E}/submission-notes.txt`, [
 	"- Thumbnail: thumbnail.png (1920 x 960; thumbnail@2x.png is 3840 x 1920 if the console takes it)",
 	"- App icon: app-icon.png (288 x 288; app-icon@2x.png is 576 x 576)",
 	"- Gallery in this order: gallery/01 ... 06 (PNG 1920 x 960 or the @2x files, video MP4 1920 x 1080 under 250 MB; 3 to 10 items)",
+	"- Release notes: release-notes.txt",
 	"- AI use must be declared: plugin code, texts and generated artwork were created with AI assistance (Claude) and reviewed by the maintainer.",
 	"",
 ].join("\n"));
