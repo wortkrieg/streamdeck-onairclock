@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (2026-11-12)
+## 2.0.0 (2026-11-13)
 
 On Air Clock V2 is a complete rebuild. The plugin ID is unchanged, so existing keys keep their settings.
 
