@@ -19,10 +19,11 @@ pair marketing/gallery-1-hero.png "$E/thumbnail.png"
 pair marketing/marketplace-icon.png "$E/app-icon.png"
 pair marketing/gallery-1-hero.png "$E/gallery/01-hero.png"
 cp marketing/store-video.mp4 "$E/gallery/02-video-1920x1080.mp4"
-pair marketing/gallery-2-faces.png "$E/gallery/03-faces.png"
-pair marketing/gallery-5-colors.png "$E/gallery/04-colors.png"
-pair marketing/gallery-3-timezones.png "$E/gallery/05-timezones.png"
-pair marketing/gallery-4-countdown.png "$E/gallery/06-countdown.png"
+pair marketing/gallery-6-actions.png "$E/gallery/03-actions.png"
+pair marketing/gallery-2-faces.png "$E/gallery/04-faces.png"
+pair marketing/gallery-4-countdown.png "$E/gallery/05-countdown.png"
+pair marketing/gallery-5-colors.png "$E/gallery/06-colors.png"
+pair marketing/gallery-3-timezones.png "$E/gallery/07-timezones.png"
 cp docs/release/marketplace-listing.md "$E/listing.md"
 
 # GitHub
@@ -74,7 +75,7 @@ writeFileSync(`${E}/submission-notes.txt`, [
 	`- Description: description-en.txt (${long.length} characters, limit 250 to 1500, first 250 plain text incl. requirements)`,
 	"- Thumbnail: thumbnail.png (1920 x 960; thumbnail@2x.png is 3840 x 1920 if the console takes it)",
 	"- App icon: app-icon.png (288 x 288; app-icon@2x.png is 576 x 576)",
-	"- Gallery in this order: gallery/01 ... 06 (PNG 1920 x 960 or the @2x files, video MP4 1920 x 1080 under 250 MB; 3 to 10 items)",
+	"- Gallery in this order: gallery/01 ... 07 (PNG 1920 x 960 or the @2x files, video MP4 1920 x 1080 under 250 MB; 3 to 10 items)",
 	"- Release notes: release-notes.txt",
 	"- AI use must be declared: plugin code, texts and generated artwork were created with AI assistance (Claude) and reviewed by the maintainer.",
 	"",
@@ -87,7 +88,7 @@ On Air Clock V2: assets for manual uploads (generated from branch v2, not in git
 Every PNG comes twice: name.png at the platform's size and name@2x.png rendered
 at double resolution from the same vector source (sharper on high-density screens).
 
-elgato-marketplace/   thumbnail, app icon, gallery 01-06 (02 is the video), texts to paste,
+elgato-marketplace/   thumbnail, app icon, gallery 01-07 (02 is the video), texts to paste,
                       submission notes (incl. the AI declaration), full listing.md
 github/               social preview (Settings > Social preview), readme/ images, repo-settings.md
 social/               GIFs, store video and social preview for posts

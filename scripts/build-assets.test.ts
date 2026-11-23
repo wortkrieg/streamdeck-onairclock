@@ -29,6 +29,7 @@ const PNG_SIZES: ReadonlyArray<[string, number, number]> = [
 	["marketing/gallery-3-timezones.png", 1920, 960],
 	["marketing/gallery-4-countdown.png", 1920, 960],
 	["marketing/gallery-5-colors.png", 1920, 960],
+	["marketing/gallery-6-actions.png", 1920, 960],
 	["marketing/hero-variants/hero-a.png", 1920, 960],
 	["marketing/hero-variants/hero-b.png", 1920, 960],
 	["marketing/hero-variants/hero-c.png", 1920, 960],

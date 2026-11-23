@@ -883,6 +883,34 @@ const COLORS_ROW: RowLayout = {
 	key: 304,
 };
 
+/** The four actions as they first appear on a key, with the plugin's defaults. */
+const ACTIONS_ROW: RowLayout = {
+	heading: "Four actions",
+	support: "Clocks for every key, a countdown, and keys to set its time.",
+	keys: [],
+	captions: ["On Air Clock", "Countdown", "Countdown +", "Countdown \u2212"],
+	key: 340,
+};
+
+function actionsRow(): string {
+	const adjust = (direction: "plus" | "minus") =>
+		renderAdjustKey(direction, ADJUST_DEFAULTS.stepSec, ADJUST_DEFAULTS.color);
+	return rowPage(
+		ACTIONS_ROW,
+		[
+			keySvg(clockKey(CLOCK_DEFAULTS.face, CLOCK_DEFAULTS.colors.active)),
+			renderCountdownKey(
+				null,
+				COUNTDOWN_DEFAULTS.durationSec,
+				COUNTDOWN_DEFAULTS.color,
+			),
+			adjust("plus"),
+			adjust("minus"),
+		],
+		G_H,
+	);
+}
+
 // ---------- animations (GIFs and video) ----------
 
 /** The plugin's fast frame interval: one GIF frame per device frame at 10 fps. */
@@ -1573,6 +1601,7 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 	writePng("marketing/gallery-3-timezones.png", row(ZONES_ROW));
 	writePng("marketing/gallery-4-countdown.png", row(COUNTDOWN_ROW));
 	writePng("marketing/gallery-5-colors.png", row(COLORS_ROW));
+	writePng("marketing/gallery-6-actions.png", actionsRow());
 	const social: HeroLayout = {
 		w: 1280,
 		h: 640,

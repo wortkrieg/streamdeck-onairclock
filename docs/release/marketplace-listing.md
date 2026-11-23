@@ -16,17 +16,25 @@ On Air Clock
 
 ## Long description (EN)
 
-On Air Clock turns any Stream Deck key into a broadcast-style studio clock. Choose one of five watchfaces, set every color yourself, show any time zone and run a countdown on all your clocks at once. Requires Stream Deck 7.1 or newer on macOS 12+ or Windows 10+.
+On Air Clock turns your Stream Deck keys into broadcast-style studio clocks for streamers, podcasters and studios: five watchfaces, any color, time zones and a countdown. Requires Stream Deck 7.1 or newer on macOS 12+ or Windows 10+.
 
-Watchfaces: Classic (60 dots, hour marks, optional date and seconds), Modern Minimal, Line, Comet and Big, all with large digits that read well from a distance. Line, Comet and Big sweep their ring smoothly through the minute.
+Included actions
+- On Air Clock: the time on a key or on the Stream Deck + touch display.
+- Countdown: starts a preset time of up to 99:59 on every clock of the same Stream Deck. Press it again to cancel.
+- Countdown + and Countdown −: set the time in steps of minutes or seconds, and add or take time while it runs.
 
-Colors: set the active color, the inactive color and the background freely. Optionally the time gets its own color, apart from the ring ("Time color").
+How it works
+1. Drag On Air Clock onto a key, then pick a watchface, colors and time zone in its settings.
+2. Put a Countdown key next to your clocks and set the duration.
+3. Press Countdown. Your clocks count down, and at zero they count the overtime (+00:12).
 
-Time zones: every key can show the system time, an IANA time zone or a fixed UTC offset (-12:00 to +14:00 in 15-minute steps). Add a short label such as NYC to tell world clocks apart.
-
-Countdown: the Countdown action starts a preset duration of up to 99:59 on all clocks of the same Stream Deck that have "Show countdown" enabled. Countdown + and − set the duration in steps of minutes or seconds, and add or take time while it runs. At zero the clock counts overtime (+MM:SS), holds at 00:00 or goes back to the time. An optional warning pulse marks the last 10 seconds.
-
-Details: rolling digits, ring reset, blinking colon and afterglow (each can be switched off), five date formats, 12 or 24 hour display with PM indicator, Stream Deck+ touch display support. Updating from version 1 keeps your keys and settings.
+Features
+- Five watchfaces: Classic with 60 second dots, Modern Minimal, Line, Comet and Big. Large digits you can read from across the room.
+- Colors: ring, time, inactive dots and background, each in any color.
+- Time zones: system time, any time zone or a fixed UTC offset, with a short label like NYC for world clocks.
+- Countdown end: count overtime, hold at 00:00 or go back to the time. Optional warning pulse in the last 10 seconds.
+- Rolling digits and smooth rings (can be switched off), 12 or 24 hours, five date formats.
+- Updating from version 1 keeps your keys and settings.
 
 ## Long description (DE)
 
@@ -52,10 +60,11 @@ clock, time zone, countdown, broadcast, studio
 
 1. `marketing/gallery-1-hero.png`: hero, the claim with clocks in several colors (also the thumbnail)
 2. `marketing/store-video.mp4`: 29.5 s video, faces, countdown, world clocks, colors (1920 x 1080)
-3. `marketing/gallery-2-faces.png`: the five watchfaces
-4. `marketing/gallery-5-colors.png`: ring and time in separate colors
-5. `marketing/gallery-3-timezones.png`: world clocks with time zones and labels
-6. `marketing/gallery-4-countdown.png`: countdown on the clock
+3. `marketing/gallery-6-actions.png`: the four actions with their default keys
+4. `marketing/gallery-2-faces.png`: the five watchfaces
+5. `marketing/gallery-4-countdown.png`: countdown on the clock
+6. `marketing/gallery-5-colors.png`: ring and time in separate colors
+7. `marketing/gallery-3-timezones.png`: world clocks with time zones and labels
 
 Icon: `marketing/marketplace-icon.png`
 
@@ -89,9 +98,9 @@ Requires Stream Deck 7.1 or newer on macOS 12+ or Windows 10+. On first start, S
 Checked against docs.elgato.com/guidelines/products and /guidelines/submissions (2026-11-12).
 
 - Name: "On Air Clock" (English, under 30 characters, no "Plugin", no Maker name).
-- Description: the EN long description above, 250 to 1,500 characters (currently about 1,460), the first 250 characters plain text and including the requirements.
+- Description: the EN long description above, 250 to 1,500 characters (currently 1,404), the first 250 characters plain text and including the requirements.
 - Thumbnail: static PNG 1920 x 960 with English text: `marketing/gallery-1-hero.png`.
 - App icon: PNG 288 x 288: `marketing/marketplace-icon.png`.
-- Gallery (3 to 10 items, PNG 1920 x 960, video MP4 1920 x 1080 under 250 MB), in this order: hero, `marketing/store-video.mp4`, faces, colors (`gallery-5-colors.png`), time zones, countdown.
+- Gallery (3 to 10 items, PNG 1920 x 960, video MP4 1920 x 1080 under 250 MB), in the order of "Gallery images" above.
 - Release notes: the section "Release notes 2.0.0" above.
 - AI use must be declared: the plugin code, texts and generated artwork were created with AI assistance (Claude) and reviewed by the maintainer.
