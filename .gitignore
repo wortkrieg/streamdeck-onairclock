@@ -13,6 +13,9 @@ dist/
 
 # V2 build output
 build/
+# downloaded third-party media (Elgato press kit photo for assets:device) and what is built from it
+.cache/
+marketing/gallery-device*.png
 *.sdPlugin/bin
 *.sdPlugin/logs
 

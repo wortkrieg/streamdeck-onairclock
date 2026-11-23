@@ -15,7 +15,8 @@
 		"assets": "tsx scripts/build-assets.ts",
 		"assets:light": "tsx scripts/build-light-media.ts",
 		"assets:collect": "sh scripts/collect-uploads.sh",
-		"assets:video": "tsx scripts/build-assets.ts --video"
+		"assets:video": "tsx scripts/build-assets.ts --video",
+		"assets:device": "tsx scripts/build-device-media.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.6.6",

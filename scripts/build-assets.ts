@@ -40,7 +40,7 @@ const gifenc = createRequire(import.meta.url)(
 	"gifenc",
 ) as typeof import("gifenc");
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BRAND_DIR = join(ROOT, "assets/brand");
 /**
  * Only these fonts are loaded (no system fonts), so the output is the same everywhere.
@@ -77,16 +77,16 @@ export const BRAND = {
 } as const;
 
 /** Paper at ~78 % on ultramarine, for supporting text. */
-const PAPER_SOFT = "#C9CEFF";
+export const PAPER_SOFT = "#C9CEFF";
 const SHADOW = "#0A1066";
-const TEXT = "Barlow";
+export const TEXT = "Barlow";
 /** Condensed grotesk for signage, tally and lower-third lettering (always uppercase). */
-const COND = "Barlow Condensed";
+export const COND = "Barlow Condensed";
 const MONO = "IBM Plex Mono";
 /** On-air tally red, a touch warmer than the clock red so the lamp reads as light. */
 const TALLY = "#FF3B2F";
 /** Cap heights in em, measured from the bundled fonts. */
-const TEXT_CAP = 0.7;
+export const TEXT_CAP = 0.7;
 
 // ---------- time ----------
 
@@ -121,9 +121,9 @@ interface CountdownKey {
 	elapsedMs: number;
 	durationSec?: number;
 }
-type KeySpec = ClockKey | CountdownKey;
+export type KeySpec = ClockKey | CountdownKey;
 
-const clockKey = (
+export const clockKey = (
 	face: FaceId,
 	color: string,
 	extra: Partial<Omit<ClockKey, "kind" | "face" | "color">> = {},
@@ -153,7 +153,7 @@ function clockConfig(k: ClockKey): ClockConfig {
 }
 
 /** The 144x144 key SVG exactly as the plugin would draw it at `nowMs`. */
-function keySvg(k: KeySpec, nowMs = STILL_MS): string {
+export function keySvg(k: KeySpec, nowMs = STILL_MS): string {
 	if (k.kind === "countdown") {
 		const durationSec = k.durationSec ?? COUNTDOWN_DEFAULTS.durationSec;
 		const c: Countdown = {
@@ -268,7 +268,7 @@ function esc(s: string): string {
 		.replace(/"/g, "&quot;");
 }
 
-interface TextOptions {
+export interface TextOptions {
 	family: string;
 	weight: number;
 	size: number;
@@ -278,7 +278,7 @@ interface TextOptions {
 	tracking?: number;
 }
 
-function text(s: string, x: number, y: number, o: TextOptions): string {
+export function text(s: string, x: number, y: number, o: TextOptions): string {
 	const ls = o.tracking ? ` letter-spacing="${n2(o.tracking * o.size)}"` : "";
 	const anchor =
 		o.anchor && o.anchor !== "start" ? ` text-anchor="${o.anchor}"` : "";
@@ -286,7 +286,7 @@ function text(s: string, x: number, y: number, o: TextOptions): string {
 }
 
 /** Give a face SVG's ids a prefix so several keys can share one document. */
-function scopeIds(svg: string, prefix: string): string {
+export function scopeIds(svg: string, prefix: string): string {
 	return svg
 		.replace(/id="([^"]+)"/g, `id="${prefix}-$1"`)
 		.replace(/url\(#([^)]+)\)/g, `url(#${prefix}-$1)`);
@@ -323,7 +323,7 @@ function keyAt(
 	return `${lift}<clipPath id="${id}-clip"><rect ${box} rx="${rx}"/></clipPath><rect ${box} rx="${rx}" fill="${BRAND.black}"/><g clip-path="url(#${id}-clip)">${inner}</g>`;
 }
 
-function page(
+export function page(
 	w: number,
 	h: number,
 	body: string,
@@ -352,7 +352,7 @@ function resvg(svg: string, width?: number, zoom = 1): Resvg {
 	});
 }
 
-function png(svg: string, width?: number, zoom = 1): Buffer {
+export function png(svg: string, width?: number, zoom = 1): Buffer {
 	return resvg(svg, width, zoom).render().asPng();
 }
 
@@ -434,7 +434,7 @@ interface HeroLayout {
 	keys: readonly KeySpec[];
 }
 
-const CLAIM = "Studio clocks in any color, on any key.";
+export const CLAIM = "Studio clocks in any color, on any key.";
 
 /** Ink width of one text line as resvg sets it (for layout and fitting). */
 function textWidth(s: string, o: TextOptions): number {
@@ -485,7 +485,7 @@ function heroGrid(l: HeroLayout, nowMs: number): HeroGrid {
 }
 
 /** Ring/time swatches along `y` (centre line), from `x`. */
-function pairSwatches(x: number, y: number, d: number): string {
+export function pairSwatches(x: number, y: number, d: number): string {
 	const step = d * 1.75;
 	return PAIRS.map(([ring, time], i) => {
 		const cx = n2(x + d / 2 + i * step);
@@ -712,7 +712,7 @@ function hero(l: HeroLayout, nowMs = STILL_MS): string {
 	return HERO_VARIANTS[HERO_CHOICE](l, nowMs);
 }
 
-interface RowLayout {
+export interface RowLayout {
 	heading: string;
 	support: string;
 	keys: readonly KeySpec[];
@@ -722,9 +722,9 @@ interface RowLayout {
 	arrows?: boolean;
 }
 
-const G_W = 1920;
-const G_H = 960;
-const G_MARGIN = 120;
+export const G_W = 1920;
+export const G_H = 960;
+export const G_MARGIN = 120;
 const G_HEAD = 80;
 const G_SUPPORT = 40;
 const G_CAPTION = 34;
@@ -798,7 +798,7 @@ function rowPage(l: RowLayout, svgs: readonly string[], h: number): string {
 	return page(G_W, h, body, shadowFilter(l.key));
 }
 
-const FACES_ROW: RowLayout = {
+export const FACES_ROW: RowLayout = {
 	heading: "Five watchfaces",
 	support: "Pick one per key, in any color.",
 	keys: [
@@ -812,7 +812,7 @@ const FACES_ROW: RowLayout = {
 	key: 304,
 };
 
-const ZONES_ROW: RowLayout = {
+export const ZONES_ROW: RowLayout = {
 	heading: "World clocks with time zones",
 	support: "Any IANA zone or a fixed UTC offset.",
 	keys: [
@@ -859,7 +859,7 @@ const COUNTDOWN_ROW: RowLayout = {
 	arrows: true,
 };
 
-const COLORS_ROW: RowLayout = {
+export const COLORS_ROW: RowLayout = {
 	heading: "Unlimited color combinations",
 	support: "Ring, time, dots and background, each in any color.",
 	keys: [
@@ -909,6 +909,67 @@ function actionsRow(): string {
 		],
 		G_H,
 	);
+}
+
+/** A crop of a Stream Deck app screenshot (assets/screenshots) as a data URI. */
+function screenshot(name: string): string {
+	const png = readFileSync(join(ROOT, "assets/screenshots", name));
+	return `data:image/png;base64,${png.toString("base64")}`;
+}
+
+/** A screenshot crop with rounded corners, lifted off the background like the keys. */
+function panel(
+	id: string,
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	href: string,
+): string {
+	const box = `x="${n2(x)}" y="${n2(y)}" width="${n2(w)}" height="${n2(h)}"`;
+	return `<rect x="${n2(x)}" y="${n2(y + 14)}" width="${n2(w)}" height="${n2(h)}" rx="18" fill="${SHADOW}" opacity=".45" filter="url(#key-shadow)"/><clipPath id="${id}"><rect ${box} rx="18"/></clipPath><image ${box} href="${href}" clip-path="url(#${id})" preserveAspectRatio="none"/>`;
+}
+
+/** The real settings in the Stream Deck app: the key grid and the selected clock's settings. */
+function settingsPage(): string {
+	const headBase = G_MARGIN + G_HEAD * 1.1 * TEXT_CAP;
+	const supportBase = headBase + 72;
+	let body = text("SETTINGS PER KEY", G_MARGIN - G_HEAD * 0.01, headBase, {
+		family: COND,
+		weight: 800,
+		size: G_HEAD * 1.1,
+		fill: BRAND.paper,
+		tracking: 0.03,
+	});
+	body += text(
+		"Face, colors, time zone and label in the Stream Deck app.",
+		G_MARGIN - G_SUPPORT * 0.047,
+		supportBase,
+		{ family: TEXT, weight: 500, size: G_SUPPORT, fill: PAPER_SOFT },
+	);
+	// Crops at 2x (1030 x 852 and 850 x 512 px), scaled to fit under the heading.
+	const top = supportBase + 56;
+	const sw = 1030 * 0.66;
+	const sh = 852 * 0.66;
+	const kw = 850 * 0.9;
+	const kh = 512 * 0.9;
+	body += panel(
+		"keys",
+		G_MARGIN,
+		top + (sh - kh) / 2,
+		kw,
+		kh,
+		screenshot("app-keys.png"),
+	);
+	body += panel(
+		"settings",
+		G_W - G_MARGIN - sw,
+		top,
+		sw,
+		sh,
+		screenshot("app-settings.png"),
+	);
+	return page(G_W, G_H, body, shadowFilter(120));
 }
 
 // ---------- animations (GIFs and video) ----------
@@ -1602,6 +1663,7 @@ export async function buildAssets(outRoot: string): Promise<string[]> {
 	writePng("marketing/gallery-4-countdown.png", row(COUNTDOWN_ROW));
 	writePng("marketing/gallery-5-colors.png", row(COLORS_ROW));
 	writePng("marketing/gallery-6-actions.png", actionsRow());
+	writePng("marketing/gallery-7-settings.png", settingsPage());
 	const social: HeroLayout = {
 		w: 1280,
 		h: 640,

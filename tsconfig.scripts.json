@@ -3,6 +3,8 @@
 	"include": [
 		"scripts/build-assets.ts",
 		"scripts/build-light-media.ts",
+		"scripts/build-device-media.ts",
+		"scripts/build-device-media.test.ts",
 		"scripts/build-assets.test.ts",
 		"scripts/gifenc.d.ts"
 	]

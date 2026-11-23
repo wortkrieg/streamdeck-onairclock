@@ -24,6 +24,7 @@ npm run build:dev     # dev variant into build/
 npx streamdeck link build/fail.marc.onairclock.dev.sdPlugin
 npx streamdeck restart fail.marc.onairclock.dev
 npm run assets        # regenerate icons, key images, gallery, GIFs
+npm run assets:device # Marketplace device image (downloads Elgato's MK.2 photo into .cache/, needs ffmpeg)
 ```
 
 Run test, typecheck, lint, build and validate before every commit.

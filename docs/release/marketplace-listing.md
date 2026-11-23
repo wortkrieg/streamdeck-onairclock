@@ -58,13 +58,14 @@ clock, time zone, countdown, broadcast, studio
 
 ## Gallery images
 
-1. `marketing/gallery-1-hero.png`: hero, the claim with clocks in several colors (also the thumbnail)
+1. `marketing/gallery-device.png`: a Stream Deck MK.2 with 15 clock and countdown keys, name and claim (also the thumbnail). Built by `npm run assets:device` from Elgato's press kit photo, not in git.
 2. `marketing/store-video.mp4`: 29.5 s video, faces, countdown, world clocks, colors (1920 x 1080)
 3. `marketing/gallery-6-actions.png`: the four actions with their default keys
-4. `marketing/gallery-2-faces.png`: the five watchfaces
-5. `marketing/gallery-4-countdown.png`: countdown on the clock
-6. `marketing/gallery-5-colors.png`: ring and time in separate colors
-7. `marketing/gallery-3-timezones.png`: world clocks with time zones and labels
+4. `marketing/gallery-7-settings.png`: the Stream Deck app with a clock's settings (crops in `assets/screenshots/`)
+5. `marketing/gallery-2-faces.png`: the five watchfaces
+6. `marketing/gallery-4-countdown.png`: countdown on the clock
+7. `marketing/gallery-5-colors.png`: ring and time in separate colors
+8. `marketing/gallery-3-timezones.png`: world clocks with time zones and labels
 
 Icon: `marketing/marketplace-icon.png`
 

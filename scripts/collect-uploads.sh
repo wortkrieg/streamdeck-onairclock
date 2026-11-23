@@ -1,6 +1,6 @@
 #!/bin/sh
 # Collects every marketing asset into marketing/upload/ (untracked) for manual uploads.
-# Run after `npm run assets` (and `npm run assets:video`); PNGs come with an @2x rendering.
+# Run after `npm run assets`, `npm run assets:video` and `npm run assets:device`; PNGs come with an @2x rendering.
 set -eu
 cd "$(dirname "$0")/.."
 U=marketing/upload
@@ -14,16 +14,17 @@ pair() { # pair <source.png> <target.png>: copies the PNG and its @2x rendering
 	cp "${1%.png}@2x.png" "${2%.png}@2x.png"
 }
 
-# Elgato Marketplace
-pair marketing/gallery-1-hero.png "$E/thumbnail.png"
+# Elgato Marketplace (the device image comes from npm run assets:device)
+pair marketing/gallery-device.png "$E/thumbnail.png"
 pair marketing/marketplace-icon.png "$E/app-icon.png"
-pair marketing/gallery-1-hero.png "$E/gallery/01-hero.png"
+pair marketing/gallery-device.png "$E/gallery/01-device.png"
 cp marketing/store-video.mp4 "$E/gallery/02-video-1920x1080.mp4"
 pair marketing/gallery-6-actions.png "$E/gallery/03-actions.png"
-pair marketing/gallery-2-faces.png "$E/gallery/04-faces.png"
-pair marketing/gallery-4-countdown.png "$E/gallery/05-countdown.png"
-pair marketing/gallery-5-colors.png "$E/gallery/06-colors.png"
-pair marketing/gallery-3-timezones.png "$E/gallery/07-timezones.png"
+pair marketing/gallery-7-settings.png "$E/gallery/04-settings.png"
+pair marketing/gallery-2-faces.png "$E/gallery/05-faces.png"
+pair marketing/gallery-4-countdown.png "$E/gallery/06-countdown.png"
+pair marketing/gallery-5-colors.png "$E/gallery/07-colors.png"
+pair marketing/gallery-3-timezones.png "$E/gallery/08-timezones.png"
 cp docs/release/marketplace-listing.md "$E/listing.md"
 
 # GitHub
@@ -75,7 +76,7 @@ writeFileSync(`${E}/submission-notes.txt`, [
 	`- Description: description-en.txt (${long.length} characters, limit 250 to 1500, first 250 plain text incl. requirements)`,
 	"- Thumbnail: thumbnail.png (1920 x 960; thumbnail@2x.png is 3840 x 1920 if the console takes it)",
 	"- App icon: app-icon.png (288 x 288; app-icon@2x.png is 576 x 576)",
-	"- Gallery in this order: gallery/01 ... 07 (PNG 1920 x 960 or the @2x files, video MP4 1920 x 1080 under 250 MB; 3 to 10 items)",
+	"- Gallery in this order: gallery/01 ... 08 (PNG 1920 x 960 or the @2x files, video MP4 1920 x 1080 under 250 MB; 3 to 10 items)",
 	"- Release notes: release-notes.txt",
 	"- AI use must be declared: plugin code, texts and generated artwork were created with AI assistance (Claude) and reviewed by the maintainer.",
 	"",
@@ -88,7 +89,7 @@ On Air Clock V2: assets for manual uploads (generated from branch v2, not in git
 Every PNG comes twice: name.png at the platform's size and name@2x.png rendered
 at double resolution from the same vector source (sharper on high-density screens).
 
-elgato-marketplace/   thumbnail, app icon, gallery 01-07 (02 is the video), texts to paste,
+elgato-marketplace/   thumbnail, app icon, gallery 01-08 (02 is the video), texts to paste,
                       submission notes (incl. the AI declaration), full listing.md
 github/               social preview (Settings > Social preview), readme/ images, repo-settings.md
 social/               GIFs, store video and social preview for posts
@@ -97,6 +98,6 @@ brand/                hero variants A/B/C (A chosen), icon variants A/B/C (B cho
 marc-fail/            blog post draft, product page, NOTES.md, media/ and faces/ (handed to
                       the marc.fail session)
 
-Regenerate: npm run assets && npm run assets:video && npm run assets:light && npm run assets:collect
+Regenerate: npm run assets && npm run assets:video && npm run assets:device && npm run assets:light && npm run assets:collect
 TXT
 echo "collected $(find "$U" -type f | wc -l | tr -d ' ') files into $U"
